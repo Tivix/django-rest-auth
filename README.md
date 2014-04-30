@@ -73,9 +73,12 @@ API endpoints with Authentication
 1. /rest\_accounts/logout/ - GET
 
 2. /rest\_accounts/user/ - GET & POST
-    - user as dictionary with id, email, first\_name, last\_name
+
+    - POST parameters
+
+    user as dictionary with id, email, first\_name, last\_name
             "user": {"id": 1, "first_name": "Person", "last_name": "2"}
-    - user-defined UserProfile model fields
+    user-defined UserProfile model fields
 
 3. /rest\_accounts/password/change/ - POST
     - new\_password1
