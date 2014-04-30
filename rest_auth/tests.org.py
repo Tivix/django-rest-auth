@@ -11,13 +11,16 @@ from registration.models import RegistrationProfile
 
 
 # Get the UserProfile model from the setting value
-user_profile_model = _resolve_model(getattr(settings, 'REST_PROFILE_MODULE', None))
+user_profile_model = _resolve_model(
+    getattr(settings, 'REST_PROFILE_MODULE', None))
 
 # Get the REST Registration Backend for django-registration
-registration_backend = getattr(settings, 'REST_REGISTRATION_BACKEND', 'rest_auth.backends.rest_registration.RESTRegistrationView')
+registration_backend = getattr(settings, 'REST_REGISTRATION_BACKEND',
+                               'rest_auth.backends.rest_registration.RESTRegistrationView')
 
 
 class RegistrationAndActivationTestCase(TestCase):
+
     """
     Unit Test for registering and activating a new user
 
@@ -30,7 +33,8 @@ class RegistrationAndActivationTestCase(TestCase):
 
     def test_successful_registration(self):
         print 'Registering a new user'
-        payload = {"username": "person", "password": "person", "email": "person@world.com", "newsletter_subscribe": "false"}
+        payload = {"username": "person", "password": "person",
+                   "email": "person@world.com", "newsletter_subscribe": "false"}
 
         print 'The request will attempt to register:'
         print 'Django User object'
@@ -39,7 +43,8 @@ class RegistrationAndActivationTestCase(TestCase):
         print 'newsletter_subscribe: false'
         print 'Sending a POST request to register API'
 
-        r = requests.post(self.url, data=json.dumps(payload), headers=self.headers)
+        r = requests.post(self.url, data=json.dumps(payload),
+                          headers=self.headers)
 
         if self.assertEqual(r.status_code, 201):
             print r.content
@@ -47,10 +52,12 @@ class RegistrationAndActivationTestCase(TestCase):
             print 'Activating a new user'
 
             # Get the latest activation key from RegistrationProfile model
-            activation_key = RegistrationProfile.objects.latest('id').activation_key
+            activation_key = RegistrationProfile.objects.latest(
+                'id').activation_key
 
             # Set the url and GET the request to verify and activate a new user
-            url = "http://localhost:8000/rest_auth/verify-email/" + activation_key + "/"
+            url = "http://localhost:8000/rest_auth/verify-email/" + \
+                activation_key + "/"
             r = requests.get(url)
 
             print "Sending a GET request to activate the user from verify-email API"
@@ -69,7 +76,8 @@ class RegistrationAndActivationTestCase(TestCase):
 
     def test_successful_registration_without_userprofile_model(self):
         print 'Registering a new user'
-        payload = {"username": "person1", "password": "person1", "email": "person1@world.com"}
+        payload = {"username": "person1", "password":
+                   "person1", "email": "person1@world.com"}
 
         print 'The request will attempt to register:'
         print 'Django User object'
@@ -77,7 +85,8 @@ class RegistrationAndActivationTestCase(TestCase):
         print 'No Django UserProfile object'
         print 'Sending a POST request to register API'
 
-        r = requests.post(self.url, data=json.dumps(payload), headers=self.headers)
+        r = requests.post(self.url, data=json.dumps(payload),
+                          headers=self.headers)
 
         if self.assertEqual(r.status_code, 201):
             print r.content
@@ -85,10 +94,12 @@ class RegistrationAndActivationTestCase(TestCase):
             print 'Activating a new user'
 
             # Get the latest activation key from RegistrationProfile model
-            activation_key = RegistrationProfile.objects.latest('id').activation_key
+            activation_key = RegistrationProfile.objects.latest(
+                'id').activation_key
 
             # Set the url and GET the request to verify and activate a new user
-            url = "http://localhost:8000/rest_auth/verify-email/" + activation_key + "/"
+            url = "http://localhost:8000/rest_auth/verify-email/" + \
+                activation_key + "/"
             r = requests.get(url)
 
             print "Sending a GET request to activate the user from verify-email API"
@@ -112,13 +123,15 @@ class RegistrationAndActivationTestCase(TestCase):
         print 'The request will attempt to register with no data provided.'
         print 'Sending a POST request to register API'
 
-        r = requests.post(self.url, data=json.dumps(payload), headers=self.headers)
+        r = requests.post(self.url, data=json.dumps(payload),
+                          headers=self.headers)
 
         if self.assertEqual(r.status_code, 400):
             print r.content
 
 
 class LoginTestCase(TestCase):
+
     """
     Unit Test for logging in
 
@@ -137,7 +150,8 @@ class LoginTestCase(TestCase):
         print 'Username: %s\nPassword: %s' % ('person', 'person')
         print 'Sending a POST request to login API'
 
-        r = requests.post(self.url, data=json.dumps(payload), headers=self.headers)
+        r = requests.post(self.url, data=json.dumps(payload),
+                          headers=self.headers)
 
         if self.assertEqual(r.status_code, 200):
             print r.content
@@ -152,7 +166,8 @@ class LoginTestCase(TestCase):
         print 'Username: %s\nPassword: %s' % ('person', 'person32')
         print 'Sending a POST request to login API'
 
-        r = requests.post(self.url, data=json.dumps(payload), headers=self.headers)
+        r = requests.post(self.url, data=json.dumps(payload),
+                          headers=self.headers)
 
         if self.assertEqual(r.status_code, 401):
             print r.content
@@ -164,13 +179,15 @@ class LoginTestCase(TestCase):
         print 'The request will attempt to login with no data provided.'
         print 'Sending a POST request to login API'
 
-        r = requests.post(self.url, data=json.dumps(payload), headers=self.headers)
+        r = requests.post(self.url, data=json.dumps(payload),
+                          headers=self.headers)
 
         if self.assertEqual(r.status_code, 400):
             print r.content
 
 
 class PasswordChangeCase(TestCase):
+
     """
     Unit Test for changing the password while logged in
 
@@ -188,7 +205,8 @@ class PasswordChangeCase(TestCase):
 
         print 'Sending a POST request to login API'
 
-        r = requests.post(login_url, data=json.dumps(payload), headers=self.headers)
+        r = requests.post(login_url, data=json.dumps(payload),
+                          headers=self.headers)
 
         if self.assertEqual(r.status_code, 200):
             print r.content
@@ -198,18 +216,22 @@ class PasswordChangeCase(TestCase):
             self.token = r.json()['key']
             self.headers['authorization'] = "Token " + r.json()['key']
 
-            payload = {"new_password1": "new_person", "new_password2": "new_person"}
+            payload = {"new_password1": "new_person",
+                       "new_password2": "new_person"}
             print 'Sending a POST request to password change API'
 
-            r = requests.post(self.url, data=json.dumps(payload), headers=self.headers)
+            r = requests.post(self.url, data=json.dumps(payload),
+                              headers=self.headers)
 
             if self.assertEqual(r.status_code, 200):
                 print r.content
 
-                payload = {"new_password1": "person", "new_password2": "person"}
+                payload = {"new_password1": "person",
+                           "new_password2": "person"}
                 print 'Sending a POST request to password change API'
 
-                r = requests.post(self.url, data=json.dumps(payload), headers=self.headers)
+                r = requests.post(
+                    self.url, data=json.dumps(payload), headers=self.headers)
 
                 if self.assertEqual(r.status_code, 200):
                     print r.content
@@ -221,7 +243,8 @@ class PasswordChangeCase(TestCase):
 
         print 'Sending a POST request to login API'
 
-        r = requests.post(login_url, data=json.dumps(payload), headers=self.headers)
+        r = requests.post(login_url, data=json.dumps(payload),
+                          headers=self.headers)
 
         if self.assertEqual(r.status_code, 200):
             print r.content
@@ -231,10 +254,12 @@ class PasswordChangeCase(TestCase):
             self.token = r.json()['key']
             self.headers['authorization'] = "Token " + r.json()['key']
 
-            payload = {"new_password1": "new_person", "new_password2": "wrong_person"}
+            payload = {"new_password1": "new_person",
+                       "new_password2": "wrong_person"}
             print 'Sending a POST request to password change API'
 
-            r = requests.post(self.url, data=json.dumps(payload), headers=self.headers)
+            r = requests.post(self.url, data=json.dumps(payload),
+                              headers=self.headers)
 
             if self.assertEqual(r.status_code, 400):
                 print r.content
@@ -246,7 +271,8 @@ class PasswordChangeCase(TestCase):
 
         print 'Sending a POST request to login API'
 
-        r = requests.post(login_url, data=json.dumps(payload), headers=self.headers)
+        r = requests.post(login_url, data=json.dumps(payload),
+                          headers=self.headers)
 
         if self.assertEqual(r.status_code, 200):
             print r.content
@@ -261,7 +287,8 @@ class PasswordChangeCase(TestCase):
             print 'The request will attempt to login with no data provided.'
             print 'Sending a POST request to password change API'
 
-            r = requests.post(self.url, data=json.dumps(payload), headers=self.headers)
+            r = requests.post(self.url, data=json.dumps(payload),
+                              headers=self.headers)
 
             if self.assertEqual(r.status_code, 400):
                 print r.content

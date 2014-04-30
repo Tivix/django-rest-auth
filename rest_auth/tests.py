@@ -11,6 +11,7 @@ from django.contrib.auth.models import User
 
 
 class APIClient(Client):
+
     def patch(self, path, data='', content_type=MULTIPART_CONTENT, follow=False, **extra):
         return self.generic('PATCH', path, data, content_type, **extra)
 
@@ -19,6 +20,7 @@ class APIClient(Client):
 
 
 class CustomJSONEncoder(json.JSONEncoder):
+
     """
     Convert datetime/date objects into isoformat
     """
@@ -31,13 +33,15 @@ class CustomJSONEncoder(json.JSONEncoder):
 
 
 class BaseAPITestCase(object):
+
     """
     base for API tests:
         * easy request calls, f.e.: self.post(url, data), self.get(url)
         * easy status check, f.e.: self.post(url, data, status_code=200)
     """
 
-    img = os.path.join(settings.STATICFILES_DIRS[0][1], 'images/no_profile_photo.png')
+    img = os.path.join(
+        settings.STATICFILES_DIRS[0][1], 'images/no_profile_photo.png')
 
     def send_request(self, request_method, *args, **kwargs):
         request_func = getattr(self.client, request_method)
@@ -55,10 +59,12 @@ class BaseAPITestCase(object):
             kwargs['HTTP_AUTHORIZATION'] = 'Token %s' % self.token
 
         if hasattr(self, 'company_token'):
-            kwargs['HTTP_AUTHORIZATION'] = 'Company-Token %s' % self.company_token
+            kwargs[
+                'HTTP_AUTHORIZATION'] = 'Company-Token %s' % self.company_token
 
         self.response = request_func(*args, **kwargs)
-        is_json = bool(filter(lambda x: 'json' in x, self.response._headers['content-type']))
+        is_json = bool(
+            filter(lambda x: 'json' in x, self.response._headers['content-type']))
         if is_json and self.response.content:
             self.response.json = json.loads(self.response.content)
         else:
@@ -95,7 +101,8 @@ class BaseAPITestCase(object):
             content_type = kwargs.pop('content_type')
         response = self.send_request('get', *args, **kwargs)
         if content_type:
-            self.assertEqual(bool(filter(lambda x: content_type in x, response._headers['content-type'])), True)
+            self.assertEqual(
+                bool(filter(lambda x: content_type in x, response._headers['content-type'])), True)
         return response
 
     def init(self):
@@ -103,12 +110,11 @@ class BaseAPITestCase(object):
         self.client = APIClient()
 
 
-
 # -----------------------
 #  T E S T   H E R E
 # -----------------------
-
 class LoginAPITestCase(TestCase, BaseAPITestCase):
+
     """
     just run: python manage.py test rest_auth
     """
@@ -137,7 +143,6 @@ class LoginAPITestCase(TestCase, BaseAPITestCase):
         self.post(self.login_url, data=payload, status_code=200)
         self.assertEqual('key' in self.response.json.keys(), True)
 
-
         self.token = self.response.json['key']
         # TODO:
         # now all urls that required token should be available
@@ -145,4 +150,5 @@ class LoginAPITestCase(TestCase, BaseAPITestCase):
 
 
         # TODO:
-        # another case to test - make user inactive and test if login is impossible
+        # another case to test - make user inactive and test if login is
+        # impossible

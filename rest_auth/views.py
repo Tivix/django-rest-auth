@@ -230,8 +230,9 @@ class PasswordReset(LoggedOutRESTAPIView, GenericAPIView):
                 reset_form.save(**opts)
 
                 # Return the success message with OK HTTP status
-                return Response({"success": "Password reset e-mail has been sent."},
-                                status=status.HTTP_200_OK)
+                return Response(
+                    {"success": "Password reset e-mail has been sent."},
+                    status=status.HTTP_200_OK)
 
             else:
                 return Response(reset_form._errors,
@@ -241,7 +242,9 @@ class PasswordReset(LoggedOutRESTAPIView, GenericAPIView):
             return Response(serializer.errors,
                             status=status.HTTP_400_BAD_REQUEST)
 
+
 class PasswordResetConfirm(LoggedOutRESTAPIView, GenericAPIView):
+
     """
     Password reset e-mail link is confirmed, therefore this resets the user's password.
 
@@ -276,10 +279,13 @@ class PasswordResetConfirm(LoggedOutRESTAPIView, GenericAPIView):
                         form.save()
 
                         # Return the success message with OK HTTP status
-                        return Response({"success": "Password has been reset with the new password."},
+                        return Response(
+                            {"success":
+                                "Password has been reset with the new password."},
                             status=status.HTTP_200_OK)
                     else:
-                        return Response({"error": "Invalid password reset token."},
+                        return Response(
+                            {"error": "Invalid password reset token."},
                             status=status.HTTP_400_BAD_REQUEST)
                 else:
                     return Response(form._errors, status=status.HTTP_400_BAD_REQUEST)
@@ -293,6 +299,7 @@ class PasswordResetConfirm(LoggedOutRESTAPIView, GenericAPIView):
 
 
 class VerifyEmail(LoggedOutRESTAPIView, GenericAPIView):
+
     """
     Verifies the email of the user through their activation_key.
 

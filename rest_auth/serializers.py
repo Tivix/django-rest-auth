@@ -12,6 +12,7 @@ class LoginSerializer(serializers.Serializer):
 
 
 class TokenSerializer(serializers.ModelSerializer):
+
     """
     Serializer for Token model.
     """
@@ -22,6 +23,7 @@ class TokenSerializer(serializers.ModelSerializer):
 
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
+
     """
     Serializer for Django User model and most of its fields.
     """
@@ -32,16 +34,18 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
 
 
 class UserRegistrationProfileSerializer(serializers.ModelSerializer):
+
     """
     Serializer that includes all profile fields except for user fk / id.
     """
     class Meta:
         model = _resolve_model(getattr(settings, 'REST_PROFILE_MODULE', None))
         fields = filter(lambda x: x != 'id' and x != 'user',
-            map(lambda x: x.name, model._meta.fields))
+                        map(lambda x: x.name, model._meta.fields))
 
 
 class UserDetailsSerializer(serializers.ModelSerializer):
+
     """
     User model w/o password
     """
@@ -51,6 +55,7 @@ class UserDetailsSerializer(serializers.ModelSerializer):
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
+
     """
     Serializer for UserProfile model.
     """
@@ -63,6 +68,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
 
 class DynamicFieldsModelSerializer(serializers.ModelSerializer):
+
     """
     ModelSerializer that allows fields argument to control fields
     """
@@ -81,6 +87,7 @@ class DynamicFieldsModelSerializer(serializers.ModelSerializer):
 
 
 class UserUpdateSerializer(DynamicFieldsModelSerializer):
+
     """
     User model w/o username and password
     """
@@ -90,6 +97,7 @@ class UserUpdateSerializer(DynamicFieldsModelSerializer):
 
 
 class UserProfileUpdateSerializer(serializers.ModelSerializer):
+
     """
     Serializer for updating User and UserProfile model.
     """
@@ -102,6 +110,7 @@ class UserProfileUpdateSerializer(serializers.ModelSerializer):
 
 
 class SetPasswordSerializer(serializers.Serializer):
+
     """
     Serializer for changing Django User password.
     """
@@ -111,6 +120,7 @@ class SetPasswordSerializer(serializers.Serializer):
 
 
 class PasswordResetSerializer(serializers.Serializer):
+
     """
     Serializer for requesting a password reset e-mail.
     """
