@@ -19,8 +19,6 @@ Installation
     > django-registration>=1.0
     >
     > djangorestframework>=2.3.13
-    >
-    > django-rest-swagger>=0.1.14
 
 2. Install this package.
 

@@ -31,7 +31,6 @@ setup(
         'Django>=1.5.0',
         'django-registration>=1.0',
         'djangorestframework>=2.3.13',
-        'django-rest-swagger>=0.1.14',
     ],
     test_suite='rest_auth.tests',
     include_package_data=True,
