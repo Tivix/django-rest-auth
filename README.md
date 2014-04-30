@@ -1,5 +1,5 @@
 django-rest-auth
-=====
+================
 
 Since the introduction of django-rest-framework, Django apps have been able to serve up app-level REST API endpoints. As a result, we saw a lot of instances where developers implemented their own REST registration API endpoints here and there, snippets, and so on. We aim to solve this demand by providing django-rest-auth, a set of REST API endpoints to handle User Registration and Authentication tasks. By having these API endpoints, your client apps such as AngularJS, iOS, Android, and others can communicate to your Django backend site independently via REST APIs for User Management. Of course, we'll add more API endpoints as we see the demand.
 
@@ -12,7 +12,7 @@ Features
 5. Password reset via e-mail
 
 Installation
------------
+------------
 
 1. This project needs the following packages
 
@@ -68,7 +68,7 @@ API endpoints without Authentication
 5. /rest\_accounts/verify-email/{activation\_key}/ - GET
 
 API endpoints with Authentication
-------------------------------------
+---------------------------------
 
 1. /rest\_accounts/logout/ - GET
 
@@ -76,9 +76,11 @@ API endpoints with Authentication
 
     - POST parameters
 
-    user as dictionary with id, email, first\_name, last\_name
+        - user as dictionary
+        - user-defined UserProfile model fields
+
+    - user data example
             "user": {"id": 1, "first_name": "Person", "last_name": "2"}
-    user-defined UserProfile model fields
 
 3. /rest\_accounts/password/change/ - POST
     - new\_password1
