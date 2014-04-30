@@ -20,7 +20,7 @@ Installation
     >
     > djangorestframework>=2.3.13
 
-2. Install this package.
+2. Install this package
 
 3. Add rest_auth app to INSTALLED\_APPS in your django settings.py
 
@@ -29,7 +29,7 @@ Installation
             'rest_auth',
         )
 
-4. This project depends on django-rest-framework library, therefore the following REST_FRAMEWORK settings needs to be entered in your Django settings.py::
+4. This project depends on django-rest-framework library, therefore the following REST_FRAMEWORK settings needs to be entered in your Django settings.py
 
         REST_FRAMEWORK = {
                 'DEFAULT_AUTHENTICATION_CLASSES': (
@@ -41,7 +41,7 @@ Installation
             )
         }
 
-5. Lastly, this project accepts the following Django setting values. You can set the UserProfile model and/or create your own REST registration backend for django-registration.
+5. Lastly, this project accepts the following Django setting values. You can set the UserProfile model and/or create your own REST registration backend for django-registration
 
         REST_REGISTRATION_BACKEND = 'rest_auth.backends.rest_registration.RESTRegistrationView'
         REST_PROFILE_MODULE = 'accounts.UserProfile'
@@ -51,37 +51,41 @@ Installation
 API endpoints without Authentication
 ------------------------------------
 
-1. /rest\_accounts/register/ - POST
-    - username
-    - password
-    - email
-    - first\_name
-    - last\_name
-2. /rest\_accounts/password/reset/ - POST
-    - email
-3. /rest\_accounts/password/reset/confirm/{uidb64}/{token}/ - POST
-    - new\_password1
-    - new\_password2
-4. /rest\_accounts/login/ - POST
-    - username
-    - password
-5. /rest\_accounts/verify-email/{activation\_key}/ - GET
+1. /rest\_accounts/register/
+    - POST
+        - username
+        - password
+        - email
+        - first\_name
+        - last\_name
+2. /rest\_accounts/password/reset/
+    - POST
+        - email
+3. /rest\_accounts/password/reset/confirm/{uidb64}/{token}/
+    - POST
+        - new\_password1
+        - new\_password2
+4. /rest\_accounts/login/
+    - POST
+        - username
+        - password
+5. /rest\_accounts/verify-email/{activation\_key}/
+    - GET
 
 API endpoints with Authentication
 ---------------------------------
 
-1. /rest\_accounts/logout/ - GET
+1. /rest\_accounts/logout/
+    - GET
+2. /rest\_accounts/user/
+    - GET & POST
+        - POST parameters
+            - user as dictionary
+            - user-defined UserProfile model fields
+            - user data example
+                    "user": {"id": 1, "first_name": "Person", "last_name": "2"}
 
-2. /rest\_accounts/user/ - GET & POST
-
-    - POST parameters
-
-        - user as dictionary
-        - user-defined UserProfile model fields
-
-    - user data example
-            "user": {"id": 1, "first_name": "Person", "last_name": "2"}
-
-3. /rest\_accounts/password/change/ - POST
-    - new\_password1
-    - new\_password2
+3. /rest\_accounts/password/change/
+    - POST
+        - new\_password1
+        - new\_password2
