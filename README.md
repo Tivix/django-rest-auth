@@ -24,31 +24,27 @@ Installation
 
 3. Add rest_auth app to INSTALLED\_APPS in your django settings.py
 
-    > INSTALLED\_APPS = (
-    >
-    >     ...,
-    >
-    >     'rest_auth',
-    > )
+        INSTALLED_APPS = (
+            ...,
+            'rest_auth',
+        )
 
 4. This project depends on django-rest-framework library, therefore the following REST_FRAMEWORK settings needs to be entered in your Django settings.py::
 
-    > REST_FRAMEWORK = {
-    >
-    >     'DEFAULT_AUTHENTICATION_CLASSES': (
-    >        'rest_framework.authentication.SessionAuthentication',
-    >     ),
-    >
-    >     'DEFAULT_PERMISSION_CLASSES': (
-    >         'rest_framework.permissions.IsAuthenticated'
-    >     )
-    > }
+        REST_FRAMEWORK = {
+                'DEFAULT_AUTHENTICATION_CLASSES': (
+                'rest_framework.authentication.SessionAuthentication',
+            ),
+
+            'DEFAULT_PERMISSION_CLASSES': (
+                'rest_framework.permissions.IsAuthenticated'
+            )
+        }
 
 5. Lastly, this project accepts the following Django setting values. You can set the UserProfile model and/or create your own REST registration backend for django-registration.
 
-    > REST\_REGISTRATION\_BACKEND = 'rest\_auth.backends.rest\_registration.RESTRegistrationView'
-    >
-    > REST\_PROFILE\_MODULE = 'accounts.UserProfile'
+        REST_REGISTRATION_BACKEND = 'rest_auth.backends.rest_registration.RESTRegistrationView'
+        REST_PROFILE_MODULE = 'accounts.UserProfile'
 
 6. You're good to go now!
 
@@ -56,38 +52,20 @@ API endpoints without Authentication
 ------------------------------------
 
 1. /rest\_accounts/register/ - POST
-
-    Parameters
-
-    username, password, email, first\_name, last\_name
-
+    - username
+    - password
+    - email
+    - first\_name
+    - last\_name
 2. /rest\_accounts/password/reset/ - POST
-
-    Parameters
-
-    email
-
+    - email
 3. /rest\_accounts/password/reset/confirm/{uidb64}/{token}/ - POST
-
-    Django URL Keywords
-
-    uidb64, token
-
-    Parameters
-
-    new\_password1, new\_password2
-
+    - new\_password1
+    - new\_password2
 4. /rest\_accounts/login/ - POST
-
-    Parameters
-
-    username, password
-
+    - username
+    - password
 5. /rest\_accounts/verify-email/{activation\_key}/ - GET
-
-    Django URL Keywords
-
-    activation_key
 
 API endpoints with Authentication
 ------------------------------------
@@ -95,19 +73,10 @@ API endpoints with Authentication
 1. /rest\_accounts/logout/ - GET
 
 2. /rest\_accounts/user/ - GET & POST
-
-    GET Parameters
-
-    POST Parameters
-
-   user as dictionary with id, email, first\_name, last\_name
-
-   Ex) "user": {"id": 1, "first\_name": "Person", "last\_name": "2"}
-
-   user-defined UserProfile model fields
+    - user as dictionary with id, email, first\_name, last\_name
+            "user": {"id": 1, "first_name": "Person", "last_name": "2"}
+    - user-defined UserProfile model fields
 
 3. /rest\_accounts/password/change/ - POST
-
-    Parameters
-
-    new\_password1, new\_password2
+    - new\_password1
+    - new\_password2
