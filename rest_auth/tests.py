@@ -1,13 +1,16 @@
 import json
 import os
 from datetime import datetime, date, time
-from pprint import pprint
 
 from django.conf import settings
 from django.test.client import Client, MULTIPART_CONTENT
 from django.test import TestCase
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
+from registration.models import RegistrationProfile
+from django.contrib.auth import get_user_model
+
+from rest_framework.serializers import _resolve_model
 
 
 class APIClient(Client):
@@ -113,6 +116,10 @@ class BaseAPITestCase(object):
 # -----------------------
 #  T E S T   H E R E
 # -----------------------
+
+user_profile_model = _resolve_model(
+    getattr(settings, 'REST_PROFILE_MODULE', None))
+
 class LoginAPITestCase(TestCase, BaseAPITestCase):
 
     """
@@ -122,9 +129,12 @@ class LoginAPITestCase(TestCase, BaseAPITestCase):
     USERNAME = 'person'
     PASS = 'person'
 
+
     def setUp(self):
         self.init()
         self.login_url = reverse('rest_login')
+        self.password_change_url = reverse('rest_password_change')
+        self.register_url = reverse('rest_register')
 
     def test_login(self):
         payload = {
@@ -134,21 +144,117 @@ class LoginAPITestCase(TestCase, BaseAPITestCase):
         # there is no users in db so it should throw error (401)
         self.post(self.login_url, data=payload, status_code=401)
 
-        # you can easily print response
-        pprint(self.response.json)
+        self.post(self.password_change_url, status_code=403)
 
         # create user
         user = User.objects.create_user(self.USERNAME, '', self.PASS)
 
         self.post(self.login_url, data=payload, status_code=200)
         self.assertEqual('key' in self.response.json.keys(), True)
-
         self.token = self.response.json['key']
-        # TODO:
-        # now all urls that required token should be available
-        # would be perfect to test one of
+
+        self.post(self.password_change_url, status_code=400)
+
+        # test inactive user
+        user.is_active = False
+        user.save()
+        self.post(self.login_url, data=payload, status_code=401)
+
+        # test wrong username/password
+        payload = {
+            "username": self.USERNAME+'?',
+            "password": self.PASS
+        }
+        self.post(self.login_url, data=payload, status_code=401)
+
+        # test empty payload
+        self.post(self.login_url, data={}, status_code=400)
 
 
-        # TODO:
-        # another case to test - make user inactive and test if login is
-        # impossible
+    def test_password_change(self):
+        login_payload = {
+            "username": self.USERNAME,
+            "password": self.PASS
+        }
+        user = User.objects.create_user(self.USERNAME, '', self.PASS)
+        self.post(self.login_url, data=login_payload, status_code=200)
+        self.token = self.response.json['key']
+
+        new_password_payload = {
+            "new_password1": "new_person",
+            "new_password2": "new_person"
+        }
+        self.post(self.password_change_url, data=new_password_payload,
+            status_code=200)
+
+        # user should not be able to login using old password
+        self.post(self.login_url, data=login_payload, status_code=401)
+
+        # new password should work
+        login_payload['password'] = new_password_payload['new_password1']
+        self.post(self.login_url, data=login_payload, status_code=200)
+
+        # pass1 and pass2 are not equal
+        new_password_payload = {
+            "new_password1": "new_person1",
+            "new_password2": "new_person"
+        }
+        self.post(self.password_change_url, data=new_password_payload,
+            status_code=400)
+
+        # send empty payload
+        self.post(self.password_change_url, data={}, status_code=400)
+
+    def test_registration_user_with_profile(self):
+        payload = {
+            "username": self.USERNAME,
+            "password": self.PASS,
+            "email": "person@world.com",
+            "newsletter_subscribe": "false"
+        }
+
+        # test empty payload
+        self.post(self.register_url, data={}, status_code=400)
+
+        self.post(self.register_url, data=payload, status_code=201)
+
+        activation_key = RegistrationProfile.objects.latest('id').activation_key
+        verify_url = reverse('verify_email',
+            kwargs={'activation_key': activation_key})
+
+        # new user at this point shouldn't be active
+        new_user = get_user_model().objects.latest('id')
+        self.assertEqual(new_user.is_active, False)
+
+        # let's active new user and check is_active flag
+        self.get(verify_url)
+        new_user = get_user_model().objects.latest('id')
+        self.assertEqual(new_user.is_active, True)
+        user_profile = user_profile_model.objects.get(user=new_user)
+        self.assertIsNotNone(user_profile)
+
+    def test_registration_user_without_profile(self):
+
+        payload = {
+            "username": self.USERNAME,
+            "password": self.PASS,
+            "email": "person1@world.com"
+        }
+
+        self.post(self.register_url, data=payload, status_code=201)
+
+        activation_key = RegistrationProfile.objects.latest('id').activation_key
+        verify_url = reverse('verify_email',
+            kwargs={'activation_key': activation_key})
+
+        # new user at this point shouldn't be active
+        new_user = get_user_model().objects.latest('id')
+        self.assertEqual(new_user.is_active, False)
+
+        # let's active new user and check is_active flag
+        self.get(verify_url)
+        new_user = get_user_model().objects.latest('id')
+        self.assertEqual(new_user.is_active, True)
+
+        user_profile = user_profile_model.objects.get(user=new_user)
+        self.assertIsNotNone(user_profile)
