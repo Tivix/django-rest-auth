@@ -46,38 +46,45 @@ Installation
         REST_REGISTRATION_BACKEND = 'rest_auth.backends.rest_registration.RESTRegistrationView'
         REST_PROFILE_MODULE = 'accounts.UserProfile'
 
-6. You're good to go now!
+6. Add rest_auth urls in your project root urls.py
+
+        urlpatterns = patterns('',
+            ...,
+            (r'^rest-auth/', include('rest_auth.urls')),
+        )
+
+7. You're good to go now!
 
 API endpoints without Authentication
 ------------------------------------
 
-1. /rest\_accounts/register/
+1. /rest-auth/register/
     - POST
         - username
         - password
         - email
         - first\_name
         - last\_name
-2. /rest\_accounts/password/reset/
+2. /rest-auth/password/reset/
     - POST
         - email
-3. /rest\_accounts/password/reset/confirm/{uidb64}/{token}/
+3. /rest-auth/password/reset/confirm/{uidb64}/{token}/
     - POST
         - new\_password1
         - new\_password2
-4. /rest\_accounts/login/
+4. /rest-auth/login/
     - POST
         - username
         - password
-5. /rest\_accounts/verify-email/{activation\_key}/
+5. /rest-auth/verify-email/{activation\_key}/
     - GET
 
 API endpoints with Authentication
 ---------------------------------
 
-1. /rest\_accounts/logout/
+1. /rest-auth/logout/
     - GET
-2. /rest\_accounts/user/
+2. /rest-auth/user/
     - GET & POST
         - POST parameters
             - user as dictionary
@@ -85,7 +92,7 @@ API endpoints with Authentication
             - user data example
                     "user": {"id": 1, "first_name": "Person", "last_name": "2"}
 
-3. /rest\_accounts/password/change/
+3. /rest-auth/password/change/
     - POST
         - new\_password1
         - new\_password2
