@@ -1,7 +1,11 @@
 from django.contrib.auth.forms import PasswordResetForm, SetPasswordForm
 from django.contrib.auth import authenticate, login, logout, get_user_model
 from django.contrib.auth.tokens import default_token_generator
-from django.utils.http import urlsafe_base64_decode
+try:
+    from django.utils.http import urlsafe_base64_decode as uid_decoder
+except:
+    # make compatible with django 1.5
+    from django.utils.http import base36_to_int as uid_decoder
 from django.conf import settings
 
 from rest_framework import status
@@ -261,7 +265,7 @@ class PasswordResetConfirm(LoggedOutRESTAPIView, GenericAPIView):
 
         # Decode the uidb64 to uid to get User object
         try:
-            uid = urlsafe_base64_decode(uidb64)
+            uid = uid_decoder(uidb64)
             user = UserModel._default_manager.get(pk=uid)
         except (TypeError, ValueError, OverflowError, UserModel.DoesNotExist):
             user = None
