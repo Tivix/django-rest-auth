@@ -2,7 +2,6 @@ import django
 import os, sys
 
 # PROJECT_ROOT = os.path.abspath(os.path.split(os.path.split(__file__)[0])[0])
-# sys.path.append(os.path.join(PROJECT_ROOT, 'django-rest-registration-auth/apps/'))
 # ROOT_URLCONF = 'urls'
 
 # STATIC_URL = '/static/'
@@ -32,8 +31,12 @@ else:
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
+    'django.contrib.humanize',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
+    'django.contrib.sites',
+    'django.contrib.sitemaps',
+    'django.contrib.staticfiles',
 
     'rest_framework',
     'rest_framework.authtoken',
@@ -43,18 +46,5 @@ INSTALLED_APPS = [
 ]
 
 SECRET_KEY = "38dh*skf8sjfhs287dh&^hd8&3hdg*j2&sd"
-
-
-from django.db import models
-from django.contrib.auth.models import User
-
-class UserProfile(models.Model):
-    user = models.ForeignKey(User, unique=True)
-    newsletter_subscribe = models.BooleanField(default=False)
-
-    class Meta:
-        app_label = 'rest_auth'
-
-REST_PROFILE_MODULE = UserProfile
-REST_REGISTRATION_BACKEND = 'registration.backends.default.views.RegistrationView'
 ACCOUNT_ACTIVATION_DAYS = 1
+SITE_ID = 1

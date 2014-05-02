@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.conf.urls import patterns, url, include
 
-from .views import Login, Logout, Register, UserDetails, \
+from rest_auth.views import Login, Logout, Register, UserDetails, \
     PasswordChange, PasswordReset, VerifyEmail, PasswordResetConfirm
 
 

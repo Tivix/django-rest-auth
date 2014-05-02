@@ -32,7 +32,7 @@ setup(
         'django-registration>=1.0',
         'djangorestframework>=2.3.13',
     ],
-    test_suite='rest_auth.tests',
+    test_suite='rest_auth.runtests.runtests',
     include_package_data=True,
     # cmdclass={},
     classifiers=[
