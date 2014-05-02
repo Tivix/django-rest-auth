@@ -27,7 +27,7 @@ urlpatterns = patterns('rest_auth.views',
                            name='rest_password_change'),
                        )
 
-if settings.DEBUG:
+if settings.DEBUG and not settings.IS_TEST:
     urlpatterns += patterns('',
                             # Swagger Docs
                             url(r'^docs/',
