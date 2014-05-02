@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/Tivix/django-rest-auth.svg?branch=master)](https://travis-ci.org/Tivix/django-rest-auth)
+
 django-rest-auth
 ================
 
