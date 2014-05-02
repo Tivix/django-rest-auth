@@ -23,7 +23,6 @@ class APIClient(Client):
 
 
 class CustomJSONEncoder(json.JSONEncoder):
-
     """
     Convert datetime/date objects into isoformat
     """
