@@ -1,17 +1,16 @@
 import django
 import os, sys
 
-# PROJECT_ROOT = os.path.abspath(os.path.split(os.path.split(__file__)[0])[0])
-# ROOT_URLCONF = 'urls'
-
-# STATIC_URL = '/static/'
-# STATIC_ROOT = '%s/staticserve' % PROJECT_ROOT
-# STATICFILES_DIRS = (
-#     ('global', '%s/static' % PROJECT_ROOT),
-# )
-# UPLOADS_DIR_NAME = 'uploads'
-# MEDIA_URL = '/%s/' % UPLOADS_DIR_NAME
-# MEDIA_ROOT = os.path.join(PROJECT_ROOT, '%s' % UPLOADS_DIR_NAME)
+PROJECT_ROOT = os.path.abspath(os.path.split(os.path.split(__file__)[0])[0])
+ROOT_URLCONF = 'urls'
+STATIC_URL = '/static/'
+STATIC_ROOT = '%s/staticserve' % PROJECT_ROOT
+STATICFILES_DIRS = (
+    ('global', '%s/static' % PROJECT_ROOT),
+)
+UPLOADS_DIR_NAME = 'uploads'
+MEDIA_URL = '/%s/' % UPLOADS_DIR_NAME
+MEDIA_ROOT = os.path.join(PROJECT_ROOT, '%s' % UPLOADS_DIR_NAME)
 
 IS_DEV = False
 IS_STAGING = False
