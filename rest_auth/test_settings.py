@@ -11,6 +11,7 @@ else:
     DATABASE_ENGINE = 'sqlite3'
 
 INSTALLED_APPS = [
+    'django.contrib.auth',
     'rest_auth',
 ]
 
