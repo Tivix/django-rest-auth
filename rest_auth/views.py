@@ -148,7 +148,10 @@ class Register(LoggedOutRESTAPIView, GenericAPIView):
             # TODO: Make this customizable backend via settings.
             # Call RESTRegistrationView().register to create new Django User
             # and UserProfile models
-            RESTRegistrationView().register(request, **serializer.data)
+            data = serializer.data.copy()
+            data.update(profile_serializer.data)
+
+            RESTRegistrationView().register(request, **data)
 
             # Return the User object with Created HTTP status
             return Response(UserDetailsSerializer(serializer.data).data,
@@ -272,7 +275,7 @@ class PasswordResetConfirm(LoggedOutRESTAPIView, GenericAPIView):
 
         # If we get the User object
         if user:
-            serializer = self.serializer_class(data=request.DATA)
+            serializer = self.serializer_class(data=request.DATA, user=user)
 
             if serializer.is_valid():
                 # Construct SetPasswordForm instance
