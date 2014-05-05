@@ -11,6 +11,7 @@ from django.contrib.sites.models import RequestSite
 from django.contrib.sites.models import Site
 from django.db import models
 
+from rest_framework.serializers import _resolve_model
 from registration.models import RegistrationProfile
 from registration.backends.default.views import RegistrationView as BaseRegistrationView
 from registration import signals
@@ -43,6 +44,12 @@ class RegistrationView(BaseRegistrationView):
         signals.user_registered.send(sender=self.__class__,
                                      user=new_user,
                                      request=request)
+
+        # create user profile
+        user_profile_model = _resolve_model(
+            getattr(settings, 'REST_PROFILE_MODULE', None))
+        user_profile_model.objects.create(user=new_user)
+
         return new_user
 
 settings.REST_REGISTRATION_BACKEND = 'rest_auth.runtests.RegistrationView'

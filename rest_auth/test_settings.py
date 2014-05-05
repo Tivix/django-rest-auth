@@ -15,7 +15,7 @@ MEDIA_ROOT = os.path.join(PROJECT_ROOT, '%s' % UPLOADS_DIR_NAME)
 IS_DEV = False
 IS_STAGING = False
 IS_PROD = False
-IS_TEST = 'test' in sys.argv
+IS_TEST = 'test' in sys.argv or 'test_coverage' in sys.argv
 
 if django.VERSION[:2] >= (1, 3):
     DATABASES = {

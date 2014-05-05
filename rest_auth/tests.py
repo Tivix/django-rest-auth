@@ -2,6 +2,7 @@ import json
 import os
 import sys
 from datetime import datetime, date, time
+from urlparse import urlparse
 
 os.environ['DJANGO_SETTINGS_MODULE'] = 'test_settings'
 test_dir = os.path.dirname(__file__)
@@ -13,6 +14,8 @@ from django.test.client import Client, MULTIPART_CONTENT
 from django.test import TestCase
 from django.contrib.auth.models import User
 from django.contrib.auth import get_user_model
+from django.core import mail
+from django.core.urlresolvers import resolve
 
 from registration.models import RegistrationProfile
 from rest_framework.serializers import _resolve_model
@@ -128,13 +131,15 @@ class LoginAPITestCase(TestCase, BaseAPITestCase):
 
     USERNAME = 'person'
     PASS = 'person'
-
+    EMAIL = "person1@world.com"
+    NEW_PASS = 'new-test-pass'
 
     def setUp(self):
         self.init()
         self.login_url = reverse('rest_login')
         self.password_change_url = reverse('rest_password_change')
         self.register_url = reverse('rest_register')
+        self.password_reset_url = reverse('rest_password_reset')
 
     def test_login(self):
         payload = {
@@ -230,15 +235,15 @@ class LoginAPITestCase(TestCase, BaseAPITestCase):
         self.get(verify_url)
         new_user = get_user_model().objects.latest('id')
         self.assertEqual(new_user.is_active, True)
-        #user_profile = user_profile_model.objects.get(user=new_user)
-        #self.assertIsNotNone(user_profile)
+        user_profile = user_profile_model.objects.get(user=new_user)
+        self.assertIsNotNone(user_profile)
 
     def test_registration_user_without_profile(self):
 
         payload = {
             "username": self.USERNAME,
             "password": self.PASS,
-            "email": "person1@world.com"
+            "email": self.EMAIL,
         }
 
         self.post(self.register_url, data=payload, status_code=201)
@@ -256,5 +261,45 @@ class LoginAPITestCase(TestCase, BaseAPITestCase):
         new_user = get_user_model().objects.latest('id')
         self.assertEqual(new_user.is_active, True)
 
-        # user_profile = user_profile_model.objects.get(user=new_user)
-        # self.assertIsNotNone(user_profile)
+        user_profile = user_profile_model.objects.get(user=new_user)
+        self.assertIsNotNone(user_profile)
+
+    def test_password_reset(self):
+        user = User.objects.create_user(self.USERNAME, self.EMAIL, self.PASS)
+
+        # call password reset
+        mail_count = len(mail.outbox)
+        payload = {'email': self.EMAIL}
+        self.post(self.password_reset_url, data=payload)
+        self.assertEqual(len(mail.outbox), mail_count+1)
+
+        url_kwargs = self.generate_uid_and_token(user)
+
+        data = {
+            'new_password1': self.NEW_PASS,
+            'new_password2': self.NEW_PASS
+        }
+        url = reverse('rest_password_reset_confirm', kwargs=url_kwargs)
+        self.post(url, data=data, status_code=200)
+
+        payload = {
+            "username": self.USERNAME,
+            "password": self.NEW_PASS
+        }
+        self.post(self.login_url, data=payload, status_code=200)
+
+
+    def generate_uid_and_token(self, user):
+        result = {}
+        from django.utils.encoding import force_bytes
+        from django.contrib.auth.tokens import default_token_generator
+        from django import VERSION
+        if VERSION[1] == 6:
+            from django.utils.http import urlsafe_base64_encode
+            result['uid'] = urlsafe_base64_encode(force_bytes(user.pk))
+        elif VERSION[1] == 5:
+            from django.utils.http import int_to_base36
+            result['uid'] = int_to_base36(user.pk)
+        result['token'] = default_token_generator.make_token(user)
+        return result
+

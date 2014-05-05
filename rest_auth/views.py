@@ -133,11 +133,12 @@ class Register(LoggedOutRESTAPIView, GenericAPIView):
     """
 
     serializer_class = UserRegistrationSerializer
+    profile_serializer_class = UserRegistrationProfileSerializer
 
     def post(self, request):
         # Create serializers with request.DATA
         serializer = self.serializer_class(data=request.DATA)
-        profile_serializer = UserRegistrationProfileSerializer(
+        profile_serializer = self.profile_serializer_class(
             data=request.DATA)
 
         if serializer.is_valid() and profile_serializer.is_valid():
@@ -256,19 +257,19 @@ class PasswordResetConfirm(LoggedOutRESTAPIView, GenericAPIView):
     Password reset e-mail link is confirmed, therefore this resets the user's password.
 
     Accepts the following POST parameters: new_password1, new_password2
-    Accepts the following Django URL arguments: token, uidb64
+    Accepts the following Django URL arguments: token, uid
     Returns the success/fail message.
     """
 
     serializer_class = SetPasswordSerializer
 
-    def post(self, request, uidb64=None, token=None):
+    def post(self, request, uid=None, token=None):
         # Get the UserModel
         UserModel = get_user_model()
 
         # Decode the uidb64 to uid to get User object
         try:
-            uid = uid_decoder(uidb64)
+            uid = uid_decoder(uid)
             user = UserModel._default_manager.get(pk=uid)
         except (TypeError, ValueError, OverflowError, UserModel.DoesNotExist):
             user = None
@@ -302,7 +303,7 @@ class PasswordResetConfirm(LoggedOutRESTAPIView, GenericAPIView):
                                 status=status.HTTP_400_BAD_REQUEST)
 
         else:
-            return Response({"errors": "Couldn\'t find the user from uidb64."}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"errors": "Couldn\'t find the user from uid."}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class VerifyEmail(LoggedOutRESTAPIView, GenericAPIView):

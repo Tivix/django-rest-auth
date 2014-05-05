@@ -11,7 +11,7 @@ urlpatterns = patterns('rest_auth.views',
                            name='rest_register'),
                        url(r'^password/reset/$', PasswordReset.as_view(),
                            name='rest_password_reset'),
-                       url(r'^password/reset/confirm/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$',
+                       url(r'^password/reset/confirm/(?P<uid>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$',
                            PasswordResetConfirm.as_view(
                            ), name='rest_password_reset_confirm'),
                        url(r'^login/$', Login.as_view(), name='rest_login'),
@@ -33,3 +33,7 @@ if settings.DEBUG and not settings.IS_TEST:
                             url(r'^docs/',
                                 include('rest_framework_swagger.urls')),
                             )
+
+if settings.IS_TEST:
+    from django.contrib.auth.tests import urls
+    urlpatterns += patterns('', url(r'^test-admin/', include(urls)))
