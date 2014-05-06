@@ -1,12 +1,5 @@
 import json
-import os
-import sys
 from datetime import datetime, date, time
-from urlparse import urlparse
-
-os.environ['DJANGO_SETTINGS_MODULE'] = 'test_settings'
-test_dir = os.path.dirname(__file__)
-sys.path.insert(0, test_dir)
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
@@ -15,7 +8,6 @@ from django.test import TestCase
 from django.contrib.auth.models import User
 from django.contrib.auth import get_user_model
 from django.core import mail
-from django.core.urlresolvers import resolve
 
 from registration.models import RegistrationProfile
 from rest_framework.serializers import _resolve_model
