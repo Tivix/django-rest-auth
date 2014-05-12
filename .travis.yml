@@ -9,6 +9,6 @@ install:
   - pip install -q Django==$DJANGO --use-mirrors
   - pip install coveralls
 script:
-  - python setup.py test
+  - coverage run --source=rest_auth setup.py test
 after_success:
   - coveralls
