@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/Tivix/django-rest-auth.svg?branch=master)](https://travis-ci.org/Tivix/django-rest-auth)  [![Coverage Status](https://coveralls.io/repos/Tivix/django-rest-auth/badge.png?branch=master)](https://coveralls.io/r/Tivix/django-rest-auth?branch=master)
+[![Build Status](https://travis-ci.org/Tivix/django-rest-auth.svg?branch=master)](https://travis-ci.org/Tivix/django-rest-auth)  [![Coverage Status](https://coveralls.io/repos/Tivix/django-rest-auth/badge.png?branch=master)](https://coveralls.io/r/Tivix/django-rest-auth?branch=master)  [![Requirements Status](https://requires.io/github/Tivix/django-rest-auth/requirements.png?branch=master)](https://requires.io/github/Tivix/django-rest-auth/requirements/?branch=master)
 
 django-rest-auth
 ================
