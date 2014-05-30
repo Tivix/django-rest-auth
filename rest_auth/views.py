@@ -68,6 +68,8 @@ class Login(LoggedOutRESTAPIView, GenericAPIView):
     """
 
     serializer_class = LoginSerializer
+    token_model = Token
+    token_serializer = TokenSerializer
 
     def post(self, request):
         # Create a serializer with request.DATA
@@ -86,8 +88,8 @@ class Login(LoggedOutRESTAPIView, GenericAPIView):
                     login(request, user)
 
                     # Return REST Token object with OK HTTP status
-                    token, created = Token.objects.get_or_create(user=user)
-                    return Response(TokenSerializer(token).data,
+                    token, created = self.token_model.objects.get_or_create(user=user)
+                    return Response(self.token_serializer(token).data,
                                     status=status.HTTP_200_OK)
                 else:
                     return Response({'error': 'This account is disabled.'},

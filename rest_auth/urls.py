@@ -27,13 +27,6 @@ urlpatterns = patterns('rest_auth.views',
                            name='rest_password_change'),
                        )
 
-if settings.DEBUG and not settings.IS_TEST:
-    urlpatterns += patterns('',
-                            # Swagger Docs
-                            url(r'^docs/',
-                                include('rest_framework_swagger.urls')),
-                            )
-
-if settings.IS_TEST:
+if getattr(settings, 'IS_TEST', False):
     from django.contrib.auth.tests import urls
     urlpatterns += patterns('', url(r'^test-admin/', include(urls)))
