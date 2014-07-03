@@ -7,6 +7,7 @@ except:
     # make compatible with django 1.5
     from django.utils.http import base36_to_int as uid_decoder
 from django.conf import settings
+from django.core.exceptions import ObjectDoesNotExist
 
 from rest_framework import status
 from rest_framework.views import APIView
@@ -32,11 +33,14 @@ from .serializers import TokenSerializer, UserDetailsSerializer, \
 
 
 # Get the UserProfile model from the setting value
-user_profile_model = _resolve_model(
-    getattr(settings, 'REST_PROFILE_MODULE', None))
+user_profile_path = getattr(settings, 'REST_PROFILE_MODULE', None)
+user_profile_model = None
+if user_profile_path:
+    user_profile_model = _resolve_model(user_profile_path)
 
 # Get the REST Registration Backend for django-registration
-registration_backend = getattr(settings, 'REST_REGISTRATION_BACKEND', None)
+registration_backend = getattr(settings, 'REST_REGISTRATION_BACKEND',
+    'registration.backends.default.views.RegistrationView')
 
 if not registration_backend:
     raise Exception('Please configure a registration backend')
@@ -184,12 +188,16 @@ class UserDetails(LoggedInRESTAPIView, GenericAPIView):
     def get(self, request):
         # Create serializers with request.user and profile
         user_details = UserDetailsSerializer(request.user)
-        serializer = self.serializer_class(request.user.get_profile())
+        try:
+            serializer = self.serializer_class(request.user.get_profile())
+            profile_data = serializer.data
+        except ObjectDoesNotExist:
 
+            profile_data = {}
         # Send the Return the User and its profile model with OK HTTP status
         return Response({
             'user': user_details.data,
-            'profile': serializer.data},
+            'profile': profile_data},
             status=status.HTTP_200_OK)
 
     def post(self, request):

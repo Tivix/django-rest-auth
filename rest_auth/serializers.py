@@ -5,6 +5,7 @@ from rest_framework import serializers
 from rest_framework.serializers import _resolve_model
 from rest_framework.authtoken.models import Token
 
+profile_model_path = getattr(settings, 'REST_PROFILE_MODULE', None)
 
 class LoginSerializer(serializers.Serializer):
     username = serializers.CharField(max_length=30)
@@ -22,28 +23,6 @@ class TokenSerializer(serializers.ModelSerializer):
         fields = ('key',)
 
 
-class UserRegistrationSerializer(serializers.ModelSerializer):
-
-    """
-    Serializer for Django User model and most of its fields.
-    """
-
-    class Meta:
-        model = get_user_model()
-        fields = ('username', 'password', 'email', 'first_name', 'last_name')
-
-
-class UserRegistrationProfileSerializer(serializers.ModelSerializer):
-
-    """
-    Serializer that includes all profile fields except for user fk / id.
-    """
-    class Meta:
-        model = _resolve_model(getattr(settings, 'REST_PROFILE_MODULE', None))
-        fields = filter(lambda x: x != 'id' and x != 'user',
-                        map(lambda x: x.name, model._meta.fields))
-
-
 class UserDetailsSerializer(serializers.ModelSerializer):
 
     """
@@ -54,17 +33,15 @@ class UserDetailsSerializer(serializers.ModelSerializer):
         fields = ('username', 'email', 'first_name', 'last_name')
 
 
-class UserProfileSerializer(serializers.ModelSerializer):
+class UserRegistrationSerializer(serializers.ModelSerializer):
 
     """
-    Serializer for UserProfile model.
+    Serializer for Django User model and most of its fields.
     """
-
-    user = UserDetailsSerializer()
 
     class Meta:
-        # http://stackoverflow.com/questions/4881607/django-get-model-from-string
-        model = _resolve_model(getattr(settings, 'REST_PROFILE_MODULE', None))
+        model = get_user_model()
+        fields = ('username', 'password', 'email', 'first_name', 'last_name')
 
 
 class DynamicFieldsModelSerializer(serializers.ModelSerializer):
@@ -96,17 +73,50 @@ class UserUpdateSerializer(DynamicFieldsModelSerializer):
         fields = ('id', 'email', 'first_name', 'last_name')
 
 
-class UserProfileUpdateSerializer(serializers.ModelSerializer):
 
-    """
-    Serializer for updating User and UserProfile model.
-    """
+if profile_model_path:
+    class UserRegistrationProfileSerializer(serializers.ModelSerializer):
 
-    user = UserUpdateSerializer()
+        """
+        Serializer that includes all profile fields except for user fk / id.
+        """
+        class Meta:
 
-    class Meta:
-        # http://stackoverflow.com/questions/4881607/django-get-model-from-string
-        model = _resolve_model(getattr(settings, 'REST_PROFILE_MODULE', None))
+            model = _resolve_model(profile_model_path)
+            fields = filter(lambda x: x != 'id' and x != 'user',
+                            map(lambda x: x.name, model._meta.fields))
+
+    class UserProfileSerializer(serializers.ModelSerializer):
+
+        """
+        Serializer for UserProfile model.
+        """
+
+        user = UserDetailsSerializer()
+
+        class Meta:
+            # http://stackoverflow.com/questions/4881607/django-get-model-from-string
+            model = _resolve_model(profile_model_path)
+
+    class UserProfileUpdateSerializer(serializers.ModelSerializer):
+
+        """
+        Serializer for updating User and UserProfile model.
+        """
+
+        user = UserUpdateSerializer()
+
+        class Meta:
+            # http://stackoverflow.com/questions/4881607/django-get-model-from-string
+            model = _resolve_model(profile_model_path)
+
+else:
+    class UserRegistrationProfileSerializer(serializers.Serializer):
+        pass
+    class UserProfileSerializer(serializers.Serializer):
+        pass
+    class UserProfileUpdateSerializer(serializers.Serializer):
+        pass
 
 
 class SetPasswordSerializer(serializers.Serializer):
