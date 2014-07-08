@@ -23,31 +23,31 @@ from registration.models import RegistrationProfile
 from registration import signals
 from registration.views import ActivationView
 
-from .utils import construct_modules_and_import
-from .models import *
-from .serializers import TokenSerializer, UserDetailsSerializer, \
-    LoginSerializer, UserRegistrationSerializer, \
-    UserRegistrationProfileSerializer, \
-    UserProfileUpdateSerializer, SetPasswordSerializer, \
-    PasswordResetSerializer
+from rest_auth.utils import construct_modules_and_import
+from rest_auth.models import *
+from rest_auth.serializers import (TokenSerializer, UserDetailsSerializer,
+    LoginSerializer, UserRegistrationSerializer,
+    SetPasswordSerializer, PasswordResetSerializer, UserUpdateSerializer,
+    get_user_registration_profile_serializer, get_user_profile_serializer,
+    get_user_profile_update_serializer)
 
 
-# Get the UserProfile model from the setting value
-user_profile_path = getattr(settings, 'REST_PROFILE_MODULE', None)
-user_profile_model = None
-if user_profile_path:
-    user_profile_model = _resolve_model(user_profile_path)
+def get_user_profile_model():
+    # Get the UserProfile model from the setting value
+    user_profile_path = getattr(settings, 'REST_PROFILE_MODULE', None)
+    if user_profile_path:
+        setattr(settings, 'AUTH_PROFILE_MODULE', user_profile_path)
+        return _resolve_model(user_profile_path)
 
-# Get the REST Registration Backend for django-registration
-registration_backend = getattr(settings, 'REST_REGISTRATION_BACKEND',
-    'registration.backends.default.views.RegistrationView')
 
-if not registration_backend:
-    raise Exception('Please configure a registration backend')
+def get_registration_backend():
+    # Get the REST Registration Backend for django-registration
+    registration_backend = getattr(settings, 'REST_REGISTRATION_BACKEND',
+        'registration.backends.simple.views.RegistrationView')
 
-# Get the REST REGISTRATION BACKEND class from the setting value via above
-# method
-RESTRegistrationView = construct_modules_and_import(registration_backend)
+    # Get the REST REGISTRATION BACKEND class from the setting value via above
+    # method
+    return construct_modules_and_import(registration_backend)
 
 
 class LoggedInRESTAPIView(APIView):
@@ -139,13 +139,15 @@ class Register(LoggedOutRESTAPIView, GenericAPIView):
     """
 
     serializer_class = UserRegistrationSerializer
-    profile_serializer_class = UserRegistrationProfileSerializer
+
+    def get_profile_serializer_class(self):
+        return get_user_registration_profile_serializer()
 
     def post(self, request):
         # Create serializers with request.DATA
         serializer = self.serializer_class(data=request.DATA)
-        profile_serializer = self.profile_serializer_class(
-            data=request.DATA)
+        profile_serializer_class = self.get_profile_serializer_class()
+        profile_serializer = profile_serializer_class(data=request.DATA)
 
         if serializer.is_valid() and profile_serializer.is_valid():
             # Change the password key to password1 so that RESTRegistrationView
@@ -158,6 +160,7 @@ class Register(LoggedOutRESTAPIView, GenericAPIView):
             data = serializer.data.copy()
             data.update(profile_serializer.data)
 
+            RESTRegistrationView = get_registration_backend()
             RESTRegistrationView().register(request, **data)
 
             # Return the User object with Created HTTP status
@@ -182,28 +185,33 @@ class UserDetails(LoggedInRESTAPIView, GenericAPIView):
         Optional: email, first_name, last_name and UserProfile fields
     Returns the updated UserProfile and/or User object.
     """
+    def get_profile_serializer_class(self):
+        return get_user_profile_serializer()
 
-    serializer_class = UserProfileUpdateSerializer
+    def get_profile_update_serializer_class(self):
+        return get_user_profile_update_serializer()
 
     def get(self, request):
         # Create serializers with request.user and profile
-        user_details = UserDetailsSerializer(request.user)
-        try:
-            serializer = self.serializer_class(request.user.get_profile())
-            profile_data = serializer.data
-        except ObjectDoesNotExist:
-
-            profile_data = {}
+        user_profile_model = get_user_profile_model()
+        if user_profile_model:
+            profile_serializer_class = self.get_profile_serializer_class()
+            serializer = profile_serializer_class(request.user.get_profile())
+        else:
+            serializer = UserDetailsSerializer(request.user)
         # Send the Return the User and its profile model with OK HTTP status
-        return Response({
-            'user': user_details.data,
-            'profile': profile_data},
-            status=status.HTTP_200_OK)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request):
         # Get the User object updater via this Serializer
-        serializer = self.serializer_class(
-            request.user.get_profile(), data=request.DATA, partial=True)
+        user_profile_model = get_user_profile_model()
+        if user_profile_model:
+            profile_serializer_class = self.get_profile_update_serializer_class()
+            serializer = profile_serializer_class(request.user.get_profile(),
+                data=request.DATA, partial=True)
+        else:
+            serializer = UserUpdateSerializer(request.user, data=request.DATA,
+                partial=True)
 
         if serializer.is_valid():
             # Save UserProfileUpdateSerializer

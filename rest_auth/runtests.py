@@ -26,8 +26,6 @@ class UserProfile(models.Model):
     class Meta:
         app_label = 'rest_auth'
 
-settings.REST_PROFILE_MODULE = UserProfile
-
 
 """
 overwrite register to avoid sending email
@@ -46,14 +44,12 @@ class RegistrationView(BaseRegistrationView):
                                      request=request)
 
         # create user profile
-        user_profile_model = _resolve_model(
-            getattr(settings, 'REST_PROFILE_MODULE', None))
-        user_profile_model.objects.create(user=new_user)
+        profile_model_path = getattr(settings, 'REST_PROFILE_MODULE', None)
+        if profile_model_path:
+            user_profile_model = _resolve_model(profile_model_path)
+            user_profile_model.objects.create(user=new_user)
 
         return new_user
-
-settings.REST_REGISTRATION_BACKEND = 'rest_auth.runtests.RegistrationView'
-
 
 
 def runtests():

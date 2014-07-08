@@ -112,19 +112,40 @@ class BaseAPITestCase(object):
 #  T E S T   H E R E
 # -----------------------
 
-user_profile_model = _resolve_model(
-    getattr(settings, 'REST_PROFILE_MODULE', None))
 
-class LoginAPITestCase(TestCase, BaseAPITestCase):
 
+class APITestCase1(TestCase, BaseAPITestCase):
     """
-    just run: python manage.py test rest_auth
+    Case #1:
+    - user profile: defined
+    - custom registration: backend defined
     """
 
     USERNAME = 'person'
     PASS = 'person'
     EMAIL = "person1@world.com"
     NEW_PASS = 'new-test-pass'
+    PROFILE_MODEL = 'rest_auth.UserProfile'
+    REGISTRATION_VIEW = 'rest_auth.runtests.RegistrationView'
+
+    # data without user profile
+    BASIC_REGISTRATION_DATA = {
+        "username": USERNAME,
+        "password": PASS,
+        "email": EMAIL
+    }
+
+    # data with user profile
+    REGISTRATION_DATA = BASIC_REGISTRATION_DATA.copy()
+    REGISTRATION_DATA['newsletter_subscribe'] = False
+
+    BASIC_USER_DATA = {
+        'first_name': "John",
+        'last_name': 'Smith',
+        'email': EMAIL
+    }
+    USER_DATA = BASIC_USER_DATA.copy()
+    USER_DATA['newsletter_subscribe'] = True
 
     def setUp(self):
         self.init()
@@ -132,6 +153,17 @@ class LoginAPITestCase(TestCase, BaseAPITestCase):
         self.password_change_url = reverse('rest_password_change')
         self.register_url = reverse('rest_register')
         self.password_reset_url = reverse('rest_password_reset')
+        self.user_url = reverse('rest_user_details')
+
+        setattr(settings, 'REST_PROFILE_MODULE', self.PROFILE_MODEL)
+        self.user_profile_model = None
+        if self.PROFILE_MODEL:
+            self.user_profile_model = _resolve_model(self.PROFILE_MODEL)
+
+        if self.REGISTRATION_VIEW:
+            setattr(settings, 'REST_REGISTRATION_BACKEND', self.REGISTRATION_VIEW)
+        elif hasattr(settings, 'REST_REGISTRATION_BACKEND'):
+            delattr(settings, 'REST_REGISTRATION_BACKEND')
 
     def test_login(self):
         payload = {
@@ -202,59 +234,60 @@ class LoginAPITestCase(TestCase, BaseAPITestCase):
         # send empty payload
         self.post(self.password_change_url, data={}, status_code=400)
 
-    def test_registration_user_with_profile(self):
-        payload = {
-            "username": self.USERNAME,
-            "password": self.PASS,
-            "email": "person@world.com",
-            "newsletter_subscribe": "false"
-        }
+    def test_registration(self):
+        user_count = User.objects.all().count()
 
         # test empty payload
         self.post(self.register_url, data={}, status_code=400)
 
-        self.post(self.register_url, data=payload, status_code=201)
-
-        activation_key = RegistrationProfile.objects.latest('id').activation_key
-        verify_url = reverse('verify_email',
-            kwargs={'activation_key': activation_key})
-
-        # new user at this point shouldn't be active
+        self.post(self.register_url, data=self.REGISTRATION_DATA, status_code=201)
+        self.assertEqual(User.objects.all().count(), user_count+1)
         new_user = get_user_model().objects.latest('id')
-        self.assertEqual(new_user.is_active, False)
 
-        # let's active new user and check is_active flag
-        self.get(verify_url)
+        if self.REGISTRATION_VIEW:
+            activation_key = RegistrationProfile.objects.latest('id').activation_key
+            verify_url = reverse('verify_email',
+                kwargs={'activation_key': activation_key})
+
+            # new user at this point shouldn't be active
+            self.assertEqual(new_user.is_active, False)
+
+            # let's active new user and check is_active flag
+            self.get(verify_url)
+            new_user = get_user_model().objects.latest('id')
+            self.assertEqual(new_user.is_active, True)
+            if self.user_profile_model:
+                user_profile = self.user_profile_model.objects.get(user=new_user)
+                self.assertIsNotNone(user_profile)
+        else:
+            self.assertEqual(new_user.is_active, True)
+
+    def test_registration_without_profile_data(self):
+        user_count = User.objects.all().count()
+
+        self.post(self.register_url, data=self.BASIC_REGISTRATION_DATA,
+            status_code=201)
+        self.assertEqual(User.objects.all().count(), user_count+1)
         new_user = get_user_model().objects.latest('id')
-        self.assertEqual(new_user.is_active, True)
-        user_profile = user_profile_model.objects.get(user=new_user)
-        self.assertIsNotNone(user_profile)
 
-    def test_registration_user_without_profile(self):
+        if self.REGISTRATION_VIEW:
+            activation_key = RegistrationProfile.objects.latest('id').activation_key
+            verify_url = reverse('verify_email',
+                kwargs={'activation_key': activation_key})
 
-        payload = {
-            "username": self.USERNAME,
-            "password": self.PASS,
-            "email": self.EMAIL,
-        }
+            # new user at this point shouldn't be active
+            self.assertEqual(new_user.is_active, False)
 
-        self.post(self.register_url, data=payload, status_code=201)
+            # let's active new user and check is_active flag
+            self.get(verify_url)
+            new_user = get_user_model().objects.latest('id')
+            self.assertEqual(new_user.is_active, True)
+            if self.user_profile_model:
+                user_profile = self.user_profile_model.objects.get(user=new_user)
+                self.assertIsNotNone(user_profile)
+        else:
+            self.assertEqual(new_user.is_active, True)
 
-        activation_key = RegistrationProfile.objects.latest('id').activation_key
-        verify_url = reverse('verify_email',
-            kwargs={'activation_key': activation_key})
-
-        # new user at this point shouldn't be active
-        new_user = get_user_model().objects.latest('id')
-        self.assertEqual(new_user.is_active, False)
-
-        # let's active new user and check is_active flag
-        self.get(verify_url)
-        new_user = get_user_model().objects.latest('id')
-        self.assertEqual(new_user.is_active, True)
-
-        user_profile = user_profile_model.objects.get(user=new_user)
-        self.assertIsNotNone(user_profile)
 
     def test_password_reset(self):
         user = User.objects.create_user(self.USERNAME, self.EMAIL, self.PASS)
@@ -280,6 +313,33 @@ class LoginAPITestCase(TestCase, BaseAPITestCase):
         }
         self.post(self.login_url, data=payload, status_code=200)
 
+    def test_user_details(self):
+        user = User.objects.create_user(self.USERNAME, self.EMAIL, self.PASS)
+        if self.user_profile_model:
+            self.user_profile_model.objects.create(user=user)
+        payload = {
+            "username": self.USERNAME,
+            "password": self.PASS
+        }
+        self.post(self.login_url, data=payload, status_code=200)
+        self.token = self.response.json['key']
+        self.get(self.user_url, status_code=200)
+
+        self.post(self.user_url, data=self.BASIC_USER_DATA, status_code=200)
+        user = User.objects.get(pk=user.pk)
+
+        if self.user_profile_model:
+            self.post(self.user_url, data=self.USER_DATA, status_code=200)
+            user = User.objects.get(pk=user.pk)
+            self.assertEqual(user.first_name, self.response.json['user']['first_name'])
+            self.assertEqual(user.last_name, self.response.json['user']['last_name'])
+            self.assertEqual(user.email, self.response.json['user']['email'])
+            self.assertIn('newsletter_subscribe', self.response.json)
+        else:
+            self.assertEqual(user.first_name, self.response.json['first_name'])
+            self.assertEqual(user.last_name, self.response.json['last_name'])
+            self.assertEqual(user.email, self.response.json['email'])
+
 
     def generate_uid_and_token(self, user):
         result = {}
@@ -295,3 +355,30 @@ class LoginAPITestCase(TestCase, BaseAPITestCase):
         result['token'] = default_token_generator.make_token(user)
         return result
 
+
+class APITestCase2(APITestCase1):
+    """
+    Case #2:
+    - user profile: not defined
+    - custom registration backend: not defined
+    """
+    PROFILE_MODEL = None
+
+
+class APITestCase3(APITestCase1):
+    """
+    Case #3:
+    - user profile: defined
+    - custom registration backend: not defined
+    """
+    REGISTRATION_VIEW = None
+
+
+class APITestCase4(APITestCase1):
+    """
+    Case #4:
+    - user profile: not defined
+    - custom registration backend: not defined
+    """
+    PROFILE_MODEL = None
+    REGISTRATION_VIEW = None
