@@ -185,6 +185,11 @@ class UserDetails(LoggedInRESTAPIView, GenericAPIView):
         Optional: email, first_name, last_name and UserProfile fields
     Returns the updated UserProfile and/or User object.
     """
+    if get_user_profile_model():
+        serializer_class = get_user_profile_update_serializer()
+    else:
+        serializer_class = UserUpdateSerializer
+
     def get_profile_serializer_class(self):
         return get_user_profile_serializer()
 

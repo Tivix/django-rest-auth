@@ -75,7 +75,7 @@ class UserUpdateSerializer(DynamicFieldsModelSerializer):
 
 
 
-def get_user_registration_profile_serializer():
+def get_user_registration_profile_serializer(*args, **kwargs):
     if profile_model_path():
         class UserRegistrationProfileSerializer(serializers.ModelSerializer):
 
@@ -93,7 +93,7 @@ def get_user_registration_profile_serializer():
     return UserRegistrationProfileSerializer
 
 
-def get_user_profile_serializer():
+def get_user_profile_serializer(*args, **kwargs):
     if profile_model_path():
         class UserProfileSerializer(serializers.ModelSerializer):
 
@@ -115,7 +115,7 @@ def get_user_profile_serializer():
     return UserProfileSerializer
 
 
-def get_user_profile_update_serializer():
+def get_user_profile_update_serializer(*args, **kwargs):
     if profile_model_path():
         class UserProfileUpdateSerializer(serializers.ModelSerializer):
 
