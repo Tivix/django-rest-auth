@@ -28,6 +28,10 @@ Installation
 
         INSTALLED_APPS = (
             ...,
+            'rest_framework',
+            'rest_framework.authtoken',
+            'registration',
+            ...,
             'rest_auth',
         )
 
@@ -43,7 +47,7 @@ Installation
             )
         }
 
-5. Lastly, this project accepts the following Django setting values. You can set the UserProfile model and/or create your own REST registration backend for django-registration
+5. (optional) Lastly, this project accepts the following Django setting values. You can set the UserProfile model (do not define it if you are not using any UserProfile model) and/or create your own REST registration backend for django-registration (default is registration.backends.simple.views.RegistrationView)
 
         REST_REGISTRATION_BACKEND = 'rest_auth.backends.rest_registration.RESTRegistrationView'
         REST_PROFILE_MODULE = 'accounts.UserProfile'
