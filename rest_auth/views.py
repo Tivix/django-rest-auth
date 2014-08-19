@@ -241,6 +241,7 @@ class PasswordReset(LoggedOutRESTAPIView, GenericAPIView):
     """
 
     serializer_class = PasswordResetSerializer
+    password_reset_form_class = PasswordResetForm
 
     def post(self, request):
         # Create a serializer with request.DATA
@@ -248,7 +249,7 @@ class PasswordReset(LoggedOutRESTAPIView, GenericAPIView):
 
         if serializer.is_valid():
             # Create PasswordResetForm with the serializer
-            reset_form = PasswordResetForm(data=serializer.data)
+            reset_form = self.password_reset_form_class(data=serializer.data)
 
             if reset_form.is_valid():
                 # Sett some values to trigger the send_email method.
