@@ -86,10 +86,8 @@ class Login(LoggedOutRESTAPIView, GenericAPIView):
 
             if user and user.is_authenticated():
                 if user.is_active:
-                    # TODO: be able to configure this to either be
-                    # session or token or both
-                    # right now it's both.
-                    login(request, user)
+                    if getattr(settings, 'REST_SESSION_LOGIN', True):
+                        login(request, user)
 
                     # Return REST Token object with OK HTTP status
                     token, created = self.token_model.objects.get_or_create(user=user)

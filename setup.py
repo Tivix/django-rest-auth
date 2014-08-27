@@ -18,7 +18,7 @@ f.close()
 
 setup(
     name='django-rest-auth',
-    version='0.2.4',
+    version='0.2.5',
     author='Sumit Chachra',
     author_email='chachra@tivix.com',
     url='http://github.com/Tivix/django-rest-auth',
