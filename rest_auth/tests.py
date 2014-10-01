@@ -328,7 +328,7 @@ class APITestCase1(TestCase, BaseAPITestCase):
             status_code=status.HTTP_400_BAD_REQUEST)
 
         self.post(self.register_url, data=self.REGISTRATION_DATA_WITH_EMAIL,
-            status_code=status.HTTP_201_BAD_REQUEST)
+            status_code=status.HTTP_201_CREATED)
         self.assertEqual(User.objects.all().count(), user_count + 1)
         self.assertEqual(len(mail.outbox), mail_count + 1)
         new_user = get_user_model().objects.latest('id')
