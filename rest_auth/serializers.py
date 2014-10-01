@@ -34,17 +34,6 @@ class UserDetailsSerializer(serializers.ModelSerializer):
         fields = ('username', 'email', 'first_name', 'last_name')
 
 
-class UserRegistrationSerializer(serializers.ModelSerializer):
-
-    """
-    Serializer for Django User model and most of its fields.
-    """
-
-    class Meta:
-        model = get_user_model()
-        fields = ('username', 'password', 'email', 'first_name', 'last_name')
-
-
 class DynamicFieldsModelSerializer(serializers.ModelSerializer):
 
     """

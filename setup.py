@@ -29,7 +29,7 @@ setup(
     zip_safe=False,
     install_requires=[
         'Django>=1.5.0',
-        'django-registration>=1.0',
+        'django-allauth>=0.18.0',
         'djangorestframework>=2.3.13',
     ],
     test_suite='rest_auth.runtests.runtests',

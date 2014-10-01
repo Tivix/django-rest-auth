@@ -9,7 +9,6 @@ from django.contrib.auth.models import User
 from django.contrib.auth import get_user_model
 from django.core import mail
 
-from registration.models import RegistrationProfile
 from rest_framework.serializers import _resolve_model
 
 
@@ -113,7 +112,6 @@ class BaseAPITestCase(object):
 # -----------------------
 
 
-
 class APITestCase1(TestCase, BaseAPITestCase):
     """
     Case #1:
@@ -129,15 +127,11 @@ class APITestCase1(TestCase, BaseAPITestCase):
     REGISTRATION_VIEW = 'rest_auth.runtests.RegistrationView'
 
     # data without user profile
-    BASIC_REGISTRATION_DATA = {
+    REGISTRATION_DATA = {
         "username": USERNAME,
-        "password": PASS,
-        "email": EMAIL
+        "password1": PASS,
+        "password2": PASS
     }
-
-    # data with user profile
-    REGISTRATION_DATA = BASIC_REGISTRATION_DATA.copy()
-    REGISTRATION_DATA['newsletter_subscribe'] = False
 
     BASIC_USER_DATA = {
         'first_name': "John",
@@ -191,7 +185,7 @@ class APITestCase1(TestCase, BaseAPITestCase):
 
         # test wrong username/password
         payload = {
-            "username": self.USERNAME+'?',
+            "username": self.USERNAME + '?',
             "password": self.PASS
         }
         self.post(self.login_url, data=payload, status_code=401)
@@ -199,13 +193,12 @@ class APITestCase1(TestCase, BaseAPITestCase):
         # test empty payload
         self.post(self.login_url, data={}, status_code=400)
 
-
     def test_password_change(self):
         login_payload = {
             "username": self.USERNAME,
             "password": self.PASS
         }
-        user = User.objects.create_user(self.USERNAME, '', self.PASS)
+        User.objects.create_user(self.USERNAME, '', self.PASS)
         self.post(self.login_url, data=login_payload, status_code=200)
         self.token = self.response.json['key']
 
@@ -234,61 +227,6 @@ class APITestCase1(TestCase, BaseAPITestCase):
         # send empty payload
         self.post(self.password_change_url, data={}, status_code=400)
 
-    def test_registration(self):
-        user_count = User.objects.all().count()
-
-        # test empty payload
-        self.post(self.register_url, data={}, status_code=400)
-
-        self.post(self.register_url, data=self.REGISTRATION_DATA, status_code=201)
-        self.assertEqual(User.objects.all().count(), user_count+1)
-        new_user = get_user_model().objects.latest('id')
-
-        if self.REGISTRATION_VIEW:
-            activation_key = RegistrationProfile.objects.latest('id').activation_key
-            verify_url = reverse('verify_email',
-                kwargs={'activation_key': activation_key})
-
-            # new user at this point shouldn't be active
-            self.assertEqual(new_user.is_active, False)
-
-            # let's active new user and check is_active flag
-            self.get(verify_url)
-            new_user = get_user_model().objects.latest('id')
-            self.assertEqual(new_user.is_active, True)
-            if self.user_profile_model:
-                user_profile = self.user_profile_model.objects.get(user=new_user)
-                self.assertIsNotNone(user_profile)
-        else:
-            self.assertEqual(new_user.is_active, True)
-
-    def test_registration_without_profile_data(self):
-        user_count = User.objects.all().count()
-
-        self.post(self.register_url, data=self.BASIC_REGISTRATION_DATA,
-            status_code=201)
-        self.assertEqual(User.objects.all().count(), user_count+1)
-        new_user = get_user_model().objects.latest('id')
-
-        if self.REGISTRATION_VIEW:
-            activation_key = RegistrationProfile.objects.latest('id').activation_key
-            verify_url = reverse('verify_email',
-                kwargs={'activation_key': activation_key})
-
-            # new user at this point shouldn't be active
-            self.assertEqual(new_user.is_active, False)
-
-            # let's active new user and check is_active flag
-            self.get(verify_url)
-            new_user = get_user_model().objects.latest('id')
-            self.assertEqual(new_user.is_active, True)
-            if self.user_profile_model:
-                user_profile = self.user_profile_model.objects.get(user=new_user)
-                self.assertIsNotNone(user_profile)
-        else:
-            self.assertEqual(new_user.is_active, True)
-
-
     def test_password_reset(self):
         user = User.objects.create_user(self.USERNAME, self.EMAIL, self.PASS)
 
@@ -296,7 +234,7 @@ class APITestCase1(TestCase, BaseAPITestCase):
         mail_count = len(mail.outbox)
         payload = {'email': self.EMAIL}
         self.post(self.password_reset_url, data=payload)
-        self.assertEqual(len(mail.outbox), mail_count+1)
+        self.assertEqual(len(mail.outbox), mail_count + 1)
 
         url_kwargs = self.generate_uid_and_token(user)
 
@@ -340,7 +278,6 @@ class APITestCase1(TestCase, BaseAPITestCase):
             self.assertEqual(user.last_name, self.response.json['last_name'])
             self.assertEqual(user.email, self.response.json['email'])
 
-
     def generate_uid_and_token(self, user):
         result = {}
         from django.utils.encoding import force_bytes
@@ -355,30 +292,13 @@ class APITestCase1(TestCase, BaseAPITestCase):
         result['token'] = default_token_generator.make_token(user)
         return result
 
+    def test_registration(self):
+        user_count = User.objects.all().count()
 
-class APITestCase2(APITestCase1):
-    """
-    Case #2:
-    - user profile: not defined
-    - custom registration backend: not defined
-    """
-    PROFILE_MODEL = None
+        # test empty payload
+        self.post(self.register_url, data={}, status_code=400)
 
-
-class APITestCase3(APITestCase1):
-    """
-    Case #3:
-    - user profile: defined
-    - custom registration backend: not defined
-    """
-    REGISTRATION_VIEW = None
-
-
-class APITestCase4(APITestCase1):
-    """
-    Case #4:
-    - user profile: not defined
-    - custom registration backend: not defined
-    """
-    PROFILE_MODEL = None
-    REGISTRATION_VIEW = None
+        self.post(self.register_url, data=self.REGISTRATION_DATA, status_code=201)
+        self.assertEqual(User.objects.all().count(), user_count + 1)
+        new_user = get_user_model().objects.latest('id')
+        self.assertEqual(new_user.username, self.REGISTRATION_DATA['username'])

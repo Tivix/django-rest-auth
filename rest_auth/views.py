@@ -7,7 +7,6 @@ except:
     # make compatible with django 1.5
     from django.utils.http import base36_to_int as uid_decoder
 from django.conf import settings
-from django.core.exceptions import ObjectDoesNotExist
 
 from rest_framework import status
 from rest_framework.views import APIView
@@ -19,17 +18,11 @@ from rest_framework.authentication import SessionAuthentication, \
     TokenAuthentication
 from rest_framework.authtoken.models import Token
 
-from registration.models import RegistrationProfile
-from registration import signals
-from registration.views import ActivationView
-
 from rest_auth.utils import construct_modules_and_import
-from rest_auth.models import *
 from rest_auth.serializers import (TokenSerializer, UserDetailsSerializer,
-    LoginSerializer, UserRegistrationSerializer,
+    LoginSerializer,
     SetPasswordSerializer, PasswordResetSerializer, UserUpdateSerializer,
-    get_user_registration_profile_serializer, get_user_profile_serializer,
-    get_user_profile_update_serializer)
+    get_user_profile_serializer, get_user_profile_update_serializer)
 
 
 def get_user_profile_model():
@@ -38,16 +31,6 @@ def get_user_profile_model():
     if user_profile_path:
         setattr(settings, 'AUTH_PROFILE_MODULE', user_profile_path)
         return _resolve_model(user_profile_path)
-
-
-def get_registration_backend():
-    # Get the REST Registration Backend for django-registration
-    registration_backend = getattr(settings, 'REST_REGISTRATION_BACKEND',
-        'registration.backends.simple.views.RegistrationView')
-
-    # Get the REST REGISTRATION BACKEND class from the setting value via above
-    # method
-    return construct_modules_and_import(registration_backend)
 
 
 class LoggedInRESTAPIView(APIView):
@@ -123,53 +106,6 @@ class Logout(LoggedInRESTAPIView):
 
         return Response({"success": "Successfully logged out."},
                         status=status.HTTP_200_OK)
-
-
-class Register(LoggedOutRESTAPIView, GenericAPIView):
-
-    """
-    Registers a new Django User object by accepting required field values.
-
-    Accepts the following POST parameters:
-        Required: username, password, email
-        Optional: first_name & last_name for User object and UserProfile fields
-    Returns the newly created User object including REST Framework Token key.
-    """
-
-    serializer_class = UserRegistrationSerializer
-
-    def get_profile_serializer_class(self):
-        return get_user_registration_profile_serializer()
-
-    def post(self, request):
-        # Create serializers with request.DATA
-        serializer = self.serializer_class(data=request.DATA)
-        profile_serializer_class = self.get_profile_serializer_class()
-        profile_serializer = profile_serializer_class(data=request.DATA)
-
-        if serializer.is_valid() and profile_serializer.is_valid():
-            # Change the password key to password1 so that RESTRegistrationView
-            # can accept the data
-            serializer.data['password1'] = serializer.data.pop('password')
-
-            # TODO: Make this customizable backend via settings.
-            # Call RESTRegistrationView().register to create new Django User
-            # and UserProfile models
-            data = serializer.data.copy()
-            data.update(profile_serializer.data)
-
-            RESTRegistrationView = get_registration_backend()
-            RESTRegistrationView().register(request, **data)
-
-            # Return the User object with Created HTTP status
-            return Response(UserDetailsSerializer(serializer.data).data,
-                            status=status.HTTP_201_CREATED)
-
-        else:
-            return Response({
-                'user': serializer.errors,
-                'profile': profile_serializer.errors},
-                status=status.HTTP_400_BAD_REQUEST)
 
 
 class UserDetails(LoggedInRESTAPIView, GenericAPIView):
@@ -326,37 +262,6 @@ class PasswordResetConfirm(LoggedOutRESTAPIView, GenericAPIView):
 
         else:
             return Response({"errors": "Couldn\'t find the user from uid."}, status=status.HTTP_400_BAD_REQUEST)
-
-
-class VerifyEmail(LoggedOutRESTAPIView, GenericAPIView):
-
-    """
-    Verifies the email of the user through their activation_key.
-
-    Accepts activation_key django argument: key from activation email.
-    Returns the success/fail message.
-    """
-
-    model = RegistrationProfile
-
-    def get(self, request, activation_key=None):
-        # Get the user registration profile with the activation key
-        target_user = RegistrationProfile.objects.activate_user(activation_key)
-
-        if target_user:
-            # Send the activation signal
-            signals.user_activated.send(sender=ActivationView.__class__,
-                                        user=target_user,
-                                        request=request)
-
-            # Return the success message with OK HTTP status
-            ret_msg = "User {0}'s account was successfully activated!".format(
-                target_user.username)
-            return Response({"success": ret_msg}, status=status.HTTP_200_OK)
-
-        else:
-            ret_msg = "The account was not able to be activated or already activated, please contact support."
-            return Response({"errors": ret_msg}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class PasswordChange(LoggedInRESTAPIView, GenericAPIView):

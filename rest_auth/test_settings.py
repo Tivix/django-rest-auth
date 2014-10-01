@@ -1,5 +1,6 @@
 import django
-import os, sys
+import os
+import sys
 
 PROJECT_ROOT = os.path.abspath(os.path.split(os.path.split(__file__)[0])[0])
 ROOT_URLCONF = 'urls'
@@ -37,11 +38,14 @@ INSTALLED_APPS = [
     'django.contrib.sitemaps',
     'django.contrib.staticfiles',
 
+    'allauth',
+    'allauth.account',
+
     'rest_framework',
     'rest_framework.authtoken',
-    'registration',
 
     'rest_auth',
+    'rest_auth.registration'
 ]
 
 SECRET_KEY = "38dh*skf8sjfhs287dh&^hd8&3hdg*j2&sd"
