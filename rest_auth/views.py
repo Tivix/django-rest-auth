@@ -62,29 +62,18 @@ class Login(LoggedOutRESTAPIView, GenericAPIView):
         # Create a serializer with request.DATA
         serializer = self.serializer_class(data=request.DATA)
 
-        if serializer.is_valid():
-            # Authenticate the credentials by grabbing Django User object
-            user = authenticate(username=serializer.data['username'],
-                                password=serializer.data['password'])
-
-            if user and user.is_authenticated():
-                if user.is_active:
-                    if getattr(settings, 'REST_SESSION_LOGIN', True):
-                        login(request, user)
-
-                    # Return REST Token object with OK HTTP status
-                    token, created = self.token_model.objects.get_or_create(user=user)
-                    return Response(self.token_serializer(token).data,
-                                    status=status.HTTP_200_OK)
-                else:
-                    return Response({'error': 'This account is disabled.'},
-                                    status=status.HTTP_401_UNAUTHORIZED)
-            else:
-                return Response({'error': 'Invalid Username/Password.'},
-                                status=status.HTTP_401_UNAUTHORIZED)
-        else:
+        if not serializer.is_valid():
             return Response(serializer.errors,
-                            status=status.HTTP_400_BAD_REQUEST)
+                status=status.HTTP_400_BAD_REQUEST)
+
+        user = serializer.object['user']
+        token, created = self.token_model.objects.get_or_create(user=user)
+
+        if getattr(settings, 'REST_SESSION_LOGIN', True):
+            login(request, user)
+
+        return Response(self.token_serializer(token).data,
+                        status=status.HTTP_200_OK)
 
 
 class Logout(LoggedInRESTAPIView):

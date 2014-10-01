@@ -8,8 +8,10 @@ from django.test import TestCase
 from django.contrib.auth.models import User
 from django.contrib.auth import get_user_model
 from django.core import mail
+from django.test.utils import override_settings
 
 from rest_framework.serializers import _resolve_model
+from rest_framework import status
 
 
 class APIClient(Client):
@@ -133,6 +135,9 @@ class APITestCase1(TestCase, BaseAPITestCase):
         "password2": PASS
     }
 
+    REGISTRATION_DATA_WITH_EMAIL = REGISTRATION_DATA.copy()
+    REGISTRATION_DATA_WITH_EMAIL['email'] = EMAIL
+
     BASIC_USER_DATA = {
         'first_name': "John",
         'last_name': 'Smith',
@@ -164,8 +169,8 @@ class APITestCase1(TestCase, BaseAPITestCase):
             "username": self.USERNAME,
             "password": self.PASS
         }
-        # there is no users in db so it should throw error (401)
-        self.post(self.login_url, data=payload, status_code=401)
+        # there is no users in db so it should throw error (400)
+        self.post(self.login_url, data=payload, status_code=400)
 
         self.post(self.password_change_url, status_code=403)
 
@@ -181,14 +186,14 @@ class APITestCase1(TestCase, BaseAPITestCase):
         # test inactive user
         user.is_active = False
         user.save()
-        self.post(self.login_url, data=payload, status_code=401)
+        self.post(self.login_url, data=payload, status_code=400)
 
         # test wrong username/password
         payload = {
             "username": self.USERNAME + '?',
             "password": self.PASS
         }
-        self.post(self.login_url, data=payload, status_code=401)
+        self.post(self.login_url, data=payload, status_code=400)
 
         # test empty payload
         self.post(self.login_url, data={}, status_code=400)
@@ -210,7 +215,7 @@ class APITestCase1(TestCase, BaseAPITestCase):
             status_code=200)
 
         # user should not be able to login using old password
-        self.post(self.login_url, data=login_payload, status_code=401)
+        self.post(self.login_url, data=login_payload, status_code=400)
 
         # new password should work
         login_payload['password'] = new_password_payload['new_password1']
@@ -302,3 +307,33 @@ class APITestCase1(TestCase, BaseAPITestCase):
         self.assertEqual(User.objects.all().count(), user_count + 1)
         new_user = get_user_model().objects.latest('id')
         self.assertEqual(new_user.username, self.REGISTRATION_DATA['username'])
+
+        payload = {
+            "username": self.USERNAME,
+            "password": self.PASS
+        }
+        self.post(self.login_url, data=payload, status_code=200)
+
+    @override_settings(
+        ACCOUNT_EMAIL_VERIFICATION='mandatory',
+        ACCOUNT_EMAIL_REQUIRED=True
+    )
+    def test_registration_with_email_verification(self):
+        user_count = User.objects.all().count()
+        mail_count = len(mail.outbox)
+
+        # test empty payload
+        self.post(self.register_url, data={}, status_code=400)
+
+        self.post(self.register_url, data=self.REGISTRATION_DATA_WITH_EMAIL, status_code=201)
+        self.assertEqual(User.objects.all().count(), user_count + 1)
+        self.assertEqual(len(mail.outbox), mail_count + 1)
+        new_user = get_user_model().objects.latest('id')
+        self.assertEqual(new_user.username, self.REGISTRATION_DATA['username'])
+
+        # email is not verified yet
+        payload = {
+            "username": self.USERNAME,
+            "password": self.PASS
+        }
+        self.post(self.login_url, data=payload, status=status.HTTP_400_BAD_REQUEST)

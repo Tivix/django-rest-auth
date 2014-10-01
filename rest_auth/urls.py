@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.conf.urls import patterns, url, include
+from django.views.generic import TemplateView
 
 from rest_auth.views import Login, Logout, UserDetails, \
     PasswordChange, PasswordReset, PasswordResetConfirm
@@ -27,5 +28,9 @@ if getattr(settings, 'IS_TEST', False):
     from django.contrib.auth.tests import urls
     urlpatterns += patterns('',
         url(r'^rest-registration/', include('registration.urls')),
-        url(r'^test-admin/', include(urls))
+        url(r'^test-admin/', include(urls)),
+        url(r'^account-email-verification-sent/$', TemplateView.as_view(),
+            name='account_email_verification_sent'),
+        url(r'^account-confirm-email/(?P<key>\w+)/$', TemplateView.as_view(),
+            name='account_confirm_email'),
     )

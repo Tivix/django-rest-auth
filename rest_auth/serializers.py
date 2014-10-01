@@ -4,13 +4,25 @@ from django.conf import settings
 from rest_framework import serializers
 from rest_framework.serializers import _resolve_model
 from rest_framework.authtoken.models import Token
+from rest_framework.authtoken.serializers import AuthTokenSerializer
 
 
 profile_model_path = lambda: getattr(settings, 'REST_PROFILE_MODULE', None)
 
-class LoginSerializer(serializers.Serializer):
-    username = serializers.CharField(max_length=30)
-    password = serializers.CharField(max_length=128)
+
+class LoginSerializer(AuthTokenSerializer):
+
+    def validate(self, attrs):
+        attrs = super(LoginSerializer, self).validate(attrs)
+
+        if 'rest_auth.registration' in settings.INSTALLED_APPS:
+            from allauth.account import app_settings
+            if app_settings.EMAIL_VERIFICATION == app_settings.EmailVerificationMethod.MANDATORY:
+                user = attrs['user']
+                email_address = user.emailaddress_set.get(email=user.email)
+                if not email_address.verified:
+                    raise serializers.ValidationError('E-mail is not verified.')
+        return attrs
 
 
 class TokenSerializer(serializers.ModelSerializer):
