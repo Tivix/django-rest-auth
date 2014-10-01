@@ -153,6 +153,7 @@ class APITestCase1(TestCase, BaseAPITestCase):
         self.register_url = reverse('rest_register')
         self.password_reset_url = reverse('rest_password_reset')
         self.user_url = reverse('rest_user_details')
+        self.veirfy_email_url = reverse('verify_email')
 
         setattr(settings, 'REST_PROFILE_MODULE', self.PROFILE_MODEL)
         self.user_profile_model = None
@@ -323,9 +324,11 @@ class APITestCase1(TestCase, BaseAPITestCase):
         mail_count = len(mail.outbox)
 
         # test empty payload
-        self.post(self.register_url, data={}, status_code=400)
+        self.post(self.register_url, data={},
+            status_code=status.HTTP_400_BAD_REQUEST)
 
-        self.post(self.register_url, data=self.REGISTRATION_DATA_WITH_EMAIL, status_code=201)
+        self.post(self.register_url, data=self.REGISTRATION_DATA_WITH_EMAIL,
+            status_code=status.HTTP_201_BAD_REQUEST)
         self.assertEqual(User.objects.all().count(), user_count + 1)
         self.assertEqual(len(mail.outbox), mail_count + 1)
         new_user = get_user_model().objects.latest('id')
@@ -336,4 +339,14 @@ class APITestCase1(TestCase, BaseAPITestCase):
             "username": self.USERNAME,
             "password": self.PASS
         }
-        self.post(self.login_url, data=payload, status=status.HTTP_400_BAD_REQUEST)
+        self.post(self.login_url, data=payload,
+            status=status.HTTP_400_BAD_REQUEST)
+
+        # veirfy email
+        email_confirmation = new_user.emailaddress_set.get(email=self.EMAIL)\
+            .emailconfirmation_set.last()
+        self.post(self.veirfy_email_url, data={"key": email_confirmation.key},
+            status_code=status.HTTP_200_OK)
+
+        # try to login again
+        self.post(self.login_url, data=payload, status_code=status.HTTP_200_OK)

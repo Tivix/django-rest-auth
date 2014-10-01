@@ -5,8 +5,7 @@ from .views import Register, VerifyEmail
 
 urlpatterns = patterns('',
     url(r'^$', Register.as_view(), name='rest_register'),
-    url(r'^verify-email/(?P<activation_key>\w+)/$', VerifyEmail.as_view(),
-        name='verify_email'),
+    url(r'^verify-email/$', VerifyEmail.as_view(), name='verify_email'),
 
     url(r'^account-email-verification-sent/$', TemplateView.as_view(),
         name='account_email_verification_sent'),

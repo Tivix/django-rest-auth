@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from rest_framework import status
 
-from allauth.account.views import SignupView
+from allauth.account.views import SignupView, ConfirmEmailView
 from allauth.account.utils import complete_signup
 from allauth.account import app_settings
 
@@ -40,5 +40,12 @@ class Register(APIView, SignupView):
         return Response(self.form.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class VerifyEmail(APIView):
-    pass
+class VerifyEmail(APIView, ConfirmEmailView):
+
+    permission_classes = (AllowAny,)
+
+    def post(self, request, *args, **kwargs):
+        self.kwargs['key'] = self.request.DATA.get('key', '')
+        confirmation = self.get_object()
+        confirmation.confirm(self.request)
+        return Response({'message': 'ok'}, status=status.HTTP_200_OK)
