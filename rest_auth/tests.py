@@ -344,7 +344,7 @@ class APITestCase1(TestCase, BaseAPITestCase):
 
         # veirfy email
         email_confirmation = new_user.emailaddress_set.get(email=self.EMAIL)\
-            .emailconfirmation_set.last()
+            .emailconfirmation_set.order_by('-created')[0]
         self.post(self.veirfy_email_url, data={"key": email_confirmation.key},
             status_code=status.HTTP_200_OK)
 
