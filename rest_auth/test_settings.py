@@ -28,6 +28,14 @@ if django.VERSION[:2] >= (1, 3):
 else:
     DATABASE_ENGINE = 'sqlite3'
 
+MIDDLEWARE_CLASSES = [
+    'django.middleware.common.CommonMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware'
+]
+
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -51,3 +59,7 @@ INSTALLED_APPS = [
 SECRET_KEY = "38dh*skf8sjfhs287dh&^hd8&3hdg*j2&sd"
 ACCOUNT_ACTIVATION_DAYS = 1
 SITE_ID = 1
+
+MIGRATION_MODULES = {
+    'authtoken': 'authtoken.migrations',
+}

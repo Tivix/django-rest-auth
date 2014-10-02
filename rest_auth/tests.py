@@ -170,12 +170,12 @@ class APITestCase1(TestCase, BaseAPITestCase):
         from django.utils.encoding import force_bytes
         from django.contrib.auth.tokens import default_token_generator
         from django import VERSION
-        if VERSION[1] == 6:
-            from django.utils.http import urlsafe_base64_encode
-            result['uid'] = urlsafe_base64_encode(force_bytes(user.pk))
-        elif VERSION[1] == 5:
+        if VERSION[1] == 5:
             from django.utils.http import int_to_base36
             result['uid'] = int_to_base36(user.pk)
+        else:
+            from django.utils.http import urlsafe_base64_encode
+            result['uid'] = urlsafe_base64_encode(force_bytes(user.pk))
         result['token'] = default_token_generator.make_token(user)
         return result
 
