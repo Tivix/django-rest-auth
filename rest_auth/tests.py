@@ -125,7 +125,6 @@ class APITestCase1(TestCase, BaseAPITestCase):
     PASS = 'person'
     EMAIL = "person1@world.com"
     NEW_PASS = 'new-test-pass'
-    PROFILE_MODEL = 'rest_auth.UserProfile'
     REGISTRATION_VIEW = 'rest_auth.runtests.RegistrationView'
 
     # data without user profile
@@ -149,21 +148,36 @@ class APITestCase1(TestCase, BaseAPITestCase):
     def setUp(self):
         self.init()
         self.login_url = reverse('rest_login')
+        self.logout_url = reverse('rest_logout')
         self.password_change_url = reverse('rest_password_change')
         self.register_url = reverse('rest_register')
         self.password_reset_url = reverse('rest_password_reset')
         self.user_url = reverse('rest_user_details')
         self.veirfy_email_url = reverse('verify_email')
 
-        setattr(settings, 'REST_PROFILE_MODULE', self.PROFILE_MODEL)
-        self.user_profile_model = None
-        if self.PROFILE_MODEL:
-            self.user_profile_model = _resolve_model(self.PROFILE_MODEL)
+    def _login(self):
+        payload = {
+            "username": self.USERNAME,
+            "password": self.PASS
+        }
+        self.post(self.login_url, data=payload, status_code=status.HTTP_200_OK)
 
-        if self.REGISTRATION_VIEW:
-            setattr(settings, 'REST_REGISTRATION_BACKEND', self.REGISTRATION_VIEW)
-        elif hasattr(settings, 'REST_REGISTRATION_BACKEND'):
-            delattr(settings, 'REST_REGISTRATION_BACKEND')
+    def _logout(self):
+        self.post(self.logout_url, status=status.HTTP_200_OK)
+
+    def _generate_uid_and_token(self, user):
+        result = {}
+        from django.utils.encoding import force_bytes
+        from django.contrib.auth.tokens import default_token_generator
+        from django import VERSION
+        if VERSION[1] == 6:
+            from django.utils.http import urlsafe_base64_encode
+            result['uid'] = urlsafe_base64_encode(force_bytes(user.pk))
+        elif VERSION[1] == 5:
+            from django.utils.http import int_to_base36
+            result['uid'] = int_to_base36(user.pk)
+        result['token'] = default_token_generator.make_token(user)
+        return result
 
     def test_login(self):
         payload = {
@@ -242,7 +256,7 @@ class APITestCase1(TestCase, BaseAPITestCase):
         self.post(self.password_reset_url, data=payload)
         self.assertEqual(len(mail.outbox), mail_count + 1)
 
-        url_kwargs = self.generate_uid_and_token(user)
+        url_kwargs = self._generate_uid_and_token(user)
 
         data = {
             'new_password1': self.NEW_PASS,
@@ -259,8 +273,6 @@ class APITestCase1(TestCase, BaseAPITestCase):
 
     def test_user_details(self):
         user = User.objects.create_user(self.USERNAME, self.EMAIL, self.PASS)
-        if self.user_profile_model:
-            self.user_profile_model.objects.create(user=user)
         payload = {
             "username": self.USERNAME,
             "password": self.PASS
@@ -271,32 +283,9 @@ class APITestCase1(TestCase, BaseAPITestCase):
 
         self.patch(self.user_url, data=self.BASIC_USER_DATA, status_code=200)
         user = User.objects.get(pk=user.pk)
-
-        if self.user_profile_model:
-            self.post(self.user_url, data=self.USER_DATA, status_code=200)
-            user = User.objects.get(pk=user.pk)
-            self.assertEqual(user.first_name, self.response.json['user']['first_name'])
-            self.assertEqual(user.last_name, self.response.json['user']['last_name'])
-            self.assertEqual(user.email, self.response.json['user']['email'])
-            self.assertIn('newsletter_subscribe', self.response.json)
-        else:
-            self.assertEqual(user.first_name, self.response.json['first_name'])
-            self.assertEqual(user.last_name, self.response.json['last_name'])
-            self.assertEqual(user.email, self.response.json['email'])
-
-    def generate_uid_and_token(self, user):
-        result = {}
-        from django.utils.encoding import force_bytes
-        from django.contrib.auth.tokens import default_token_generator
-        from django import VERSION
-        if VERSION[1] == 6:
-            from django.utils.http import urlsafe_base64_encode
-            result['uid'] = urlsafe_base64_encode(force_bytes(user.pk))
-        elif VERSION[1] == 5:
-            from django.utils.http import int_to_base36
-            result['uid'] = int_to_base36(user.pk)
-        result['token'] = default_token_generator.make_token(user)
-        return result
+        self.assertEqual(user.first_name, self.response.json['first_name'])
+        self.assertEqual(user.last_name, self.response.json['last_name'])
+        self.assertEqual(user.email, self.response.json['email'])
 
     def test_registration(self):
         user_count = User.objects.all().count()
@@ -309,11 +298,8 @@ class APITestCase1(TestCase, BaseAPITestCase):
         new_user = get_user_model().objects.latest('id')
         self.assertEqual(new_user.username, self.REGISTRATION_DATA['username'])
 
-        payload = {
-            "username": self.USERNAME,
-            "password": self.PASS
-        }
-        self.post(self.login_url, data=payload, status_code=200)
+        self._login()
+        self._logout()
 
     @override_settings(
         ACCOUNT_EMAIL_VERIFICATION='mandatory',
@@ -349,4 +335,5 @@ class APITestCase1(TestCase, BaseAPITestCase):
             status_code=status.HTTP_200_OK)
 
         # try to login again
-        self.post(self.login_url, data=payload, status_code=status.HTTP_200_OK)
+        self._login()
+        self._logout()

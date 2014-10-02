@@ -1,5 +1,5 @@
 from django.contrib.auth.forms import PasswordResetForm, SetPasswordForm
-from django.contrib.auth import authenticate, login, logout, get_user_model
+from django.contrib.auth import login, logout, get_user_model
 from django.contrib.auth.tokens import default_token_generator
 try:
     from django.utils.http import urlsafe_base64_decode as uid_decoder
@@ -12,7 +12,6 @@ from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.generics import GenericAPIView
-from rest_framework.serializers import _resolve_model
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.authentication import SessionAuthentication, \
     TokenAuthentication
@@ -21,14 +20,6 @@ from rest_framework.generics import RetrieveUpdateAPIView
 
 from rest_auth.serializers import (TokenSerializer, UserDetailsSerializer,
     LoginSerializer, SetPasswordSerializer, PasswordResetSerializer)
-
-
-def get_user_profile_model():
-    # Get the UserProfile model from the setting value
-    user_profile_path = getattr(settings, 'REST_PROFILE_MODULE', None)
-    if user_profile_path:
-        setattr(settings, 'AUTH_PROFILE_MODULE', user_profile_path)
-        return _resolve_model(user_profile_path)
 
 
 class LoggedInRESTAPIView(APIView):
