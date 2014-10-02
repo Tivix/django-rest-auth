@@ -48,13 +48,13 @@ class Login(LoggedOutRESTAPIView, GenericAPIView):
     response_serializer = TokenSerializer
 
     def get_serializer(self):
-        return self.serializer_class(data=self.request.DATA)
+        return self.serializer_class(data=self.request.DATA,
+            context={'request': self.request, 'view': self})
 
     def login(self):
         self.user = self.serializer.object['user']
         self.token, created = self.token_model.objects.get_or_create(
             user=self.user)
-
         if getattr(settings, 'REST_SESSION_LOGIN', True):
             login(self.request, self.user)
 
@@ -244,3 +244,5 @@ class PasswordChange(LoggedInRESTAPIView, GenericAPIView):
         else:
             return Response(serializer.errors,
                             status=status.HTTP_400_BAD_REQUEST)
+
+

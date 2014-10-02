@@ -8,6 +8,8 @@ from allauth.account.utils import complete_signup
 from allauth.account import app_settings
 
 from rest_auth.serializers import UserDetailsSerializer
+from rest_auth.registration.serializers import SocialLoginSerializer
+from rest_auth.views import Login
 
 
 class Register(APIView, SignupView):
@@ -49,3 +51,16 @@ class VerifyEmail(APIView, ConfirmEmailView):
         confirmation = self.get_object()
         confirmation.confirm(self.request)
         return Response({'message': 'ok'}, status=status.HTTP_200_OK)
+
+
+class SocialLogin(Login):
+    """
+    class used for social authentications
+    example usage for facebook
+
+    from allauth.socialaccount.providers.facebook.views import FacebookOAuth2Adapter
+    class FacebookLogin(SocialLogin):
+        adapter_class = FacebookOAuth2Adapter
+    """
+
+    serializer_class = SocialLoginSerializer
