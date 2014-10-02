@@ -2,12 +2,8 @@ from django.contrib.auth import get_user_model
 from django.conf import settings
 
 from rest_framework import serializers
-from rest_framework.serializers import _resolve_model
 from rest_framework.authtoken.models import Token
 from rest_framework.authtoken.serializers import AuthTokenSerializer
-
-
-profile_model_path = lambda: getattr(settings, 'REST_PROFILE_MODULE', None)
 
 
 class LoginSerializer(AuthTokenSerializer):
@@ -26,7 +22,6 @@ class LoginSerializer(AuthTokenSerializer):
 
 
 class TokenSerializer(serializers.ModelSerializer):
-
     """
     Serializer for Token model.
     """
@@ -43,96 +38,9 @@ class UserDetailsSerializer(serializers.ModelSerializer):
     """
     class Meta:
         model = get_user_model()
-        fields = ('username', 'email', 'first_name', 'last_name')
-
-
-class DynamicFieldsModelSerializer(serializers.ModelSerializer):
-
-    """
-    ModelSerializer that allows fields argument to control fields
-    """
-
-    def __init__(self, *args, **kwargs):
-        fields = kwargs.pop('fields', None)
-
-        super(DynamicFieldsModelSerializer, self).__init__(*args, **kwargs)
-
-        if fields:
-            allowed = set(fields)
-            existing = set(self.fields.keys())
-
-            for field_name in existing - allowed:
-                self.fields.pop(field_name)
-
-
-class UserUpdateSerializer(DynamicFieldsModelSerializer):
-
-    """
-    User model w/o username and password
-    """
-    class Meta:
-        model = get_user_model()
-        fields = ('id', 'email', 'first_name', 'last_name')
-
-
-
-def get_user_registration_profile_serializer(*args, **kwargs):
-    if profile_model_path():
-        class UserRegistrationProfileSerializer(serializers.ModelSerializer):
-
-            """
-            Serializer that includes all profile fields except for user fk / id.
-            """
-            class Meta:
-
-                model = _resolve_model(profile_model_path())
-                fields = filter(lambda x: x != 'id' and x != 'user',
-                                map(lambda x: x.name, model._meta.fields))
-    else:
-        class UserRegistrationProfileSerializer(serializers.Serializer):
-            pass
-    return UserRegistrationProfileSerializer
-
-
-def get_user_profile_serializer(*args, **kwargs):
-    if profile_model_path():
-        class UserProfileSerializer(serializers.ModelSerializer):
-
-            """
-            Serializer for UserProfile model.
-            """
-
-            user = UserDetailsSerializer()
-
-            class Meta:
-                # http://stackoverflow.com/questions/4881607/django-get-model-from-string
-                model = _resolve_model(profile_model_path())
-
-            def __init__(self, *args, **kwargs):
-                super(UserProfileSerializer, self).__init__(*args, **kwargs)
-    else:
-        class UserProfileSerializer(serializers.Serializer):
-            pass
-    return UserProfileSerializer
-
-
-def get_user_profile_update_serializer(*args, **kwargs):
-    if profile_model_path():
-        class UserProfileUpdateSerializer(serializers.ModelSerializer):
-
-            """
-            Serializer for updating User and UserProfile model.
-            """
-
-            user = UserUpdateSerializer()
-
-            class Meta:
-                # http://stackoverflow.com/questions/4881607/django-get-model-from-string
-                model = _resolve_model(profile_model_path())
-    else:
-        class UserProfileUpdateSerializer(serializers.Serializer):
-            pass
-    return UserProfileUpdateSerializer
+        exclude = ('password', 'groups', 'user_permissions', 'is_staff',
+            'is_superuser')
+        read_only_fields = ('id', 'last_login', 'is_active', 'date_joined')
 
 
 class SetPasswordSerializer(serializers.Serializer):

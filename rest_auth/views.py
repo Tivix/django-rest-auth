@@ -17,12 +17,10 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.authentication import SessionAuthentication, \
     TokenAuthentication
 from rest_framework.authtoken.models import Token
+from rest_framework.generics import RetrieveUpdateAPIView
 
-from rest_auth.utils import construct_modules_and_import
 from rest_auth.serializers import (TokenSerializer, UserDetailsSerializer,
-    LoginSerializer,
-    SetPasswordSerializer, PasswordResetSerializer, UserUpdateSerializer,
-    get_user_profile_serializer, get_user_profile_update_serializer)
+    LoginSerializer, SetPasswordSerializer, PasswordResetSerializer)
 
 
 def get_user_profile_model():
@@ -56,24 +54,33 @@ class Login(LoggedOutRESTAPIView, GenericAPIView):
 
     serializer_class = LoginSerializer
     token_model = Token
-    token_serializer = TokenSerializer
+    response_serializer = TokenSerializer
 
-    def post(self, request):
-        # Create a serializer with request.DATA
-        serializer = self.serializer_class(data=request.DATA)
+    def get_serializer(self):
+        return self.serializer_class(data=self.request.DATA)
 
-        if not serializer.is_valid():
-            return Response(serializer.errors,
-                status=status.HTTP_400_BAD_REQUEST)
-
-        user = serializer.object['user']
-        token, created = self.token_model.objects.get_or_create(user=user)
+    def login(self):
+        self.user = self.serializer.object['user']
+        self.token, created = self.token_model.objects.get_or_create(
+            user=self.user)
 
         if getattr(settings, 'REST_SESSION_LOGIN', True):
-            login(request, user)
+            login(self.request, self.user)
 
-        return Response(self.token_serializer(token).data,
-                        status=status.HTTP_200_OK)
+    def get_response(self):
+        return Response(self.response_serializer(self.token).data,
+            status=status.HTTP_200_OK)
+
+    def get_error_response(self):
+        return Response(self.serializer.errors,
+            status=status.HTTP_400_BAD_REQUEST)
+
+    def post(self, request, *args, **kwargs):
+        self.serializer = self.get_serializer()
+        if not self.serializer.is_valid():
+            return self.get_error_response()
+        self.login()
+        return self.get_response()
 
 
 class Logout(LoggedInRESTAPIView):
@@ -85,7 +92,7 @@ class Logout(LoggedInRESTAPIView):
     Accepts/Returns nothing.
     """
 
-    def get(self, request):
+    def post(self, request):
         try:
             request.user.auth_token.delete()
         except:
@@ -97,7 +104,7 @@ class Logout(LoggedInRESTAPIView):
                         status=status.HTTP_200_OK)
 
 
-class UserDetails(LoggedInRESTAPIView, GenericAPIView):
+class UserDetails(LoggedInRESTAPIView, RetrieveUpdateAPIView):
 
     """
     Returns User's details in JSON format.
@@ -108,50 +115,10 @@ class UserDetails(LoggedInRESTAPIView, GenericAPIView):
         Optional: email, first_name, last_name and UserProfile fields
     Returns the updated UserProfile and/or User object.
     """
-    if get_user_profile_model():
-        serializer_class = get_user_profile_update_serializer()
-    else:
-        serializer_class = UserUpdateSerializer
+    serializer_class = UserDetailsSerializer
 
-    def get_profile_serializer_class(self):
-        return get_user_profile_serializer()
-
-    def get_profile_update_serializer_class(self):
-        return get_user_profile_update_serializer()
-
-    def get(self, request):
-        # Create serializers with request.user and profile
-        user_profile_model = get_user_profile_model()
-        if user_profile_model:
-            profile_serializer_class = self.get_profile_serializer_class()
-            serializer = profile_serializer_class(request.user.get_profile())
-        else:
-            serializer = UserDetailsSerializer(request.user)
-        # Send the Return the User and its profile model with OK HTTP status
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-    def post(self, request):
-        # Get the User object updater via this Serializer
-        user_profile_model = get_user_profile_model()
-        if user_profile_model:
-            profile_serializer_class = self.get_profile_update_serializer_class()
-            serializer = profile_serializer_class(request.user.get_profile(),
-                data=request.DATA, partial=True)
-        else:
-            serializer = UserUpdateSerializer(request.user, data=request.DATA,
-                partial=True)
-
-        if serializer.is_valid():
-            # Save UserProfileUpdateSerializer
-            serializer.save()
-
-            # Return the User object with OK HTTP status
-            return Response(serializer.data, status=status.HTTP_200_OK)
-
-        else:
-            # Return the UserProfileUpdateSerializer errors with Bad Request
-            # HTTP status
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    def get_object(self):
+        return self.request.user
 
 
 class PasswordReset(LoggedOutRESTAPIView, GenericAPIView):

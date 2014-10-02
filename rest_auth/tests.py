@@ -269,7 +269,7 @@ class APITestCase1(TestCase, BaseAPITestCase):
         self.token = self.response.json['key']
         self.get(self.user_url, status_code=200)
 
-        self.post(self.user_url, data=self.BASIC_USER_DATA, status_code=200)
+        self.patch(self.user_url, data=self.BASIC_USER_DATA, status_code=200)
         user = User.objects.get(pk=user.pk)
 
         if self.user_profile_model:
