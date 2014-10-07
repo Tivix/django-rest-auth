@@ -10,7 +10,7 @@ urlpatterns = patterns('rest_auth.views',
                        # URLs that do not require a session or valid token
                        url(r'^password/reset/$', PasswordReset.as_view(),
                            name='rest_password_reset'),
-                       url(r'^password/reset/confirm/(?P<uid>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$',
+                       url(r'^password/reset/confirm/$',
                            PasswordResetConfirm.as_view(
                            ), name='rest_password_reset_confirm'),
                        url(r'^login/$', Login.as_view(), name='rest_login'),

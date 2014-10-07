@@ -253,16 +253,17 @@ class APITestCase1(TestCase, BaseAPITestCase):
         # call password reset
         mail_count = len(mail.outbox)
         payload = {'email': self.EMAIL}
-        self.post(self.password_reset_url, data=payload)
+        self.post(self.password_reset_url, data=payload, status_code=200)
         self.assertEqual(len(mail.outbox), mail_count + 1)
 
         url_kwargs = self._generate_uid_and_token(user)
-
         data = {
             'new_password1': self.NEW_PASS,
-            'new_password2': self.NEW_PASS
+            'new_password2': self.NEW_PASS,
+            'uid': url_kwargs['uid'],
+            'token': url_kwargs['token']
         }
-        url = reverse('rest_password_reset_confirm', kwargs=url_kwargs)
+        url = reverse('rest_password_reset_confirm')
         self.post(url, data=data, status_code=200)
 
         payload = {

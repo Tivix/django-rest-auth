@@ -1,11 +1,4 @@
-from django.contrib.auth.forms import PasswordResetForm, SetPasswordForm
-from django.contrib.auth import login, logout, get_user_model
-from django.contrib.auth.tokens import default_token_generator
-try:
-    from django.utils.http import urlsafe_base64_decode as uid_decoder
-except:
-    # make compatible with django 1.5
-    from django.utils.http import base36_to_int as uid_decoder
+from django.contrib.auth import login, logout
 from django.conf import settings
 
 from rest_framework import status
@@ -19,7 +12,8 @@ from rest_framework.authtoken.models import Token
 from rest_framework.generics import RetrieveUpdateAPIView
 
 from rest_auth.serializers import (TokenSerializer, UserDetailsSerializer,
-    LoginSerializer, SetPasswordSerializer, PasswordResetSerializer)
+    LoginSerializer, PasswordResetSerializer, PasswordResetConfirmSerializer,
+    PasswordChangeSerializer)
 
 
 class LoggedInRESTAPIView(APIView):
@@ -122,38 +116,18 @@ class PasswordReset(LoggedOutRESTAPIView, GenericAPIView):
     """
 
     serializer_class = PasswordResetSerializer
-    password_reset_form_class = PasswordResetForm
 
-    def post(self, request):
+    def post(self, request, *args, **kwargs):
         # Create a serializer with request.DATA
-        serializer = self.serializer_class(data=request.DATA)
+        serializer = self.get_serializer(data=request.DATA)
 
-        if serializer.is_valid():
-            # Create PasswordResetForm with the serializer
-            reset_form = self.password_reset_form_class(data=serializer.data)
-
-            if reset_form.is_valid():
-                # Sett some values to trigger the send_email method.
-                opts = {
-                    'use_https': request.is_secure(),
-                    'from_email': getattr(settings, 'DEFAULT_FROM_EMAIL'),
-                    'request': request,
-                }
-
-                reset_form.save(**opts)
-
-                # Return the success message with OK HTTP status
-                return Response(
-                    {"success": "Password reset e-mail has been sent."},
-                    status=status.HTTP_200_OK)
-
-            else:
-                return Response(reset_form._errors,
-                                status=status.HTTP_400_BAD_REQUEST)
-
-        else:
+        if not serializer.is_valid():
             return Response(serializer.errors,
                             status=status.HTTP_400_BAD_REQUEST)
+        serializer.save()
+        # Return the success message with OK HTTP status
+        return Response({"success": "Password reset e-mail has been sent."},
+                         status=status.HTTP_200_OK)
 
 
 class PasswordResetConfirm(LoggedOutRESTAPIView, GenericAPIView):
@@ -166,49 +140,15 @@ class PasswordResetConfirm(LoggedOutRESTAPIView, GenericAPIView):
     Returns the success/fail message.
     """
 
-    serializer_class = SetPasswordSerializer
+    serializer_class = PasswordResetConfirmSerializer
 
-    def post(self, request, uid=None, token=None):
-        # Get the UserModel
-        UserModel = get_user_model()
-
-        # Decode the uidb64 to uid to get User object
-        try:
-            uid = uid_decoder(uid)
-            user = UserModel._default_manager.get(pk=uid)
-        except (TypeError, ValueError, OverflowError, UserModel.DoesNotExist):
-            user = None
-
-        # If we get the User object
-        if user:
-            serializer = self.serializer_class(data=request.DATA, user=user)
-
-            if serializer.is_valid():
-                # Construct SetPasswordForm instance
-                form = SetPasswordForm(user=user, data=serializer.data)
-
-                if form.is_valid():
-                    if default_token_generator.check_token(user, token):
-                        form.save()
-
-                        # Return the success message with OK HTTP status
-                        return Response(
-                            {"success":
-                                "Password has been reset with the new password."},
-                            status=status.HTTP_200_OK)
-                    else:
-                        return Response(
-                            {"error": "Invalid password reset token."},
-                            status=status.HTTP_400_BAD_REQUEST)
-                else:
-                    return Response(form._errors, status=status.HTTP_400_BAD_REQUEST)
-
-            else:
-                return Response(serializer.errors,
-                                status=status.HTTP_400_BAD_REQUEST)
-
-        else:
-            return Response({"errors": "Couldn\'t find the user from uid."}, status=status.HTTP_400_BAD_REQUEST)
+    def post(self, request):
+        serializer = self.get_serializer(data=request.DATA)
+        if not serializer.is_valid():
+            return Response(serializer.errors,
+                status=status.HTTP_400_BAD_REQUEST)
+        serializer.save()
+        return Response({"success": "Password has been reset with the new password."})
 
 
 class PasswordChange(LoggedInRESTAPIView, GenericAPIView):
@@ -220,29 +160,12 @@ class PasswordChange(LoggedInRESTAPIView, GenericAPIView):
     Returns the success/fail message.
     """
 
-    serializer_class = SetPasswordSerializer
+    serializer_class = PasswordChangeSerializer
 
     def post(self, request):
-        # Create a serializer with request.DATA
-        serializer = self.serializer_class(data=request.DATA)
-
-        if serializer.is_valid():
-            # Construct the SetPasswordForm instance
-            form = SetPasswordForm(user=request.user, data=serializer.data)
-
-            if form.is_valid():
-                form.save()
-
-                # Return the success message with OK HTTP status
-                return Response({"success": "New password has been saved."},
-                                status=status.HTTP_200_OK)
-
-            else:
-                return Response(form._errors,
-                                status=status.HTTP_400_BAD_REQUEST)
-
-        else:
+        serializer = self.get_serializer(data=request.DATA)
+        if not serializer.is_valid():
             return Response(serializer.errors,
-                            status=status.HTTP_400_BAD_REQUEST)
-
-
+                status=status.HTTP_400_BAD_REQUEST)
+        serializer.save()
+        return Response({"success": "New password has been saved."})
