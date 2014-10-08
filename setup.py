@@ -31,6 +31,7 @@ setup(
         'Django>=1.5.0',
         'django-allauth>=0.18.0',
         'djangorestframework>=2.3.13',
+        'responses>=0.2.2'
     ],
     test_suite='rest_auth.runtests.runtests',
     include_package_data=True,

@@ -9,8 +9,11 @@ from django.contrib.auth.models import User
 from django.contrib.auth import get_user_model
 from django.core import mail
 from django.test.utils import override_settings
+from django.contrib.sites.models import Site
 
-from rest_framework.serializers import _resolve_model
+from allauth.socialaccount.models import SocialApp
+import responses
+
 from rest_framework import status
 
 
@@ -120,6 +123,8 @@ class APITestCase1(TestCase, BaseAPITestCase):
     - user profile: defined
     - custom registration: backend defined
     """
+
+    urls = 'rest_auth.test_urls'
 
     USERNAME = 'person'
     PASS = 'person'
@@ -338,3 +343,44 @@ class APITestCase1(TestCase, BaseAPITestCase):
         # try to login again
         self._login()
         self._logout()
+
+
+class TestSocialAuth(TestCase, BaseAPITestCase):
+
+    urls = 'rest_auth.test_urls'
+
+    def setUp(self):
+        social_app = SocialApp.objects.create(
+            provider='facebook',
+            name='Facebook',
+            client_id='123123123',
+            secret='321321321',
+        )
+        site = Site.objects.get_current()
+        social_app.sites.add(site)
+        self.fb_login_url = reverse('fb_login')
+
+    @responses.activate
+    def test_failed_social_auth(self):
+        # fake response
+        responses.add(responses.GET, 'https://graph.facebook.com/me',
+                  body='', status=400, content_type='application/json')
+
+        payload = {
+            'access_token': 'abc123'
+        }
+        self.post(self.fb_login_url, data=payload, status_code=400)
+
+    @responses.activate
+    def test_social_auth(self):
+        # fake response for facebook call
+        resp_body = '{"id":"123123123123","first_name":"John","gender":"male","last_name":"Smith","link":"https:\\/\\/www.facebook.com\\/john.smith","locale":"en_US","name":"John Smith","timezone":2,"updated_time":"2014-08-13T10:14:38+0000","username":"john.smith","verified":true}'
+        responses.add(responses.GET, 'https://graph.facebook.com/me',
+                  body=resp_body, status=200, content_type='application/json')
+
+        payload = {
+            'access_token': 'abc123'
+        }
+
+        self.post(self.fb_login_url, data=payload, status_code=200)
+        self.assertIn('key', self.response.json.keys())
