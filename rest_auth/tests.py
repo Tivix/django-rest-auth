@@ -26,16 +26,16 @@ class APIClient(Client):
         return self.generic('OPTIONS', path, data, content_type, **extra)
 
 
-class CustomJSONEncoder(json.JSONEncoder):
-    """
-    Convert datetime/date objects into isoformat
-    """
+# class CustomJSONEncoder(json.JSONEncoder):
+#     """
+#     Convert datetime/date objects into isoformat
+#     """
 
-    def default(self, obj):
-        if isinstance(obj, (datetime, date, time)):
-            return obj.isoformat()
-        else:
-            return super(CustomJSONEncoder, self).default(obj)
+#     def default(self, obj):
+#         if isinstance(obj, (datetime, date, time)):
+#             return obj.isoformat()
+#         else:
+#             return super(CustomJSONEncoder, self).default(obj)
 
 
 class BaseAPITestCase(object):
@@ -52,17 +52,13 @@ class BaseAPITestCase(object):
             kwargs['content_type'] = 'application/json'
         if 'data' in kwargs and request_method != 'get' and kwargs['content_type'] == 'application/json':
             data = kwargs.get('data', '')
-            kwargs['data'] = json.dumps(data, cls=CustomJSONEncoder)
+            kwargs['data'] = json.dumps(data)  # , cls=CustomJSONEncoder
         if 'status_code' in kwargs:
             status_code = kwargs.pop('status_code')
 
         # check_headers = kwargs.pop('check_headers', True)
         if hasattr(self, 'token'):
             kwargs['HTTP_AUTHORIZATION'] = 'Token %s' % self.token
-
-        if hasattr(self, 'company_token'):
-            kwargs[
-                'HTTP_AUTHORIZATION'] = 'Company-Token %s' % self.company_token
 
         self.response = request_func(*args, **kwargs)
         is_json = bool(
@@ -84,28 +80,28 @@ class BaseAPITestCase(object):
     def patch(self, *args, **kwargs):
         return self.send_request('patch', *args, **kwargs)
 
-    def put(self, *args, **kwargs):
-        return self.send_request('put', *args, **kwargs)
+    # def put(self, *args, **kwargs):
+    #     return self.send_request('put', *args, **kwargs)
 
-    def delete(self, *args, **kwargs):
-        return self.send_request('delete', *args, **kwargs)
+    # def delete(self, *args, **kwargs):
+    #     return self.send_request('delete', *args, **kwargs)
 
-    def options(self, *args, **kwargs):
-        return self.send_request('options', *args, **kwargs)
+    # def options(self, *args, **kwargs):
+    #     return self.send_request('options', *args, **kwargs)
 
-    def post_file(self, *args, **kwargs):
-        kwargs['content_type'] = MULTIPART_CONTENT
-        return self.send_request('post', *args, **kwargs)
+    # def post_file(self, *args, **kwargs):
+    #     kwargs['content_type'] = MULTIPART_CONTENT
+    #     return self.send_request('post', *args, **kwargs)
 
-    def get_file(self, *args, **kwargs):
-        content_type = None
-        if 'content_type' in kwargs:
-            content_type = kwargs.pop('content_type')
-        response = self.send_request('get', *args, **kwargs)
-        if content_type:
-            self.assertEqual(
-                bool(filter(lambda x: content_type in x, response._headers['content-type'])), True)
-        return response
+    # def get_file(self, *args, **kwargs):
+    #     content_type = None
+    #     if 'content_type' in kwargs:
+    #         content_type = kwargs.pop('content_type')
+    #     response = self.send_request('get', *args, **kwargs)
+    #     if content_type:
+    #         self.assertEqual(
+    #             bool(filter(lambda x: content_type in x, response._headers['content-type'])), True)
+    #     return response
 
     def init(self):
         settings.DEBUG = True
