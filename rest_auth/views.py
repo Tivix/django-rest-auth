@@ -11,7 +11,7 @@ from rest_framework.authentication import SessionAuthentication, \
 from rest_framework.authtoken.models import Token
 from rest_framework.generics import RetrieveUpdateAPIView
 
-from rest_auth.serializers import (TokenSerializer, UserDetailsSerializer,
+from app_settings import (TokenSerializer, UserDetailsSerializer,
     LoginSerializer, PasswordResetSerializer, PasswordResetConfirmSerializer,
     PasswordChangeSerializer)
 
