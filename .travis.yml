@@ -13,8 +13,8 @@ matrix:
 install:
   - pip install -q Django==$DJANGO --use-mirrors
   - pip install coveralls
+  - pip install -r test_requirements.pip
 script:
   - coverage run --source=rest_auth setup.py test
 after_success:
   - coveralls
-install: "pip install -r test_requirements.pip"
