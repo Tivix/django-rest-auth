@@ -1,0 +1,2 @@
+django-allauth>=0.18.0
+responses>=0.2.2

@@ -1,20 +1,34 @@
 from django.contrib.auth import get_user_model
 from django.conf import settings
+from django.contrib.auth.forms import PasswordResetForm, SetPasswordForm
+try:
+    from django.utils.http import urlsafe_base64_decode as uid_decoder
+except:
+    # make compatible with django 1.5
+    from django.utils.http import base36_to_int as uid_decoder
+from django.contrib.auth.tokens import default_token_generator
 
 from rest_framework import serializers
-from rest_framework.serializers import _resolve_model
 from rest_framework.authtoken.models import Token
+from rest_framework.authtoken.serializers import AuthTokenSerializer
 
 
-profile_model_path = lambda: getattr(settings, 'REST_PROFILE_MODULE', None)
+class LoginSerializer(AuthTokenSerializer):
 
-class LoginSerializer(serializers.Serializer):
-    username = serializers.CharField(max_length=30)
-    password = serializers.CharField(max_length=128)
+    def validate(self, attrs):
+        attrs = super(LoginSerializer, self).validate(attrs)
+
+        if 'rest_auth.registration' in settings.INSTALLED_APPS:
+            from allauth.account import app_settings
+            if app_settings.EMAIL_VERIFICATION == app_settings.EmailVerificationMethod.MANDATORY:
+                user = attrs['user']
+                email_address = user.emailaddress_set.get(email=user.email)
+                if not email_address.verified:
+                    raise serializers.ValidationError('E-mail is not verified.')
+        return attrs
 
 
 class TokenSerializer(serializers.ModelSerializer):
-
     """
     Serializer for Token model.
     """
@@ -34,120 +48,6 @@ class UserDetailsSerializer(serializers.ModelSerializer):
         fields = ('username', 'email', 'first_name', 'last_name')
 
 
-class UserRegistrationSerializer(serializers.ModelSerializer):
-
-    """
-    Serializer for Django User model and most of its fields.
-    """
-
-    class Meta:
-        model = get_user_model()
-        fields = ('username', 'password', 'email', 'first_name', 'last_name')
-
-
-class DynamicFieldsModelSerializer(serializers.ModelSerializer):
-
-    """
-    ModelSerializer that allows fields argument to control fields
-    """
-
-    def __init__(self, *args, **kwargs):
-        fields = kwargs.pop('fields', None)
-
-        super(DynamicFieldsModelSerializer, self).__init__(*args, **kwargs)
-
-        if fields:
-            allowed = set(fields)
-            existing = set(self.fields.keys())
-
-            for field_name in existing - allowed:
-                self.fields.pop(field_name)
-
-
-class UserUpdateSerializer(DynamicFieldsModelSerializer):
-
-    """
-    User model w/o username and password
-    """
-    class Meta:
-        model = get_user_model()
-        fields = ('id', 'email', 'first_name', 'last_name')
-
-
-
-def get_user_registration_profile_serializer(*args, **kwargs):
-    if profile_model_path():
-        class UserRegistrationProfileSerializer(serializers.ModelSerializer):
-
-            """
-            Serializer that includes all profile fields except for user fk / id.
-            """
-            class Meta:
-
-                model = _resolve_model(profile_model_path())
-                fields = filter(lambda x: x != 'id' and x != 'user',
-                                map(lambda x: x.name, model._meta.fields))
-    else:
-        class UserRegistrationProfileSerializer(serializers.Serializer):
-            pass
-    return UserRegistrationProfileSerializer
-
-
-def get_user_profile_serializer(*args, **kwargs):
-    if profile_model_path():
-        class UserProfileSerializer(serializers.ModelSerializer):
-
-            """
-            Serializer for UserProfile model.
-            """
-
-            user = UserDetailsSerializer()
-
-            class Meta:
-                # http://stackoverflow.com/questions/4881607/django-get-model-from-string
-                model = _resolve_model(profile_model_path())
-
-            def __init__(self, *args, **kwargs):
-                super(UserProfileSerializer, self).__init__(*args, **kwargs)
-    else:
-        class UserProfileSerializer(serializers.Serializer):
-            pass
-    return UserProfileSerializer
-
-
-def get_user_profile_update_serializer(*args, **kwargs):
-    if profile_model_path():
-        class UserProfileUpdateSerializer(serializers.ModelSerializer):
-
-            """
-            Serializer for updating User and UserProfile model.
-            """
-
-            user = UserUpdateSerializer()
-
-            class Meta:
-                # http://stackoverflow.com/questions/4881607/django-get-model-from-string
-                model = _resolve_model(profile_model_path())
-    else:
-        class UserProfileUpdateSerializer(serializers.Serializer):
-            pass
-    return UserProfileUpdateSerializer
-
-
-class SetPasswordSerializer(serializers.Serializer):
-
-    """
-    Serializer for changing Django User password.
-    """
-
-    new_password1 = serializers.CharField(max_length=128)
-    new_password2 = serializers.CharField(max_length=128)
-
-    def __init__(self, *args, **kwargs):
-        self.user = kwargs.pop('user', None)
-        return super(SetPasswordSerializer, self).__init__(*args, **kwargs)
-
-
 class PasswordResetSerializer(serializers.Serializer):
 
     """
@@ -155,3 +55,86 @@ class PasswordResetSerializer(serializers.Serializer):
     """
 
     email = serializers.EmailField()
+
+    password_reset_form_class = PasswordResetForm
+
+    def validate_email(self, attrs, source):
+        # Create PasswordResetForm with the serializer
+        self.reset_form = self.password_reset_form_class(data=attrs)
+        if not self.reset_form.is_valid():
+            raise serializers.ValidationError('Error')
+        return attrs
+
+    def save(self):
+        request = self.context.get('request')
+        # Set some values to trigger the send_email method.
+        opts = {
+            'use_https': request.is_secure(),
+            'from_email': getattr(settings, 'DEFAULT_FROM_EMAIL'),
+            'request': request,
+        }
+        self.reset_form.save(**opts)
+
+
+class PasswordResetConfirmSerializer(serializers.Serializer):
+
+    """
+    Serializer for requesting a password reset e-mail.
+    """
+
+    new_password1 = serializers.CharField(max_length=128)
+    new_password2 = serializers.CharField(max_length=128)
+
+    uid = serializers.CharField(required=True)
+    token = serializers.CharField(required=True)
+
+    set_password_form_class = SetPasswordForm
+
+    def custom_validation(self, attrs):
+        pass
+
+    def validate(self, attrs):
+        self._errors = {}
+        # Get the UserModel
+        UserModel = get_user_model()
+        # Decode the uidb64 to uid to get User object
+        try:
+            uid = uid_decoder(attrs['uid'])
+            self.user = UserModel._default_manager.get(pk=uid)
+        except (TypeError, ValueError, OverflowError, UserModel.DoesNotExist):
+            self._errors['uid'] = ['Invalid value']
+
+        self.custom_validation(attrs)
+
+        # Construct SetPasswordForm instance
+        self.set_password_form = self.set_password_form_class(user=self.user,
+            data=attrs)
+        if not self.set_password_form.is_valid():
+            self._errors['token'] = ['Invalid value']
+
+        if not default_token_generator.check_token(self.user, attrs['token']):
+            self._errors['token'] = ['Invalid value']
+
+    def save(self):
+        self.set_password_form.save()
+
+
+class PasswordChangeSerializer(serializers.Serializer):
+
+    new_password1 = serializers.CharField(max_length=128)
+    new_password2 = serializers.CharField(max_length=128)
+
+    set_password_form_class = SetPasswordForm
+
+    def validate(self, attrs):
+        request = self.context.get('request')
+        self.set_password_form = self.set_password_form_class(user=request.user,
+            data=attrs)
+
+        if not self.set_password_form.is_valid():
+            self._errors = self.set_password_form.errors
+            return None
+        return attrs
+
+    def save(self):
+        self.set_password_form.save()

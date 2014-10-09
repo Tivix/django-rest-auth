@@ -1,53 +1,19 @@
-from django.contrib.auth.forms import PasswordResetForm, SetPasswordForm
-from django.contrib.auth import authenticate, login, logout, get_user_model
-from django.contrib.auth.tokens import default_token_generator
-try:
-    from django.utils.http import urlsafe_base64_decode as uid_decoder
-except:
-    # make compatible with django 1.5
-    from django.utils.http import base36_to_int as uid_decoder
+from django.contrib.auth import login, logout
 from django.conf import settings
-from django.core.exceptions import ObjectDoesNotExist
 
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.generics import GenericAPIView
-from rest_framework.serializers import _resolve_model
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.authentication import SessionAuthentication, \
     TokenAuthentication
 from rest_framework.authtoken.models import Token
+from rest_framework.generics import RetrieveUpdateAPIView
 
-from registration.models import RegistrationProfile
-from registration import signals
-from registration.views import ActivationView
-
-from rest_auth.utils import construct_modules_and_import
-from rest_auth.models import *
-from rest_auth.serializers import (TokenSerializer, UserDetailsSerializer,
-    LoginSerializer, UserRegistrationSerializer,
-    SetPasswordSerializer, PasswordResetSerializer, UserUpdateSerializer,
-    get_user_registration_profile_serializer, get_user_profile_serializer,
-    get_user_profile_update_serializer)
-
-
-def get_user_profile_model():
-    # Get the UserProfile model from the setting value
-    user_profile_path = getattr(settings, 'REST_PROFILE_MODULE', None)
-    if user_profile_path:
-        setattr(settings, 'AUTH_PROFILE_MODULE', user_profile_path)
-        return _resolve_model(user_profile_path)
-
-
-def get_registration_backend():
-    # Get the REST Registration Backend for django-registration
-    registration_backend = getattr(settings, 'REST_REGISTRATION_BACKEND',
-        'registration.backends.simple.views.RegistrationView')
-
-    # Get the REST REGISTRATION BACKEND class from the setting value via above
-    # method
-    return construct_modules_and_import(registration_backend)
+from app_settings import (TokenSerializer, UserDetailsSerializer,
+    LoginSerializer, PasswordResetSerializer, PasswordResetConfirmSerializer,
+    PasswordChangeSerializer)
 
 
 class LoggedInRESTAPIView(APIView):
@@ -73,35 +39,33 @@ class Login(LoggedOutRESTAPIView, GenericAPIView):
 
     serializer_class = LoginSerializer
     token_model = Token
-    token_serializer = TokenSerializer
+    response_serializer = TokenSerializer
 
-    def post(self, request):
-        # Create a serializer with request.DATA
-        serializer = self.serializer_class(data=request.DATA)
+    def get_serializer(self):
+        return self.serializer_class(data=self.request.DATA,
+            context={'request': self.request, 'view': self})
 
-        if serializer.is_valid():
-            # Authenticate the credentials by grabbing Django User object
-            user = authenticate(username=serializer.data['username'],
-                                password=serializer.data['password'])
+    def login(self):
+        self.user = self.serializer.object['user']
+        self.token, created = self.token_model.objects.get_or_create(
+            user=self.user)
+        if getattr(settings, 'REST_SESSION_LOGIN', True):
+            login(self.request, self.user)
 
-            if user and user.is_authenticated():
-                if user.is_active:
-                    if getattr(settings, 'REST_SESSION_LOGIN', True):
-                        login(request, user)
+    def get_response(self):
+        return Response(self.response_serializer(self.token).data,
+            status=status.HTTP_200_OK)
 
-                    # Return REST Token object with OK HTTP status
-                    token, created = self.token_model.objects.get_or_create(user=user)
-                    return Response(self.token_serializer(token).data,
-                                    status=status.HTTP_200_OK)
-                else:
-                    return Response({'error': 'This account is disabled.'},
-                                    status=status.HTTP_401_UNAUTHORIZED)
-            else:
-                return Response({'error': 'Invalid Username/Password.'},
-                                status=status.HTTP_401_UNAUTHORIZED)
-        else:
-            return Response(serializer.errors,
-                            status=status.HTTP_400_BAD_REQUEST)
+    def get_error_response(self):
+        return Response(self.serializer.errors,
+            status=status.HTTP_400_BAD_REQUEST)
+
+    def post(self, request, *args, **kwargs):
+        self.serializer = self.get_serializer()
+        if not self.serializer.is_valid():
+            return self.get_error_response()
+        self.login()
+        return self.get_response()
 
 
 class Logout(LoggedInRESTAPIView):
@@ -113,7 +77,7 @@ class Logout(LoggedInRESTAPIView):
     Accepts/Returns nothing.
     """
 
-    def get(self, request):
+    def post(self, request):
         try:
             request.user.auth_token.delete()
         except:
@@ -125,54 +89,7 @@ class Logout(LoggedInRESTAPIView):
                         status=status.HTTP_200_OK)
 
 
-class Register(LoggedOutRESTAPIView, GenericAPIView):
-
-    """
-    Registers a new Django User object by accepting required field values.
-
-    Accepts the following POST parameters:
-        Required: username, password, email
-        Optional: first_name & last_name for User object and UserProfile fields
-    Returns the newly created User object including REST Framework Token key.
-    """
-
-    serializer_class = UserRegistrationSerializer
-
-    def get_profile_serializer_class(self):
-        return get_user_registration_profile_serializer()
-
-    def post(self, request):
-        # Create serializers with request.DATA
-        serializer = self.serializer_class(data=request.DATA)
-        profile_serializer_class = self.get_profile_serializer_class()
-        profile_serializer = profile_serializer_class(data=request.DATA)
-
-        if serializer.is_valid() and profile_serializer.is_valid():
-            # Change the password key to password1 so that RESTRegistrationView
-            # can accept the data
-            serializer.data['password1'] = serializer.data.pop('password')
-
-            # TODO: Make this customizable backend via settings.
-            # Call RESTRegistrationView().register to create new Django User
-            # and UserProfile models
-            data = serializer.data.copy()
-            data.update(profile_serializer.data)
-
-            RESTRegistrationView = get_registration_backend()
-            RESTRegistrationView().register(request, **data)
-
-            # Return the User object with Created HTTP status
-            return Response(UserDetailsSerializer(serializer.data).data,
-                            status=status.HTTP_201_CREATED)
-
-        else:
-            return Response({
-                'user': serializer.errors,
-                'profile': profile_serializer.errors},
-                status=status.HTTP_400_BAD_REQUEST)
-
-
-class UserDetails(LoggedInRESTAPIView, GenericAPIView):
+class UserDetails(LoggedInRESTAPIView, RetrieveUpdateAPIView):
 
     """
     Returns User's details in JSON format.
@@ -183,50 +100,10 @@ class UserDetails(LoggedInRESTAPIView, GenericAPIView):
         Optional: email, first_name, last_name and UserProfile fields
     Returns the updated UserProfile and/or User object.
     """
-    if get_user_profile_model():
-        serializer_class = get_user_profile_update_serializer()
-    else:
-        serializer_class = UserUpdateSerializer
+    serializer_class = UserDetailsSerializer
 
-    def get_profile_serializer_class(self):
-        return get_user_profile_serializer()
-
-    def get_profile_update_serializer_class(self):
-        return get_user_profile_update_serializer()
-
-    def get(self, request):
-        # Create serializers with request.user and profile
-        user_profile_model = get_user_profile_model()
-        if user_profile_model:
-            profile_serializer_class = self.get_profile_serializer_class()
-            serializer = profile_serializer_class(request.user.get_profile())
-        else:
-            serializer = UserDetailsSerializer(request.user)
-        # Send the Return the User and its profile model with OK HTTP status
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-    def post(self, request):
-        # Get the User object updater via this Serializer
-        user_profile_model = get_user_profile_model()
-        if user_profile_model:
-            profile_serializer_class = self.get_profile_update_serializer_class()
-            serializer = profile_serializer_class(request.user.get_profile(),
-                data=request.DATA, partial=True)
-        else:
-            serializer = UserUpdateSerializer(request.user, data=request.DATA,
-                partial=True)
-
-        if serializer.is_valid():
-            # Save UserProfileUpdateSerializer
-            serializer.save()
-
-            # Return the User object with OK HTTP status
-            return Response(serializer.data, status=status.HTTP_200_OK)
-
-        else:
-            # Return the UserProfileUpdateSerializer errors with Bad Request
-            # HTTP status
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    def get_object(self):
+        return self.request.user
 
 
 class PasswordReset(LoggedOutRESTAPIView, GenericAPIView):
@@ -239,38 +116,18 @@ class PasswordReset(LoggedOutRESTAPIView, GenericAPIView):
     """
 
     serializer_class = PasswordResetSerializer
-    password_reset_form_class = PasswordResetForm
 
-    def post(self, request):
+    def post(self, request, *args, **kwargs):
         # Create a serializer with request.DATA
-        serializer = self.serializer_class(data=request.DATA)
+        serializer = self.get_serializer(data=request.DATA)
 
-        if serializer.is_valid():
-            # Create PasswordResetForm with the serializer
-            reset_form = self.password_reset_form_class(data=serializer.data)
-
-            if reset_form.is_valid():
-                # Sett some values to trigger the send_email method.
-                opts = {
-                    'use_https': request.is_secure(),
-                    'from_email': getattr(settings, 'DEFAULT_FROM_EMAIL'),
-                    'request': request,
-                }
-
-                reset_form.save(**opts)
-
-                # Return the success message with OK HTTP status
-                return Response(
-                    {"success": "Password reset e-mail has been sent."},
-                    status=status.HTTP_200_OK)
-
-            else:
-                return Response(reset_form._errors,
-                                status=status.HTTP_400_BAD_REQUEST)
-
-        else:
+        if not serializer.is_valid():
             return Response(serializer.errors,
                             status=status.HTTP_400_BAD_REQUEST)
+        serializer.save()
+        # Return the success message with OK HTTP status
+        return Response({"success": "Password reset e-mail has been sent."},
+                         status=status.HTTP_200_OK)
 
 
 class PasswordResetConfirm(LoggedOutRESTAPIView, GenericAPIView):
@@ -283,80 +140,15 @@ class PasswordResetConfirm(LoggedOutRESTAPIView, GenericAPIView):
     Returns the success/fail message.
     """
 
-    serializer_class = SetPasswordSerializer
+    serializer_class = PasswordResetConfirmSerializer
 
-    def post(self, request, uid=None, token=None):
-        # Get the UserModel
-        UserModel = get_user_model()
-
-        # Decode the uidb64 to uid to get User object
-        try:
-            uid = uid_decoder(uid)
-            user = UserModel._default_manager.get(pk=uid)
-        except (TypeError, ValueError, OverflowError, UserModel.DoesNotExist):
-            user = None
-
-        # If we get the User object
-        if user:
-            serializer = self.serializer_class(data=request.DATA, user=user)
-
-            if serializer.is_valid():
-                # Construct SetPasswordForm instance
-                form = SetPasswordForm(user=user, data=serializer.data)
-
-                if form.is_valid():
-                    if default_token_generator.check_token(user, token):
-                        form.save()
-
-                        # Return the success message with OK HTTP status
-                        return Response(
-                            {"success":
-                                "Password has been reset with the new password."},
-                            status=status.HTTP_200_OK)
-                    else:
-                        return Response(
-                            {"error": "Invalid password reset token."},
-                            status=status.HTTP_400_BAD_REQUEST)
-                else:
-                    return Response(form._errors, status=status.HTTP_400_BAD_REQUEST)
-
-            else:
-                return Response(serializer.errors,
-                                status=status.HTTP_400_BAD_REQUEST)
-
-        else:
-            return Response({"errors": "Couldn\'t find the user from uid."}, status=status.HTTP_400_BAD_REQUEST)
-
-
-class VerifyEmail(LoggedOutRESTAPIView, GenericAPIView):
-
-    """
-    Verifies the email of the user through their activation_key.
-
-    Accepts activation_key django argument: key from activation email.
-    Returns the success/fail message.
-    """
-
-    model = RegistrationProfile
-
-    def get(self, request, activation_key=None):
-        # Get the user registration profile with the activation key
-        target_user = RegistrationProfile.objects.activate_user(activation_key)
-
-        if target_user:
-            # Send the activation signal
-            signals.user_activated.send(sender=ActivationView.__class__,
-                                        user=target_user,
-                                        request=request)
-
-            # Return the success message with OK HTTP status
-            ret_msg = "User {0}'s account was successfully activated!".format(
-                target_user.username)
-            return Response({"success": ret_msg}, status=status.HTTP_200_OK)
-
-        else:
-            ret_msg = "The account was not able to be activated or already activated, please contact support."
-            return Response({"errors": ret_msg}, status=status.HTTP_400_BAD_REQUEST)
+    def post(self, request):
+        serializer = self.get_serializer(data=request.DATA)
+        if not serializer.is_valid():
+            return Response(serializer.errors,
+                status=status.HTTP_400_BAD_REQUEST)
+        serializer.save()
+        return Response({"success": "Password has been reset with the new password."})
 
 
 class PasswordChange(LoggedInRESTAPIView, GenericAPIView):
@@ -368,27 +160,12 @@ class PasswordChange(LoggedInRESTAPIView, GenericAPIView):
     Returns the success/fail message.
     """
 
-    serializer_class = SetPasswordSerializer
+    serializer_class = PasswordChangeSerializer
 
     def post(self, request):
-        # Create a serializer with request.DATA
-        serializer = self.serializer_class(data=request.DATA)
-
-        if serializer.is_valid():
-            # Construct the SetPasswordForm instance
-            form = SetPasswordForm(user=request.user, data=serializer.data)
-
-            if form.is_valid():
-                form.save()
-
-                # Return the success message with OK HTTP status
-                return Response({"success": "New password has been saved."},
-                                status=status.HTTP_200_OK)
-
-            else:
-                return Response(form._errors,
-                                status=status.HTTP_400_BAD_REQUEST)
-
-        else:
+        serializer = self.get_serializer(data=request.DATA)
+        if not serializer.is_valid():
             return Response(serializer.errors,
-                            status=status.HTTP_400_BAD_REQUEST)
+                status=status.HTTP_400_BAD_REQUEST)
+        serializer.save()
+        return Response({"success": "New password has been saved."})

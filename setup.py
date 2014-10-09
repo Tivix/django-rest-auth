@@ -11,7 +11,7 @@ except ImportError:
 import os
 
 here = os.path.dirname(os.path.abspath(__file__))
-f = open(os.path.join(here,  'README.md'))
+f = open(os.path.join(here, 'README.md'))
 long_description = f.read().strip()
 f.close()
 
@@ -29,7 +29,6 @@ setup(
     zip_safe=False,
     install_requires=[
         'Django>=1.5.0',
-        'django-registration>=1.0',
         'djangorestframework>=2.3.13',
     ],
     test_suite='rest_auth.runtests.runtests',

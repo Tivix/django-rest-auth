@@ -1,5 +1,6 @@
 import django
-import os, sys
+import os
+import sys
 
 PROJECT_ROOT = os.path.abspath(os.path.split(os.path.split(__file__)[0])[0])
 ROOT_URLCONF = 'urls'
@@ -27,6 +28,26 @@ if django.VERSION[:2] >= (1, 3):
 else:
     DATABASE_ENGINE = 'sqlite3'
 
+MIDDLEWARE_CLASSES = [
+    'django.middleware.common.CommonMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware'
+]
+
+TEMPLATE_CONTEXT_PROCESSORS = [
+    'django.contrib.auth.context_processors.auth',
+    'django.core.context_processors.debug',
+    'django.core.context_processors.media',
+    'django.core.context_processors.request',
+    'django.contrib.messages.context_processors.messages',
+    'django.core.context_processors.static',
+
+    "allauth.account.context_processors.account",
+    "allauth.socialaccount.context_processors.socialaccount",
+]
+
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -37,13 +58,22 @@ INSTALLED_APPS = [
     'django.contrib.sitemaps',
     'django.contrib.staticfiles',
 
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.facebook',
+
     'rest_framework',
     'rest_framework.authtoken',
-    'registration',
 
     'rest_auth',
+    'rest_auth.registration'
 ]
 
 SECRET_KEY = "38dh*skf8sjfhs287dh&^hd8&3hdg*j2&sd"
 ACCOUNT_ACTIVATION_DAYS = 1
 SITE_ID = 1
+
+MIGRATION_MODULES = {
+    'authtoken': 'authtoken.migrations',
+}

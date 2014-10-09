@@ -8,9 +8,13 @@ from django.test import TestCase
 from django.contrib.auth.models import User
 from django.contrib.auth import get_user_model
 from django.core import mail
+from django.test.utils import override_settings
+from django.contrib.sites.models import Site
 
-from registration.models import RegistrationProfile
-from rest_framework.serializers import _resolve_model
+from allauth.socialaccount.models import SocialApp
+import responses
+
+from rest_framework import status
 
 
 class APIClient(Client):
@@ -22,16 +26,16 @@ class APIClient(Client):
         return self.generic('OPTIONS', path, data, content_type, **extra)
 
 
-class CustomJSONEncoder(json.JSONEncoder):
-    """
-    Convert datetime/date objects into isoformat
-    """
+# class CustomJSONEncoder(json.JSONEncoder):
+#     """
+#     Convert datetime/date objects into isoformat
+#     """
 
-    def default(self, obj):
-        if isinstance(obj, (datetime, date, time)):
-            return obj.isoformat()
-        else:
-            return super(CustomJSONEncoder, self).default(obj)
+#     def default(self, obj):
+#         if isinstance(obj, (datetime, date, time)):
+#             return obj.isoformat()
+#         else:
+#             return super(CustomJSONEncoder, self).default(obj)
 
 
 class BaseAPITestCase(object):
@@ -48,17 +52,13 @@ class BaseAPITestCase(object):
             kwargs['content_type'] = 'application/json'
         if 'data' in kwargs and request_method != 'get' and kwargs['content_type'] == 'application/json':
             data = kwargs.get('data', '')
-            kwargs['data'] = json.dumps(data, cls=CustomJSONEncoder)
+            kwargs['data'] = json.dumps(data)  # , cls=CustomJSONEncoder
         if 'status_code' in kwargs:
             status_code = kwargs.pop('status_code')
 
         # check_headers = kwargs.pop('check_headers', True)
         if hasattr(self, 'token'):
             kwargs['HTTP_AUTHORIZATION'] = 'Token %s' % self.token
-
-        if hasattr(self, 'company_token'):
-            kwargs[
-                'HTTP_AUTHORIZATION'] = 'Company-Token %s' % self.company_token
 
         self.response = request_func(*args, **kwargs)
         is_json = bool(
@@ -80,28 +80,28 @@ class BaseAPITestCase(object):
     def patch(self, *args, **kwargs):
         return self.send_request('patch', *args, **kwargs)
 
-    def put(self, *args, **kwargs):
-        return self.send_request('put', *args, **kwargs)
+    # def put(self, *args, **kwargs):
+    #     return self.send_request('put', *args, **kwargs)
 
-    def delete(self, *args, **kwargs):
-        return self.send_request('delete', *args, **kwargs)
+    # def delete(self, *args, **kwargs):
+    #     return self.send_request('delete', *args, **kwargs)
 
-    def options(self, *args, **kwargs):
-        return self.send_request('options', *args, **kwargs)
+    # def options(self, *args, **kwargs):
+    #     return self.send_request('options', *args, **kwargs)
 
-    def post_file(self, *args, **kwargs):
-        kwargs['content_type'] = MULTIPART_CONTENT
-        return self.send_request('post', *args, **kwargs)
+    # def post_file(self, *args, **kwargs):
+    #     kwargs['content_type'] = MULTIPART_CONTENT
+    #     return self.send_request('post', *args, **kwargs)
 
-    def get_file(self, *args, **kwargs):
-        content_type = None
-        if 'content_type' in kwargs:
-            content_type = kwargs.pop('content_type')
-        response = self.send_request('get', *args, **kwargs)
-        if content_type:
-            self.assertEqual(
-                bool(filter(lambda x: content_type in x, response._headers['content-type'])), True)
-        return response
+    # def get_file(self, *args, **kwargs):
+    #     content_type = None
+    #     if 'content_type' in kwargs:
+    #         content_type = kwargs.pop('content_type')
+    #     response = self.send_request('get', *args, **kwargs)
+    #     if content_type:
+    #         self.assertEqual(
+    #             bool(filter(lambda x: content_type in x, response._headers['content-type'])), True)
+    #     return response
 
     def init(self):
         settings.DEBUG = True
@@ -113,7 +113,6 @@ class BaseAPITestCase(object):
 # -----------------------
 
 
-
 class APITestCase1(TestCase, BaseAPITestCase):
     """
     Case #1:
@@ -121,23 +120,23 @@ class APITestCase1(TestCase, BaseAPITestCase):
     - custom registration: backend defined
     """
 
+    urls = 'rest_auth.test_urls'
+
     USERNAME = 'person'
     PASS = 'person'
     EMAIL = "person1@world.com"
     NEW_PASS = 'new-test-pass'
-    PROFILE_MODEL = 'rest_auth.UserProfile'
     REGISTRATION_VIEW = 'rest_auth.runtests.RegistrationView'
 
     # data without user profile
-    BASIC_REGISTRATION_DATA = {
+    REGISTRATION_DATA = {
         "username": USERNAME,
-        "password": PASS,
-        "email": EMAIL
+        "password1": PASS,
+        "password2": PASS
     }
 
-    # data with user profile
-    REGISTRATION_DATA = BASIC_REGISTRATION_DATA.copy()
-    REGISTRATION_DATA['newsletter_subscribe'] = False
+    REGISTRATION_DATA_WITH_EMAIL = REGISTRATION_DATA.copy()
+    REGISTRATION_DATA_WITH_EMAIL['email'] = EMAIL
 
     BASIC_USER_DATA = {
         'first_name': "John",
@@ -150,28 +149,44 @@ class APITestCase1(TestCase, BaseAPITestCase):
     def setUp(self):
         self.init()
         self.login_url = reverse('rest_login')
+        self.logout_url = reverse('rest_logout')
         self.password_change_url = reverse('rest_password_change')
         self.register_url = reverse('rest_register')
         self.password_reset_url = reverse('rest_password_reset')
         self.user_url = reverse('rest_user_details')
+        self.veirfy_email_url = reverse('verify_email')
 
-        setattr(settings, 'REST_PROFILE_MODULE', self.PROFILE_MODEL)
-        self.user_profile_model = None
-        if self.PROFILE_MODEL:
-            self.user_profile_model = _resolve_model(self.PROFILE_MODEL)
+    def _login(self):
+        payload = {
+            "username": self.USERNAME,
+            "password": self.PASS
+        }
+        self.post(self.login_url, data=payload, status_code=status.HTTP_200_OK)
 
-        if self.REGISTRATION_VIEW:
-            setattr(settings, 'REST_REGISTRATION_BACKEND', self.REGISTRATION_VIEW)
-        elif hasattr(settings, 'REST_REGISTRATION_BACKEND'):
-            delattr(settings, 'REST_REGISTRATION_BACKEND')
+    def _logout(self):
+        self.post(self.logout_url, status=status.HTTP_200_OK)
+
+    def _generate_uid_and_token(self, user):
+        result = {}
+        from django.utils.encoding import force_bytes
+        from django.contrib.auth.tokens import default_token_generator
+        from django import VERSION
+        if VERSION[1] == 5:
+            from django.utils.http import int_to_base36
+            result['uid'] = int_to_base36(user.pk)
+        else:
+            from django.utils.http import urlsafe_base64_encode
+            result['uid'] = urlsafe_base64_encode(force_bytes(user.pk))
+        result['token'] = default_token_generator.make_token(user)
+        return result
 
     def test_login(self):
         payload = {
             "username": self.USERNAME,
             "password": self.PASS
         }
-        # there is no users in db so it should throw error (401)
-        self.post(self.login_url, data=payload, status_code=401)
+        # there is no users in db so it should throw error (400)
+        self.post(self.login_url, data=payload, status_code=400)
 
         self.post(self.password_change_url, status_code=403)
 
@@ -187,25 +202,24 @@ class APITestCase1(TestCase, BaseAPITestCase):
         # test inactive user
         user.is_active = False
         user.save()
-        self.post(self.login_url, data=payload, status_code=401)
+        self.post(self.login_url, data=payload, status_code=400)
 
         # test wrong username/password
         payload = {
-            "username": self.USERNAME+'?',
+            "username": self.USERNAME + '?',
             "password": self.PASS
         }
-        self.post(self.login_url, data=payload, status_code=401)
+        self.post(self.login_url, data=payload, status_code=400)
 
         # test empty payload
         self.post(self.login_url, data={}, status_code=400)
-
 
     def test_password_change(self):
         login_payload = {
             "username": self.USERNAME,
             "password": self.PASS
         }
-        user = User.objects.create_user(self.USERNAME, '', self.PASS)
+        User.objects.create_user(self.USERNAME, '', self.PASS)
         self.post(self.login_url, data=login_payload, status_code=200)
         self.token = self.response.json['key']
 
@@ -217,7 +231,7 @@ class APITestCase1(TestCase, BaseAPITestCase):
             status_code=200)
 
         # user should not be able to login using old password
-        self.post(self.login_url, data=login_payload, status_code=401)
+        self.post(self.login_url, data=login_payload, status_code=400)
 
         # new password should work
         login_payload['password'] = new_password_payload['new_password1']
@@ -234,77 +248,23 @@ class APITestCase1(TestCase, BaseAPITestCase):
         # send empty payload
         self.post(self.password_change_url, data={}, status_code=400)
 
-    def test_registration(self):
-        user_count = User.objects.all().count()
-
-        # test empty payload
-        self.post(self.register_url, data={}, status_code=400)
-
-        self.post(self.register_url, data=self.REGISTRATION_DATA, status_code=201)
-        self.assertEqual(User.objects.all().count(), user_count+1)
-        new_user = get_user_model().objects.latest('id')
-
-        if self.REGISTRATION_VIEW:
-            activation_key = RegistrationProfile.objects.latest('id').activation_key
-            verify_url = reverse('verify_email',
-                kwargs={'activation_key': activation_key})
-
-            # new user at this point shouldn't be active
-            self.assertEqual(new_user.is_active, False)
-
-            # let's active new user and check is_active flag
-            self.get(verify_url)
-            new_user = get_user_model().objects.latest('id')
-            self.assertEqual(new_user.is_active, True)
-            if self.user_profile_model:
-                user_profile = self.user_profile_model.objects.get(user=new_user)
-                self.assertIsNotNone(user_profile)
-        else:
-            self.assertEqual(new_user.is_active, True)
-
-    def test_registration_without_profile_data(self):
-        user_count = User.objects.all().count()
-
-        self.post(self.register_url, data=self.BASIC_REGISTRATION_DATA,
-            status_code=201)
-        self.assertEqual(User.objects.all().count(), user_count+1)
-        new_user = get_user_model().objects.latest('id')
-
-        if self.REGISTRATION_VIEW:
-            activation_key = RegistrationProfile.objects.latest('id').activation_key
-            verify_url = reverse('verify_email',
-                kwargs={'activation_key': activation_key})
-
-            # new user at this point shouldn't be active
-            self.assertEqual(new_user.is_active, False)
-
-            # let's active new user and check is_active flag
-            self.get(verify_url)
-            new_user = get_user_model().objects.latest('id')
-            self.assertEqual(new_user.is_active, True)
-            if self.user_profile_model:
-                user_profile = self.user_profile_model.objects.get(user=new_user)
-                self.assertIsNotNone(user_profile)
-        else:
-            self.assertEqual(new_user.is_active, True)
-
-
     def test_password_reset(self):
         user = User.objects.create_user(self.USERNAME, self.EMAIL, self.PASS)
 
         # call password reset
         mail_count = len(mail.outbox)
         payload = {'email': self.EMAIL}
-        self.post(self.password_reset_url, data=payload)
-        self.assertEqual(len(mail.outbox), mail_count+1)
+        self.post(self.password_reset_url, data=payload, status_code=200)
+        self.assertEqual(len(mail.outbox), mail_count + 1)
 
-        url_kwargs = self.generate_uid_and_token(user)
-
+        url_kwargs = self._generate_uid_and_token(user)
         data = {
             'new_password1': self.NEW_PASS,
-            'new_password2': self.NEW_PASS
+            'new_password2': self.NEW_PASS,
+            'uid': url_kwargs['uid'],
+            'token': url_kwargs['token']
         }
-        url = reverse('rest_password_reset_confirm', kwargs=url_kwargs)
+        url = reverse('rest_password_reset_confirm')
         self.post(url, data=data, status_code=200)
 
         payload = {
@@ -315,8 +275,6 @@ class APITestCase1(TestCase, BaseAPITestCase):
 
     def test_user_details(self):
         user = User.objects.create_user(self.USERNAME, self.EMAIL, self.PASS)
-        if self.user_profile_model:
-            self.user_profile_model.objects.create(user=user)
         payload = {
             "username": self.USERNAME,
             "password": self.PASS
@@ -325,60 +283,100 @@ class APITestCase1(TestCase, BaseAPITestCase):
         self.token = self.response.json['key']
         self.get(self.user_url, status_code=200)
 
-        self.post(self.user_url, data=self.BASIC_USER_DATA, status_code=200)
+        self.patch(self.user_url, data=self.BASIC_USER_DATA, status_code=200)
         user = User.objects.get(pk=user.pk)
+        self.assertEqual(user.first_name, self.response.json['first_name'])
+        self.assertEqual(user.last_name, self.response.json['last_name'])
+        self.assertEqual(user.email, self.response.json['email'])
 
-        if self.user_profile_model:
-            self.post(self.user_url, data=self.USER_DATA, status_code=200)
-            user = User.objects.get(pk=user.pk)
-            self.assertEqual(user.first_name, self.response.json['user']['first_name'])
-            self.assertEqual(user.last_name, self.response.json['user']['last_name'])
-            self.assertEqual(user.email, self.response.json['user']['email'])
-            self.assertIn('newsletter_subscribe', self.response.json)
-        else:
-            self.assertEqual(user.first_name, self.response.json['first_name'])
-            self.assertEqual(user.last_name, self.response.json['last_name'])
-            self.assertEqual(user.email, self.response.json['email'])
+    def test_registration(self):
+        user_count = User.objects.all().count()
+
+        # test empty payload
+        self.post(self.register_url, data={}, status_code=400)
+
+        self.post(self.register_url, data=self.REGISTRATION_DATA, status_code=201)
+        self.assertEqual(User.objects.all().count(), user_count + 1)
+        new_user = get_user_model().objects.latest('id')
+        self.assertEqual(new_user.username, self.REGISTRATION_DATA['username'])
+
+        self._login()
+        self._logout()
+
+    @override_settings(
+        ACCOUNT_EMAIL_VERIFICATION='mandatory',
+        ACCOUNT_EMAIL_REQUIRED=True
+    )
+    def test_registration_with_email_verification(self):
+        user_count = User.objects.all().count()
+        mail_count = len(mail.outbox)
+
+        # test empty payload
+        self.post(self.register_url, data={},
+            status_code=status.HTTP_400_BAD_REQUEST)
+
+        self.post(self.register_url, data=self.REGISTRATION_DATA_WITH_EMAIL,
+            status_code=status.HTTP_201_CREATED)
+        self.assertEqual(User.objects.all().count(), user_count + 1)
+        self.assertEqual(len(mail.outbox), mail_count + 1)
+        new_user = get_user_model().objects.latest('id')
+        self.assertEqual(new_user.username, self.REGISTRATION_DATA['username'])
+
+        # email is not verified yet
+        payload = {
+            "username": self.USERNAME,
+            "password": self.PASS
+        }
+        self.post(self.login_url, data=payload,
+            status=status.HTTP_400_BAD_REQUEST)
+
+        # veirfy email
+        email_confirmation = new_user.emailaddress_set.get(email=self.EMAIL)\
+            .emailconfirmation_set.order_by('-created')[0]
+        self.post(self.veirfy_email_url, data={"key": email_confirmation.key},
+            status_code=status.HTTP_200_OK)
+
+        # try to login again
+        self._login()
+        self._logout()
 
 
-    def generate_uid_and_token(self, user):
-        result = {}
-        from django.utils.encoding import force_bytes
-        from django.contrib.auth.tokens import default_token_generator
-        from django import VERSION
-        if VERSION[1] == 6:
-            from django.utils.http import urlsafe_base64_encode
-            result['uid'] = urlsafe_base64_encode(force_bytes(user.pk))
-        elif VERSION[1] == 5:
-            from django.utils.http import int_to_base36
-            result['uid'] = int_to_base36(user.pk)
-        result['token'] = default_token_generator.make_token(user)
-        return result
+class TestSocialAuth(TestCase, BaseAPITestCase):
 
+    urls = 'rest_auth.test_urls'
 
-class APITestCase2(APITestCase1):
-    """
-    Case #2:
-    - user profile: not defined
-    - custom registration backend: not defined
-    """
-    PROFILE_MODEL = None
+    def setUp(self):
+        social_app = SocialApp.objects.create(
+            provider='facebook',
+            name='Facebook',
+            client_id='123123123',
+            secret='321321321',
+        )
+        site = Site.objects.get_current()
+        social_app.sites.add(site)
+        self.fb_login_url = reverse('fb_login')
 
+    @responses.activate
+    def test_failed_social_auth(self):
+        # fake response
+        responses.add(responses.GET, 'https://graph.facebook.com/me',
+                  body='', status=400, content_type='application/json')
 
-class APITestCase3(APITestCase1):
-    """
-    Case #3:
-    - user profile: defined
-    - custom registration backend: not defined
-    """
-    REGISTRATION_VIEW = None
+        payload = {
+            'access_token': 'abc123'
+        }
+        self.post(self.fb_login_url, data=payload, status_code=400)
 
+    @responses.activate
+    def test_social_auth(self):
+        # fake response for facebook call
+        resp_body = '{"id":"123123123123","first_name":"John","gender":"male","last_name":"Smith","link":"https:\\/\\/www.facebook.com\\/john.smith","locale":"en_US","name":"John Smith","timezone":2,"updated_time":"2014-08-13T10:14:38+0000","username":"john.smith","verified":true}'
+        responses.add(responses.GET, 'https://graph.facebook.com/me',
+                  body=resp_body, status=200, content_type='application/json')
 
-class APITestCase4(APITestCase1):
-    """
-    Case #4:
-    - user profile: not defined
-    - custom registration backend: not defined
-    """
-    PROFILE_MODEL = None
-    REGISTRATION_VIEW = None
+        payload = {
+            'access_token': 'abc123'
+        }
+
+        self.post(self.fb_login_url, data=payload, status_code=200)
+        self.assertIn('key', self.response.json.keys())
