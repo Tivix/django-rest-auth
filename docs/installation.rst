@@ -4,7 +4,6 @@ Installation
 1. Add ``rest_auth`` app to INSTALLED_APPS in your django settings.py:
 
 .. code-block:: python
-   :emphasize-lines: 3,5
 
     INSTALLED_APPS = (
         ...,
@@ -20,7 +19,6 @@ Installation
 2. Add rest_auth urls:
 
 .. code-block:: python
-   :emphasize-lines: 3,5
 
     urlpatterns = patterns('',
         ...,
@@ -39,7 +37,6 @@ Registration (optional)
 2. Add ``allauth``, ``allauth.account`` and ``rest_auth.registration`` apps to INSTALLED_APPS in your django settings.py:
 
 .. code-block:: python
-   :emphasize-lines: 3,5
 
     INSTALLED_APPS = (
         ...,
@@ -51,7 +48,6 @@ Registration (optional)
 3. Add rest_auth.registration urls:
 
 .. code-block:: python
-   :emphasize-lines: 3,5
 
     urlpatterns = patterns('',
         ...,
@@ -68,7 +64,6 @@ Using ``django-allauth``, ``django-rest-auth`` provides helpful class for creati
 1. Add ``allauth.socialaccount`` and ``allauth.socialaccount.providers.facebook`` apps to INSTALLED_APPS in your django settings.py:
 
 .. code-block:: python
-   :emphasize-lines: 3,5
 
     INSTALLED_APPS = (
         ...,
@@ -87,7 +82,6 @@ Using ``django-allauth``, ``django-rest-auth`` provides helpful class for creati
 2. Create a view as a subclass of ``rest_auth.registration.views.SocialLogin``:
 
 .. code-block:: python
-   :emphasize-lines: 3,5
 
     from allauth.socialaccount.providers.facebook.views import FacebookOAuth2Adapter
     from rest_auth.registration.views import SocialLogin
@@ -98,9 +92,8 @@ Using ``django-allauth``, ``django-rest-auth`` provides helpful class for creati
 3. Create url for FacebookLogin view:
 
 .. code-block:: python
-   :emphasize-lines: 3,5
 
     urlpatterns += pattern('',
         ...,
-        url(r'^social-login/facebook/$', FacebookLogin.as_view(), name='fb_login')
+        url(r'^/rest-auth/facebook/$', FacebookLogin.as_view(), name='fb_login')
     )

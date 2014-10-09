@@ -23,7 +23,6 @@ Possible key values:
 Example configuration:
 
 .. code-block:: python
-   :emphasize-lines: 3,5
 
     REST_AUTH_SERIALIZERS = {
         'LOGIN_SERIALIZER': 'path.to.custom.LoginSerializer',

@@ -17,12 +17,3 @@ Contents
    API endpoints <api_endpoints>
    Configuration <configuration>
    Changelog <changelog>
-
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
-
