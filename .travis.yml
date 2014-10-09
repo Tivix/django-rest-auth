@@ -17,3 +17,4 @@ script:
   - coverage run --source=rest_auth setup.py test
 after_success:
   - coveralls
+install: "pip install -r test_requirements.pip"
