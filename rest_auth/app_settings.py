@@ -7,7 +7,7 @@ from rest_auth.serializers import (
     PasswordResetSerializer as DefaultPasswordResetSerializer,
     PasswordResetConfirmSerializer as DefaultPasswordResetConfirmSerializer,
     PasswordChangeSerializer as DefaultPasswordChangeSerializer)
-from allauth.utils import import_callable
+from .utils import import_callable
 
 
 serializers = getattr(settings, 'REST_AUTH_SERIALIZERS', {})

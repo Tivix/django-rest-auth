@@ -45,9 +45,7 @@ class UserDetailsSerializer(serializers.ModelSerializer):
     """
     class Meta:
         model = get_user_model()
-        exclude = ('password', 'groups', 'user_permissions', 'is_staff',
-            'is_superuser')
-        read_only_fields = ('id', 'last_login', 'is_active', 'date_joined')
+        fields = ('username', 'email', 'first_name', 'last_name')
 
 
 class PasswordResetSerializer(serializers.Serializer):
