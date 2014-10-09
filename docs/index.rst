@@ -8,6 +8,9 @@ Welcome to django-rest-auth's documentation!
 
 .. warning:: Version 0.3.0 is not compatible with any of previous versions, see :doc:`Changelog </changelog>` section for a list of changes.
 
+
+|build-status| |coverage-status| |requirements-status| |docs|
+
 Contents
 --------
 
@@ -19,3 +22,27 @@ Contents
    API endpoints <api_endpoints>
    Configuration <configuration>
    Changelog <changelog>
+
+
+.. |build-status| image:: https://travis-ci.org/Tivix/django-rest-auth.svg?branch=master
+    :alt: build status
+    :scale: 100%
+    :target: https://travis-ci.org/Tivix/django-rest-auth
+
+
+.. |coverage-status| image:: https://coveralls.io/repos/Tivix/django-rest-auth/badge.png?branch=master
+    :alt: coverage status
+    :scale: 100%
+    :target: https://coveralls.io/r/Tivix/django-rest-auth?branch=master
+
+
+.. |requirements-status| image:: https://requires.io/github/Tivix/django-rest-auth/requirements.png?branch=master
+    :alt: requirements status
+    :scale: 100%
+    :target: https://requires.io/github/Tivix/django-rest-auth/requirements/?branch=master
+
+
+.. |docs| image:: https://readthedocs.org/projects/django-rest-auth/badge/?version=latest
+    :scale: 100%
+    :target: https://readthedocs.org/projects/django-rest-auth/?badge=latest
+    :alt: Documentation Status
