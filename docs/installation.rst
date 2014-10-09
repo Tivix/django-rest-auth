@@ -61,6 +61,8 @@ Social Authenitcation (optional)
 
 Using ``django-allauth``, ``django-rest-auth`` provides helpful class for creating social media authentication view. Below is an example with Facebook authentication.
 
+.. note:: Points 1, 2 and 3 are related with ``django-allauth`` configuration, so if you have already configured social authentication, then please go to step 4. See ``django-allauth`` documentation for more details.
+
 1. Add ``allauth.socialaccount`` and ``allauth.socialaccount.providers.facebook`` apps to INSTALLED_APPS in your django settings.py:
 
 .. code-block:: python
@@ -79,7 +81,11 @@ Using ``django-allauth``, ``django-rest-auth`` provides helpful class for creati
         'allauth.socialaccount.providers.facebook',
     )
 
-2. Create a view as a subclass of ``rest_auth.registration.views.SocialLogin``:
+2. Add ``allauth.socialaccount.context_processors.socialaccount`` to TEMPLATE_CONTEXT_PROCESSORS in django settings
+
+3. Add Social Application in django admin panel
+
+4. Create new view as a subclass of ``rest_auth.registration.views.SocialLogin`` with ``FacebookOAuth2Adapter`` adapter as an attribute:
 
 .. code-block:: python
 
@@ -89,7 +95,7 @@ Using ``django-allauth``, ``django-rest-auth`` provides helpful class for creati
     class FacebookLogin(SocialLogin):
         adapter_class = FacebookOAuth2Adapter
 
-3. Create url for FacebookLogin view:
+5. Create url for FacebookLogin view:
 
 .. code-block:: python
 
