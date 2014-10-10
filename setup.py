@@ -11,7 +11,7 @@ except ImportError:
 import os
 
 here = os.path.dirname(os.path.abspath(__file__))
-f = open(os.path.join(here, 'README.md'))
+f = open(os.path.join(here, 'README.rst'))
 long_description = f.read().strip()
 f.close()
 
