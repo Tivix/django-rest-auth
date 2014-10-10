@@ -1,7 +1,13 @@
 Installation
 ============
 
-1. Add ``rest_auth`` app to INSTALLED_APPS in your django settings.py:
+1. Install package:
+
+.. code-block:: python
+
+    pip install django-rest-auth
+
+2. Add ``rest_auth`` app to INSTALLED_APPS in your django settings.py:
 
 .. code-block:: python
 
@@ -16,7 +22,7 @@ Installation
 
 .. note:: This project depends on ``django-rest-framework`` library, so install it if you haven't done yet. Make sure also you have installed ``rest_framework`` and ``rest_framework.authtoken`` apps
 
-2. Add rest_auth urls:
+3. Add rest_auth urls:
 
 .. code-block:: python
 
