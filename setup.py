@@ -11,14 +11,14 @@ except ImportError:
 import os
 
 here = os.path.dirname(os.path.abspath(__file__))
-f = open(os.path.join(here, 'README.md'))
+f = open(os.path.join(here, 'README.rst'))
 long_description = f.read().strip()
 f.close()
 
 
 setup(
     name='django-rest-auth',
-    version='0.2.5',
+    version='0.3.0',
     author='Sumit Chachra',
     author_email='chachra@tivix.com',
     url='http://github.com/Tivix/django-rest-auth',
