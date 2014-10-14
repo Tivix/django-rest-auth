@@ -31,7 +31,7 @@ setup(
         'Django>=1.5.0',
         'djangorestframework>=2.3.13',
     ],
-    test_suite='rest_auth.runtests.runtests',
+    test_suite='runtests.runtests',
     include_package_data=True,
     # cmdclass={},
     classifiers=[
