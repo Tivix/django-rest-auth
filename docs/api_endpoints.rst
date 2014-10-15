@@ -60,7 +60,7 @@ Registration
 
         See allauth documentation for more details.
 
-- /rest-auth/registration/ (POST)
+- /rest-auth/registration/verify-email/ (POST)
 
     - key
 
