@@ -21,6 +21,7 @@ Contents
    Installation <installation>
    API endpoints <api_endpoints>
    Configuration <configuration>
+   Demo project <demo>
    Changelog <changelog>
 
 
