@@ -154,7 +154,7 @@ class APITestCase1(TestCase, BaseAPITestCase):
         self.register_url = reverse('rest_register')
         self.password_reset_url = reverse('rest_password_reset')
         self.user_url = reverse('rest_user_details')
-        self.veirfy_email_url = reverse('verify_email')
+        self.veirfy_email_url = reverse('rest_verify_email')
 
     def _login(self):
         payload = {
