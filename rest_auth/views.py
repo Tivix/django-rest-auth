@@ -16,16 +16,7 @@ from app_settings import (TokenSerializer, UserDetailsSerializer,
     PasswordChangeSerializer)
 
 
-class LoggedInRESTAPIView(APIView):
-    authentication_classes = ((SessionAuthentication, TokenAuthentication))
-    permission_classes = ((IsAuthenticated,))
-
-
-class LoggedOutRESTAPIView(APIView):
-    permission_classes = ((AllowAny,))
-
-
-class Login(LoggedOutRESTAPIView, GenericAPIView):
+class Login(GenericAPIView):
 
     """
     Check the credentials and return the REST Token
@@ -36,7 +27,7 @@ class Login(LoggedOutRESTAPIView, GenericAPIView):
     Accept the following POST parameters: username, password
     Return the REST Framework Token Object's key.
     """
-
+    permission_classes = (AllowAny,)
     serializer_class = LoginSerializer
     token_model = Token
     response_serializer = TokenSerializer
@@ -68,7 +59,7 @@ class Login(LoggedOutRESTAPIView, GenericAPIView):
         return self.get_response()
 
 
-class Logout(LoggedInRESTAPIView):
+class Logout(APIView):
 
     """
     Calls Django logout method and delete the Token object
@@ -76,6 +67,7 @@ class Logout(LoggedInRESTAPIView):
 
     Accepts/Returns nothing.
     """
+    permissions_classes = (AllowAny,)
 
     def post(self, request):
         try:
@@ -89,7 +81,7 @@ class Logout(LoggedInRESTAPIView):
                         status=status.HTTP_200_OK)
 
 
-class UserDetails(LoggedInRESTAPIView, RetrieveUpdateAPIView):
+class UserDetails(RetrieveUpdateAPIView):
 
     """
     Returns User's details in JSON format.
@@ -101,12 +93,13 @@ class UserDetails(LoggedInRESTAPIView, RetrieveUpdateAPIView):
     Returns the updated UserProfile and/or User object.
     """
     serializer_class = UserDetailsSerializer
+    permission_classes = (IsAuthenticated,)
 
     def get_object(self):
         return self.request.user
 
 
-class PasswordReset(LoggedOutRESTAPIView, GenericAPIView):
+class PasswordReset(GenericAPIView):
 
     """
     Calls Django Auth PasswordResetForm save method.
@@ -116,6 +109,7 @@ class PasswordReset(LoggedOutRESTAPIView, GenericAPIView):
     """
 
     serializer_class = PasswordResetSerializer
+    permission_classes = (AllowAny,)
 
     def post(self, request, *args, **kwargs):
         # Create a serializer with request.DATA
@@ -130,7 +124,7 @@ class PasswordReset(LoggedOutRESTAPIView, GenericAPIView):
                          status=status.HTTP_200_OK)
 
 
-class PasswordResetConfirm(LoggedOutRESTAPIView, GenericAPIView):
+class PasswordResetConfirm(GenericAPIView):
 
     """
     Password reset e-mail link is confirmed, therefore this resets the user's password.
@@ -141,6 +135,7 @@ class PasswordResetConfirm(LoggedOutRESTAPIView, GenericAPIView):
     """
 
     serializer_class = PasswordResetConfirmSerializer
+    permission_classes = (AllowAny,)
 
     def post(self, request):
         serializer = self.get_serializer(data=request.DATA)
@@ -151,7 +146,7 @@ class PasswordResetConfirm(LoggedOutRESTAPIView, GenericAPIView):
         return Response({"success": "Password has been reset with the new password."})
 
 
-class PasswordChange(LoggedInRESTAPIView, GenericAPIView):
+class PasswordChange(GenericAPIView):
 
     """
     Calls Django Auth SetPasswordForm save method.
@@ -161,6 +156,7 @@ class PasswordChange(LoggedInRESTAPIView, GenericAPIView):
     """
 
     serializer_class = PasswordChangeSerializer
+    permission_classes = (IsAuthenticated,)
 
     def post(self, request):
         serializer = self.get_serializer(data=request.DATA)
