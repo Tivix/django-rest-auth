@@ -248,6 +248,40 @@ class APITestCase1(TestCase, BaseAPITestCase):
         # send empty payload
         self.post(self.password_change_url, data={}, status_code=400)
 
+    @override_settings(OLD_PASSWORD_FIELD_ENABLED=True)
+    def test_password_change_with_old_password(self):
+        login_payload = {
+            "username": self.USERNAME,
+            "password": self.PASS
+        }
+        User.objects.create_user(self.USERNAME, '', self.PASS)
+        self.post(self.login_url, data=login_payload, status_code=200)
+        self.token = self.response.json['key']
+
+        new_password_payload = {
+            "old_password": "%s!" % self.PASS,  # wrong password
+            "new_password1": "new_person",
+            "new_password2": "new_person"
+        }
+        self.post(self.password_change_url, data=new_password_payload,
+            status_code=400)
+
+        new_password_payload = {
+            "old_password": self.PASS,
+            "new_password1": "new_person",
+            "new_password2": "new_person"
+        }
+        self.post(self.password_change_url, data=new_password_payload,
+            status_code=200)
+
+        # user should not be able to login using old password
+        self.post(self.login_url, data=login_payload, status_code=400)
+
+        # new password should work
+        login_payload['password'] = new_password_payload['new_password1']
+        self.post(self.login_url, data=login_payload, status_code=200)
+
+
     def test_password_reset(self):
         user = User.objects.create_user(self.USERNAME, self.EMAIL, self.PASS)
 

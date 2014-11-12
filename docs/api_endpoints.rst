@@ -16,7 +16,7 @@ Basic
 
     - email
 
-- /rest-auth/password/reset/confim/ (POST)
+- /rest-auth/password/reset/confirm/ (POST)
 
     - uid
     - token

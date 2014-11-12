@@ -6,8 +6,6 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.generics import GenericAPIView
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from rest_framework.authentication import SessionAuthentication, \
-    TokenAuthentication
 from rest_framework.authtoken.models import Token
 from rest_framework.generics import RetrieveUpdateAPIView
 
@@ -32,10 +30,6 @@ class Login(GenericAPIView):
     token_model = Token
     response_serializer = TokenSerializer
 
-    def get_serializer(self):
-        return self.serializer_class(data=self.request.DATA,
-            context={'request': self.request, 'view': self})
-
     def login(self):
         self.user = self.serializer.object['user']
         self.token, created = self.token_model.objects.get_or_create(
@@ -52,7 +46,7 @@ class Login(GenericAPIView):
             status=status.HTTP_400_BAD_REQUEST)
 
     def post(self, request, *args, **kwargs):
-        self.serializer = self.get_serializer()
+        self.serializer = self.get_serializer(data=self.request.DATA)
         if not self.serializer.is_valid():
             return self.get_error_response()
         self.login()
@@ -67,7 +61,7 @@ class Logout(APIView):
 
     Accepts/Returns nothing.
     """
-    permissions_classes = (AllowAny,)
+    permission_classes = (AllowAny,)
 
     def post(self, request):
         try:

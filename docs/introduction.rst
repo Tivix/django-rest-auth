@@ -14,7 +14,21 @@ Features
 * Password reset via e-mail
 * Social Media authentication
 
+
 Apps structure
 --------------
+
 * ``rest_auth`` has basic auth functionality like login, logout, password reset and password change
 * ``rest_auth.registration`` has logic related with registration and social media authentication
+
+
+Angular app
+-----------
+
+- Tivix has also created angular module which uses API endpoints from this app - `angular-django-registration-auth <https://github.com/Tivix/angular-django-registration-auth>`_
+
+
+Demo project
+------------
+
+- You can also check our :doc:`Demo Project </demo>` which is using jQuery on frontend.
