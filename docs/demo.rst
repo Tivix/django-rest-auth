@@ -1,7 +1,9 @@
 Demo project
 ============
 
-To run demo project (ideally in virtualenv):
+The idea of creating demo project was to show how you can potentially use
+django-rest-auth app with jQuery on frontend.
+Do these steps to make it running (ideally in virtualenv).
 
 .. code-block:: python
 

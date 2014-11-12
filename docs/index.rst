@@ -22,6 +22,7 @@ Contents
    API endpoints <api_endpoints>
    Configuration <configuration>
    Demo project <demo>
+   FAQ <faq>
    Changelog <changelog>
 
 
