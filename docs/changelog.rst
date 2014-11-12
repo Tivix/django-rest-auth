@@ -1,6 +1,14 @@
 Changelog
 =========
 
+0.3.1
+-----
+
+- added old_password field in PasswordChangeSerializer
+- make all endpoints browsable
+- removed LoggedInRESTAPIView, LoggedOutRESTAPIView
+- fixed minor bugs
+
 0.3.0
 -----
 

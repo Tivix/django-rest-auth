@@ -31,3 +31,6 @@ Configuration
 
 
 - **REST_SESSION_LOGIN** - Enable session login in Login API view (default: True)
+
+
+- **OLD_PASSWORD_FIELD_ENABLED** - set it to True if you want to have old password verification on password change enpoint (default: False)
