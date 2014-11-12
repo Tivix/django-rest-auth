@@ -52,6 +52,10 @@ class Register(APIView, SignupView):
 class VerifyEmail(APIView, ConfirmEmailView):
 
     permission_classes = (AllowAny,)
+    allowed_methods = ('POST', 'OPTIONS', 'HEAD')
+
+    def get(self, *args, **kwargs):
+        return Response({}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
     def post(self, request, *args, **kwargs):
         self.kwargs['key'] = self.request.DATA.get('key', '')
