@@ -37,5 +37,3 @@ PasswordChangeSerializer = import_callable(
     serializers.get('PASSWORD_CHANGE_SERIALIZER',
         DefaultPasswordChangeSerializer)
 )
-
-
