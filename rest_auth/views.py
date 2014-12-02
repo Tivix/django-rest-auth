@@ -31,7 +31,7 @@ class Login(GenericAPIView):
     response_serializer = TokenSerializer
 
     def login(self):
-        self.user = self.serializer.object['user']
+        self.user = self.serializer.validated_data['user']
         self.token, created = self.token_model.objects.get_or_create(
             user=self.user)
         if getattr(settings, 'REST_SESSION_LOGIN', True):
