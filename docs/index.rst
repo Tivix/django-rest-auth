@@ -8,6 +8,8 @@ Welcome to django-rest-auth's documentation!
 
 .. warning:: Version 0.3.0 is not compatible with any of previous versions, see :doc:`Changelog </changelog>` section for a list of changes.
 
+.. warning:: django-rest-auth does not support django-rest-framework 3 yet
+
 
 |build-status| |coverage-status| |requirements-status| |docs|
 

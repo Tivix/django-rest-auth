@@ -1,6 +1,11 @@
 Changelog
 =========
 
+0.3.2
+-----
+
+- fixed few minor bugs
+
 0.3.1
 -----
 
