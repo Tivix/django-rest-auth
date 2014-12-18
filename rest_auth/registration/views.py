@@ -7,7 +7,7 @@ from allauth.account.views import SignupView, ConfirmEmailView
 from allauth.account.utils import complete_signup
 from allauth.account import app_settings
 
-from rest_auth.serializers import UserDetailsSerializer
+from ..serializers import UserDetailsSerializer
 from rest_auth.registration.serializers import SocialLoginSerializer
 from rest_auth.views import Login
 
