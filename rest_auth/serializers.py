@@ -138,19 +138,20 @@ class PasswordChangeSerializer(serializers.Serializer):
         self.request = self.context.get('request')
         self.user = getattr(self.request, 'user', None)
 
-    def validate_old_password(self, attrs, source):
+    def validate_old_password(self, value):
         if self.old_password_field_enabled and self.user and \
-            not self.user.check_password(attrs.get(source, '')):
+            not self.user.check_password(value):
             raise serializers.ValidationError('Invalid password')
-        return attrs
+        return value
 
     def validate(self, attrs):
         self.set_password_form = self.set_password_form_class(user=self.user,
             data=attrs)
 
         if not self.set_password_form.is_valid():
-            self._errors = self.set_password_form.errors
-            return None
+            #self._errors = self.set_password_form.errors
+            #return None
+            raise serializers.ValidationError(self.set_password_form.errors)
         return attrs
 
     def save(self):
