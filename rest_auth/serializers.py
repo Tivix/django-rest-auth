@@ -58,12 +58,12 @@ class PasswordResetSerializer(serializers.Serializer):
 
     password_reset_form_class = PasswordResetForm
 
-    def validate_email(self, attrs, source):
+    def validate_email(self, value):
         # Create PasswordResetForm with the serializer
-        self.reset_form = self.password_reset_form_class(data=attrs)
+        self.reset_form = self.password_reset_form_class(data={'email': value})
         if not self.reset_form.is_valid():
             raise serializers.ValidationError('Error')
-        return attrs
+        return value
 
     def save(self):
         request = self.context.get('request')
@@ -103,6 +103,7 @@ class PasswordResetConfirmSerializer(serializers.Serializer):
             self.user = UserModel._default_manager.get(pk=uid)
         except (TypeError, ValueError, OverflowError, UserModel.DoesNotExist):
             self._errors['uid'] = ['Invalid value']
+            raise serializers.ValidationError('Invalid UID')
 
         self.custom_validation(attrs)
 
@@ -114,6 +115,8 @@ class PasswordResetConfirmSerializer(serializers.Serializer):
 
         if not default_token_generator.check_token(self.user, attrs['token']):
             self._errors['token'] = ['Invalid value']
+
+        return attrs
 
     def save(self):
         self.set_password_form.save()
