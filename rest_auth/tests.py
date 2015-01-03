@@ -64,7 +64,7 @@ class BaseAPITestCase(object):
         is_json = bool(
             filter(lambda x: 'json' in x, self.response._headers['content-type']))
         if is_json and self.response.content:
-            self.response.json = json.loads(self.response.content)
+            self.response.json = json.loads(self.response.content.decode())
         else:
             self.response.json = {}
         if status_code:
@@ -176,7 +176,7 @@ class APITestCase1(TestCase, BaseAPITestCase):
             result['uid'] = int_to_base36(user.pk)
         else:
             from django.utils.http import urlsafe_base64_encode
-            result['uid'] = urlsafe_base64_encode(force_bytes(user.pk))
+            result['uid'] = urlsafe_base64_encode(force_bytes(user.pk)).decode()
         result['token'] = default_token_generator.make_token(user)
         return result
 
