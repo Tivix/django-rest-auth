@@ -1,3 +1,4 @@
+from django.http import HttpRequest
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
@@ -26,7 +27,11 @@ class Register(APIView, SignupView):
 
     def form_valid(self, form):
         self.user = form.save(self.request)
-        return complete_signup(self.request, self.user,
+        if isinstance(self.request, HttpRequest):
+            request = self.request
+        else:
+            request = self.request._request
+        return complete_signup(request, self.user,
                                app_settings.EMAIL_VERIFICATION,
                                self.get_success_url())
 
