@@ -7,8 +7,9 @@ class SocialLoginSerializer(serializers.Serializer):
 
     access_token = serializers.CharField(required=True)
 
-    def validate_access_token(self, attrs, source):
-        access_token = attrs[source]
+
+    def validate(self, attrs):
+        access_token = attrs['access_token']
 
         view = self.context.get('view')
         request = self.context.get('request')
@@ -38,6 +39,6 @@ class SocialLoginSerializer(serializers.Serializer):
         if not login.is_existing:
             login.lookup()
             login.save(request, connect=True)
-        self.object = {'user': login.account.user}
+        attrs['user'] = login.account.user
 
         return attrs
