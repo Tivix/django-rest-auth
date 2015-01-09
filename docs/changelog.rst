@@ -1,6 +1,11 @@
 Changelog
 =========
 
+0.3.3
+-----
+
+- support django-rest-framework v3.0
+
 0.3.2
 -----
 
