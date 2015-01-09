@@ -12,6 +12,7 @@ from django.test.utils import override_settings
 from django.contrib.sites.models import Site
 
 from allauth.socialaccount.models import SocialApp
+from allauth.socialaccount.providers.facebook.provider import GRAPH_API_URL
 import responses
 
 from rest_framework import status
@@ -380,6 +381,7 @@ class TestSocialAuth(TestCase, BaseAPITestCase):
     urls = 'rest_auth.test_urls'
 
     def setUp(self):
+
         social_app = SocialApp.objects.create(
             provider='facebook',
             name='Facebook',
@@ -389,12 +391,13 @@ class TestSocialAuth(TestCase, BaseAPITestCase):
         site = Site.objects.get_current()
         social_app.sites.add(site)
         self.fb_login_url = reverse('fb_login')
+        self.graph_api_url = GRAPH_API_URL + '/me'
 
     @responses.activate
     def test_failed_social_auth(self):
         # fake response
-        responses.add(responses.GET, 'https://graph.facebook.com/me',
-                  body='', status=400, content_type='application/json')
+        responses.add(responses.GET, self.graph_api_url, body='', status=400,
+            content_type='application/json')
 
         payload = {
             'access_token': 'abc123'
@@ -405,8 +408,8 @@ class TestSocialAuth(TestCase, BaseAPITestCase):
     def test_social_auth(self):
         # fake response for facebook call
         resp_body = '{"id":"123123123123","first_name":"John","gender":"male","last_name":"Smith","link":"https:\\/\\/www.facebook.com\\/john.smith","locale":"en_US","name":"John Smith","timezone":2,"updated_time":"2014-08-13T10:14:38+0000","username":"john.smith","verified":true}'
-        responses.add(responses.GET, 'https://graph.facebook.com/me',
-                  body=resp_body, status=200, content_type='application/json')
+        responses.add(responses.GET, self.graph_api_url, body=resp_body,
+            status=200, content_type='application/json')
 
         payload = {
             'access_token': 'abc123'
