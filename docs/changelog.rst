@@ -1,6 +1,11 @@
 Changelog
 =========
 
+0.3.4
+-----
+- fixed bug in PasswordResetConfirmation serializer (token field wasn't validated)
+- fixed bug in Register view
+
 0.3.3
 -----
 

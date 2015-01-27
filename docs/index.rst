@@ -6,7 +6,7 @@
 Welcome to django-rest-auth's documentation!
 ============================================
 
-.. warning:: Version 0.3.0 is not compatible with any of previous versions, see :doc:`Changelog </changelog>` section for a list of changes.
+.. warning:: Updating django-rest-auth to version **0.3.4** is highly recommended because of a security issue in PasswordResetConfirmation validation method.
 
 .. note:: django-rest-auth from v0.3.3 supports django-rest-framework v3.0
 
