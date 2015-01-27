@@ -293,6 +293,36 @@ class APITestCase1(TestCase, BaseAPITestCase):
         self.assertEqual(len(mail.outbox), mail_count + 1)
 
         url_kwargs = self._generate_uid_and_token(user)
+        url = reverse('rest_password_reset_confirm')
+
+        # wrong token
+        data = {
+            'new_password1': self.NEW_PASS,
+            'new_password2': self.NEW_PASS,
+            'uid': url_kwargs['uid'],
+            'token': '-wrong-token-'
+        }
+        self.post(url, data=data, status_code=400)
+
+        # wrong uid
+        data = {
+            'new_password1': self.NEW_PASS,
+            'new_password2': self.NEW_PASS,
+            'uid': '-wrong-uid-',
+            'token': url_kwargs['token']
+        }
+        self.post(url, data=data, status_code=400)
+
+        # wrong token and uid
+        data = {
+            'new_password1': self.NEW_PASS,
+            'new_password2': self.NEW_PASS,
+            'uid': '-wrong-uid-',
+            'token': '-wrong-token-'
+        }
+        self.post(url, data=data, status_code=400)
+
+        # valid payload
         data = {
             'new_password1': self.NEW_PASS,
             'new_password2': self.NEW_PASS,
