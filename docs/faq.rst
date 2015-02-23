@@ -15,3 +15,53 @@ FAQ
     You should override this view/url to handle it in your API client somehow and then, send post to /verify-email/ endpoint with proper key.
     If you don't want to use API on that step, then just use ConfirmEmailView view from:
     djang-allauth https://github.com/pennersr/django-allauth/blob/master/allauth/account/views.py#L190
+
+
+2. How can I update UserProfile assigned to User model?
+
+    Assuming you already have UserProfile model defined like this
+
+    .. code-block:: python
+
+        from django.db import models
+        from django.contrib.auth.models import User
+
+        class UserProfile(models.Model):
+            user = models.OneToOneField(User)
+            # custom fields for user
+            company_name = models.CharField(max_length=100)
+
+    To allow update user details within one request send to rest_auth.views.UserDetails view, create serializer like this:
+
+    .. code-block:: python
+
+        from rest_framework import serializers
+        from rest_auth.serializers import UserDetailsSerializer
+
+        class UserSerializer(UserDetailsSerializer):
+
+            company_name = serializers.CharField(source="userprofile.company_name")
+
+            class Meta(UserDetailsSerializer.Meta):
+                fields = UserDetailsSerializer.Meta.fields + ('company_name',)
+
+            def update(self, instance, validated_data):
+                profile_data = validated_data.pop('userprofile', {})
+                company_name = profile_data.get('company_name')
+
+                instance = super(UserSerializer, self).update(instance, validated_data)
+
+                # get and update user profile
+                profile = instance.userprofile
+                if profile_data and company_name:
+                    profile.company_name = company_name
+                    profile.save()
+                return instance
+
+    And setup USER_DETAILS_SERIALIZER in django settings:
+
+    .. code-block:: python
+
+        REST_AUTH_SERIALIZERS = {
+            'USER_DETAILS_SERIALIZER': 'demo.serializers.UserSerializer'
+        }
