@@ -46,6 +46,7 @@ class UserDetailsSerializer(serializers.ModelSerializer):
     class Meta:
         model = get_user_model()
         fields = ('username', 'email', 'first_name', 'last_name')
+        read_only_fields = ('email', )
 
 
 class PasswordResetSerializer(serializers.Serializer):
