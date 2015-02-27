@@ -31,7 +31,6 @@ class Login(GenericAPIView):
     response_serializer = TokenSerializer
 
     def login(self):
-        # import ipdb; ipdb.set_trace()
         self.user = self.serializer.validated_data['user']
         self.token, created = self.token_model.objects.get_or_create(
             user=self.user)
