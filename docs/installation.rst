@@ -57,7 +57,7 @@ Registration (optional)
 
     urlpatterns = patterns('',
         ...,
-        (r'^rest-auth/', include('rest_auth.urls'))
+        (r'^rest-auth/', include('rest_auth.urls')),
         (r'^rest-auth/registration/', include('rest_auth.registration.urls'))
     )
 
