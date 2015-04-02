@@ -62,7 +62,7 @@ Registration (optional)
     )
 
 
-Social Authenitcation (optional)
+Social Authentication (optional)
 --------------------------------
 
 Using ``django-allauth``, ``django-rest-auth`` provides helpful class for creating social media authentication view. Below is an example with Facebook authentication.
