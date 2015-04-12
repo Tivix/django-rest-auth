@@ -37,17 +37,24 @@ class SocialLoginSerializer(serializers.Serializer):
         # We did not get the access_token, but authorization code instead
         elif('code' in attrs):
             self.callback_url = getattr(view, 'callback_url', None)
+            self.client_class = getattr(view, 'client_class', None)
 
             if not self.callback_url:
                 raise serializers.ValidationError(
                     'Define callback_url in view'
                 )
 
+            if not self.client_class:
+                raise serializers.ValidationError(
+                    'Define client_class in view'
+                )
+            self.client = self.client_class()
+
             code = attrs.get('code')
 
             provider = self.adapter.get_provider()
             scope = provider.get_scope(request)
-            client = self.adapter_class(
+            client = self.client(
                 request,
                 app.client_id,
                 app.secret,
