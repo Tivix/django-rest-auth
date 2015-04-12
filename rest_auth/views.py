@@ -8,6 +8,7 @@ from rest_framework.generics import GenericAPIView
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.authtoken.models import Token
 from rest_framework.generics import RetrieveUpdateAPIView
+from rest_framework.authentication import SessionAuthentication
 
 from .app_settings import (
     TokenSerializer,
@@ -17,6 +18,12 @@ from .app_settings import (
     PasswordResetConfirmSerializer,
     PasswordChangeSerializer,
 )
+
+
+# http://bytefilia.com/titanium-mobile-facebook-application-django-allauth-sign-sign/
+class EverybodyCanAuthentication(SessionAuthentication):
+    def authenticate(self, request):
+        return None
 
 
 class Login(GenericAPIView):
@@ -31,6 +38,7 @@ class Login(GenericAPIView):
     Return the REST Framework Token Object's key.
     """
     permission_classes = (AllowAny,)
+    authentication_classes = (EverybodyCanAuthentication,)
     serializer_class = LoginSerializer
     token_model = Token
     response_serializer = TokenSerializer
