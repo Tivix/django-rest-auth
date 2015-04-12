@@ -73,3 +73,4 @@ Basing on example from installation section :doc:`Installation </installation>`
 - /rest-auth/facebook/ (POST)
 
     - access_token
+    - code

@@ -72,11 +72,25 @@ class VerifyEmail(APIView, ConfirmEmailView):
 class SocialLogin(Login):
     """
     class used for social authentications
-    example usage for facebook
+    example usage for facebook with access_token
 
+    -------------
     from allauth.socialaccount.providers.facebook.views import FacebookOAuth2Adapter
+
     class FacebookLogin(SocialLogin):
         adapter_class = FacebookOAuth2Adapter
+
+    -------------
+    example usage for facebook with code
+
+    from allauth.socialaccount.providers.facebook.views import FacebookOAuth2Adapter
+    from allauth.socialaccount.providers.oauth2.client import OAuth2Client
+
+    class FacebookLogin(SocialLogin):
+        adapter_class = FacebookOAuth2Adapter
+        client_class = OAuth2Client
+        callback_url = 'localhost:8000'
+    -------------
     """
 
     serializer_class = SocialLoginSerializer

@@ -9,15 +9,17 @@ class SocialLoginSerializer(serializers.Serializer):
     access_token = serializers.CharField(required=True)
 
     def validate(self, attrs):
-        access_token = attrs.get('access_token')
+
         view = self.context.get('view')
         request = self.context.get('request')
         if not isinstance(request, HttpRequest):
             request = request._request
 
         if not view:
-            raise serializers.ValidationError('View is not defined, pass it ' +
-                'as a context variable')
+            raise serializers.ValidationError(
+                'View is not defined, pass it ' +
+                'as a context variable'
+            )
         self.adapter_class = getattr(view, 'adapter_class', None)
 
         if not self.adapter_class:
@@ -25,6 +27,32 @@ class SocialLoginSerializer(serializers.Serializer):
 
         self.adapter = self.adapter_class()
         app = self.adapter.get_provider().get_app(request)
+
+        # More info on code vs access_token
+        # http://stackoverflow.com/questions/8666316/facebook-oauth-2-0-code-and-token
+        # We have the access_token straight
+        if('access_token' in attrs):
+            access_token = attrs.get('access_token')
+        # We did not get the access_token, but authorization code instead
+        elif('code' in attrs):
+            code = attrs.get('code')
+
+            callback_url = self.callback_url
+
+            provider = self.adapter.get_provider()
+            scope = provider.get_scope(request)
+            client = self.adapter_class(
+                request,
+                app.client_id,
+                app.secret,
+                self.adapter.access_token_method,
+                self.adapter.access_token_url,
+                callback_url,
+                scope
+            )
+            token = client.get_access_token(code)
+            access_token = token['access_token']
+
         token = self.adapter.parse_token({'access_token': access_token})
         token.app = app
 
