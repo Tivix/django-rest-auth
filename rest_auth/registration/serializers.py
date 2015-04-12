@@ -6,7 +6,8 @@ from allauth.socialaccount.helpers import complete_social_login
 
 class SocialLoginSerializer(serializers.Serializer):
 
-    access_token = serializers.CharField(required=True)
+    access_token = serializers.CharField(required=False)
+    code = serializers.CharField(required=False)
 
     def validate(self, attrs):
 
