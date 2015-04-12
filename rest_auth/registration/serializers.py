@@ -48,13 +48,12 @@ class SocialLoginSerializer(serializers.Serializer):
                 raise serializers.ValidationError(
                     'Define client_class in view'
                 )
-            self.client = self.client_class()
 
             code = attrs.get('code')
 
             provider = self.adapter.get_provider()
             scope = provider.get_scope(request)
-            client = self.client(
+            client = self.client_class(
                 request,
                 app.client_id,
                 app.secret,
@@ -70,8 +69,12 @@ class SocialLoginSerializer(serializers.Serializer):
         token.app = app
 
         try:
-            login = self.adapter.complete_login(request, app, token,
-                                                response=access_token)
+            login = self.adapter.complete_login(
+                request,
+                app,
+                token,
+                response=access_token,
+            )
             token.account = login.account
             login.token = token
             complete_social_login(request, login)
