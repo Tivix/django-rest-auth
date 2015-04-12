@@ -9,9 +9,14 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.authtoken.models import Token
 from rest_framework.generics import RetrieveUpdateAPIView
 
-from .app_settings import (TokenSerializer, UserDetailsSerializer,
-    LoginSerializer, PasswordResetSerializer, PasswordResetConfirmSerializer,
-    PasswordChangeSerializer)
+from .app_settings import (
+    TokenSerializer,
+    UserDetailsSerializer,
+    LoginSerializer,
+    PasswordResetSerializer,
+    PasswordResetConfirmSerializer,
+    PasswordChangeSerializer,
+)
 
 
 class Login(GenericAPIView):
@@ -38,12 +43,16 @@ class Login(GenericAPIView):
             login(self.request, self.user)
 
     def get_response(self):
-        return Response(self.response_serializer(self.token).data,
-            status=status.HTTP_200_OK)
+        return Response(
+            self.response_serializer(self.token).data,
+            status=status.HTTP_200_OK
+        )
 
     def get_error_response(self):
-        return Response(self.serializer.errors,
-            status=status.HTTP_400_BAD_REQUEST)
+        return Response(
+            self.serializer.errors,
+            status=status.HTTP_400_BAD_REQUEST
+        )
 
     def post(self, request, *args, **kwargs):
         self.serializer = self.get_serializer(data=self.request.DATA)
@@ -71,8 +80,10 @@ class Logout(APIView):
 
         logout(request)
 
-        return Response({"success": "Successfully logged out."},
-                        status=status.HTTP_200_OK)
+        return Response(
+            {"success": "Successfully logged out."},
+            status=status.HTTP_200_OK
+        )
 
 
 class UserDetails(RetrieveUpdateAPIView):
@@ -114,14 +125,17 @@ class PasswordReset(GenericAPIView):
                             status=status.HTTP_400_BAD_REQUEST)
         serializer.save()
         # Return the success message with OK HTTP status
-        return Response({"success": "Password reset e-mail has been sent."},
-                         status=status.HTTP_200_OK)
+        return Response(
+            {"success": "Password reset e-mail has been sent."},
+            status=status.HTTP_200_OK
+        )
 
 
 class PasswordResetConfirm(GenericAPIView):
 
     """
-    Password reset e-mail link is confirmed, therefore this resets the user's password.
+    Password reset e-mail link is confirmed,
+    therefore this resets the user's password.
 
     Accepts the following POST parameters: new_password1, new_password2
     Accepts the following Django URL arguments: token, uid
@@ -134,10 +148,14 @@ class PasswordResetConfirm(GenericAPIView):
     def post(self, request):
         serializer = self.get_serializer(data=request.DATA)
         if not serializer.is_valid():
-            return Response(serializer.errors,
-                status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                serializer.errors,
+                status=status.HTTP_400_BAD_REQUEST
+            )
         serializer.save()
-        return Response({"success": "Password has been reset with the new password."})
+        return Response(
+            {"success": "Password has been reset with the new password."}
+        )
 
 
 class PasswordChange(GenericAPIView):
@@ -155,7 +173,11 @@ class PasswordChange(GenericAPIView):
     def post(self, request):
         serializer = self.get_serializer(data=request.DATA)
         if not serializer.is_valid():
-            return Response(serializer.errors,
-                status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                serializer.errors,
+                status=status.HTTP_400_BAD_REQUEST
+            )
         serializer.save()
-        return Response({"success": "New password has been saved."})
+        return Response(
+            {"success": "New password has been saved."}
+        )
