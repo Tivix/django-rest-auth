@@ -110,8 +110,7 @@ class PasswordResetConfirmSerializer(serializers.Serializer):
         self.set_password_form = self.set_password_form_class(user=self.user,
             data=attrs)
         if not self.set_password_form.is_valid():
-            raise ValidationError({'token': ['Invalid value']})
-
+	    raise serializers.ValidationError(self.set_password_form.errors)
         if not default_token_generator.check_token(self.user, attrs['token']):
             raise ValidationError({'token': ['Invalid value']})
 
