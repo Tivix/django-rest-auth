@@ -24,7 +24,9 @@ class SocialLoginSerializer(serializers.Serializer):
         self.adapter_class = getattr(view, 'adapter_class', None)
 
         if not self.adapter_class:
-            raise serializers.ValidationError('Define adapter_class in view')
+            raise serializers.ValidationError(
+                'Define adapter_class in view'
+            )
 
         self.adapter = self.adapter_class()
         app = self.adapter.get_provider().get_app(request)
@@ -38,6 +40,15 @@ class SocialLoginSerializer(serializers.Serializer):
         elif('code' in attrs):
             self.callback_url = getattr(view, 'callback_url', None)
             self.client_class = getattr(view, 'client_class', None)
+
+            if not self.callback_url:
+                raise serializers.ValidationError(
+                    'Define callback_url in view'
+                )
+            if not self.client_class:
+                raise serializers.ValidationError(
+                    'Define client_class in view'
+                )
 
             if not self.callback_url:
                 raise serializers.ValidationError(
