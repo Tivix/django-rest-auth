@@ -54,3 +54,6 @@ docs/_build/
 
 .DS_Store
 db.sqlite3
+
+# IntelliJ IDE files
+.idea
