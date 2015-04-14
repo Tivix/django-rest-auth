@@ -43,7 +43,7 @@ class Login(GenericAPIView):
     authentication_classes = (EverybodyCanAuthentication,)
     serializer_class = LoginSerializer
     token_model = Token
-    token_serializer = TokenSerializer
+    response_serializer = TokenSerializer
     user_serializer = UserDetailsSerializer
 
     def login(self):
@@ -54,7 +54,7 @@ class Login(GenericAPIView):
             login(self.request, self.user)
 
     def get_response(self):
-        response = self.token_serializer(self.token).data
+        response = self.response_serializer(self.token).data
         user = self.user_serializer(instance=self.user).data
         response['user'] = user
         return Response(
