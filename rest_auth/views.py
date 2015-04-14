@@ -27,16 +27,18 @@ class EverybodyCanAuthentication(SessionAuthentication):
 
 
 class Login(GenericAPIView):
-
     """
     Check the credentials and return the REST Token
+    and the user object
     if the credentials are valid and authenticated.
     Calls Django Auth login method to register User ID
     in Django session framework
 
     Accept the following POST parameters: username, password
-    Return the REST Framework Token Object's key.
+    Return the REST Framework Token Object's key
+    and user object.
     """
+
     permission_classes = (AllowAny,)
     authentication_classes = (EverybodyCanAuthentication,)
     serializer_class = LoginSerializer
