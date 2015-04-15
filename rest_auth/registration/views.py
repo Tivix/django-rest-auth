@@ -37,7 +37,7 @@ class Register(APIView, SignupView):
     authentication_classes = (EverybodyCanAuthentication,)
     token_model = Token
     token_serializer = TokenSerializer
-    user_serializer = UserDetailsSerializer
+    user_serializer_class = UserDetailsSerializer
     allowed_methods = ('POST', 'OPTIONS', 'HEAD')
 
     def get(self, *args, **kwargs):
@@ -71,7 +71,7 @@ class Register(APIView, SignupView):
 
     def get_response(self):
         response = self.token_serializer(self.token).data
-        user = self.user_serializer(instance=self.user).data
+        user = self.user_serializer_class(instance=self.user).data
         response['user'] = user
         return Response(response, status=status.HTTP_201_CREATED)
 
