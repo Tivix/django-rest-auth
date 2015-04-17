@@ -31,7 +31,7 @@ class SocialLoginSerializer(serializers.Serializer):
         try:
             login = self.adapter.complete_login(request, app, token,
                                                 response=access_token)
-            token.account = login.account
+
             login.token = token
             complete_social_login(request, login)
         except HTTPError:

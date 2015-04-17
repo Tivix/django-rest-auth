@@ -1,5 +1,4 @@
 import json
-from datetime import datetime, date, time
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
@@ -24,18 +23,6 @@ class APIClient(Client):
 
     def options(self, path, data='', content_type=MULTIPART_CONTENT, follow=False, **extra):
         return self.generic('OPTIONS', path, data, content_type, **extra)
-
-
-# class CustomJSONEncoder(json.JSONEncoder):
-#     """
-#     Convert datetime/date objects into isoformat
-#     """
-
-#     def default(self, obj):
-#         if isinstance(obj, (datetime, date, time)):
-#             return obj.isoformat()
-#         else:
-#             return super(CustomJSONEncoder, self).default(obj)
 
 
 class BaseAPITestCase(object):
@@ -471,7 +458,7 @@ class TestSocialAuth(TestCase, BaseAPITestCase):
         ACCOUNT_EMAIL_REQUIRED=True,
         REST_SESSION_LOGIN=False
     )
-    def teste_edge_case(self):
+    def test_edge_case(self):
         resp_body = '{"id":"123123123123","first_name":"John","gender":"male","last_name":"Smith","link":"https:\\/\\/www.facebook.com\\/john.smith","locale":"en_US","name":"John Smith","timezone":2,"updated_time":"2014-08-13T10:14:38+0000","username":"john.smith","verified":true,"email":"%s"}'
         responses.add(responses.GET, self.graph_api_url,
             body=resp_body % self.EMAIL,
