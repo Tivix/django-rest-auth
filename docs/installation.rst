@@ -107,5 +107,5 @@ Using ``django-allauth``, ``django-rest-auth`` provides helpful class for creati
 
     urlpatterns += pattern('',
         ...,
-        url(r'^/rest-auth/facebook/$', FacebookLogin.as_view(), name='fb_login')
+        url(r'^rest-auth/facebook/$', FacebookLogin.as_view(), name='fb_login')
     )
