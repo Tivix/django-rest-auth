@@ -86,7 +86,7 @@ class SocialLoginSerializer(serializers.Serializer):
                 token,
                 response=access_token,
             )
-            token.account = login.account
+
             login.token = token
             complete_social_login(request, login)
         except HTTPError:
