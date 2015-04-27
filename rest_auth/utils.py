@@ -1,5 +1,9 @@
 from six import string_types
-from django.utils.importlib import import_module
+import sys
+if sys.version_info < (2, 7):
+    from django.utils.importlib import import_module
+else:
+    from importlib import import_module
 
 
 def import_callable(path_or_callable):
