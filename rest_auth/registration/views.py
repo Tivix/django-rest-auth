@@ -82,6 +82,7 @@ class Register(APIView, SignupView):
 class VerifyEmail(APIView, ConfirmEmailView):
 
     permission_classes = (AllowAny,)
+    authentication_classes = (EverybodyCanAuthentication,)
     allowed_methods = ('POST', 'OPTIONS', 'HEAD')
 
     def get(self, *args, **kwargs):

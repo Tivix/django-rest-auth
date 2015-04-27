@@ -85,6 +85,7 @@ class Logout(APIView):
     Accepts/Returns nothing.
     """
     permission_classes = (AllowAny,)
+    authentication_classes = (EverybodyCanAuthentication,)
 
     def post(self, request):
         try:
@@ -113,6 +114,7 @@ class UserDetails(RetrieveUpdateAPIView):
     """
     serializer_class = UserDetailsSerializer
     permission_classes = (IsAuthenticated,)
+    authentication_classes = (EverybodyCanAuthentication,)
 
     def get_object(self):
         return self.request.user
@@ -129,6 +131,7 @@ class PasswordReset(GenericAPIView):
 
     serializer_class = PasswordResetSerializer
     permission_classes = (AllowAny,)
+    authentication_classes = (EverybodyCanAuthentication,)
 
     def post(self, request, *args, **kwargs):
         # Create a serializer with request.DATA
@@ -158,6 +161,7 @@ class PasswordResetConfirm(GenericAPIView):
 
     serializer_class = PasswordResetConfirmSerializer
     permission_classes = (AllowAny,)
+    authentication_classes = (EverybodyCanAuthentication,)
 
     def post(self, request):
         serializer = self.get_serializer(data=request.DATA)
@@ -183,6 +187,7 @@ class PasswordChange(GenericAPIView):
 
     serializer_class = PasswordChangeSerializer
     permission_classes = (IsAuthenticated,)
+    authentication_classes = (EverybodyCanAuthentication,)
 
     def post(self, request):
         serializer = self.get_serializer(data=request.DATA)
