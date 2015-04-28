@@ -78,7 +78,6 @@ class PasswordResetSerializer(serializers.Serializer):
 
 
 class PasswordResetConfirmSerializer(serializers.Serializer):
-
     """
     Serializer for requesting a password reset e-mail.
     """
@@ -107,8 +106,9 @@ class PasswordResetConfirmSerializer(serializers.Serializer):
 
         self.custom_validation(attrs)
         # Construct SetPasswordForm instance
-        self.set_password_form = self.set_password_form_class(user=self.user,
-            data=attrs)
+        self.set_password_form = self.set_password_form_class(
+            user=self.user, data=attrs
+        )
         if not self.set_password_form.is_valid():
             raise serializers.ValidationError(self.set_password_form.errors)
         if not default_token_generator.check_token(self.user, attrs['token']):
@@ -129,8 +129,9 @@ class PasswordChangeSerializer(serializers.Serializer):
     set_password_form_class = SetPasswordForm
 
     def __init__(self, *args, **kwargs):
-        self.old_password_field_enabled = getattr(settings,
-            'OLD_PASSWORD_FIELD_ENABLED', False)
+        self.old_password_field_enabled = getattr(
+            settings, 'OLD_PASSWORD_FIELD_ENABLED', False
+        )
         super(PasswordChangeSerializer, self).__init__(*args, **kwargs)
 
         if not self.old_password_field_enabled:
@@ -140,14 +141,20 @@ class PasswordChangeSerializer(serializers.Serializer):
         self.user = getattr(self.request, 'user', None)
 
     def validate_old_password(self, value):
-        if self.old_password_field_enabled and self.user and \
-            not self.user.check_password(value):
+        invalid_password_conditions = (
+            self.old_password_field_enabled,
+            self.user,
+            not self.user.check_password(value)
+        )
+
+        if all(invalid_password_conditions):
             raise serializers.ValidationError('Invalid password')
         return value
 
     def validate(self, attrs):
-        self.set_password_form = self.set_password_form_class(user=self.user,
-            data=attrs)
+        self.set_password_form = self.set_password_form_class(
+            user=self.user, data=attrs
+        )
 
         if not self.set_password_form.is_valid():
             raise serializers.ValidationError(self.set_password_form.errors)
