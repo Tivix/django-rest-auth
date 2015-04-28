@@ -1,6 +1,10 @@
 Changelog
 =========
 
+0.4.0
+-----
+- Django 1.8 compatiblity fixes
+
 0.3.4
 -----
 - fixed bug in PasswordResetConfirmation serializer (token field wasn't validated)
