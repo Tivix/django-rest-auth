@@ -11,7 +11,8 @@ from rest_auth.registration.views import SocialLogin
 class FacebookLogin(SocialLogin):
     adapter_class = FacebookOAuth2Adapter
 
-urlpatterns += patterns('',
+urlpatterns += patterns(
+    '',
     url(r'^rest-registration/', include('rest_auth.registration.urls')),
     url(r'^test-admin/', include(rest_auth.django_test_urls)),
     url(r'^account-email-verification-sent/$', TemplateView.as_view(),
