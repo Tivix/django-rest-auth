@@ -9,4 +9,3 @@ def import_callable(path_or_callable):
         assert isinstance(path_or_callable, string_types)
         package, attr = path_or_callable.rsplit('.', 1)
         return getattr(import_module(package), attr)
-

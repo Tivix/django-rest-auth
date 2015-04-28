@@ -21,3 +21,5 @@ script:
   - coverage run --source=rest_auth setup.py test
 after_success:
   - coveralls
+before_script:
+  - flake8 . --config=flake8
