@@ -9,9 +9,11 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.authtoken.models import Token
 from rest_framework.generics import RetrieveUpdateAPIView
 
-from .app_settings import (TokenSerializer, UserDetailsSerializer,
-    LoginSerializer, PasswordResetSerializer, PasswordResetConfirmSerializer,
-    PasswordChangeSerializer)
+from .app_settings import (
+    TokenSerializer, UserDetailsSerializer, LoginSerializer,
+    PasswordResetSerializer, PasswordResetConfirmSerializer,
+    PasswordChangeSerializer
+)
 
 
 class Login(GenericAPIView):
@@ -38,12 +40,14 @@ class Login(GenericAPIView):
             login(self.request, self.user)
 
     def get_response(self):
-        return Response(self.response_serializer(self.token).data,
-            status=status.HTTP_200_OK)
+        return Response(
+            self.response_serializer(self.token).data, status=status.HTTP_200_OK
+        )
 
     def get_error_response(self):
-        return Response(self.serializer.errors,
-            status=status.HTTP_400_BAD_REQUEST)
+        return Response(
+            self.serializer.errors, status=status.HTTP_400_BAD_REQUEST
+        )
 
     def post(self, request, *args, **kwargs):
         self.serializer = self.get_serializer(data=self.request.DATA)
@@ -114,8 +118,10 @@ class PasswordReset(GenericAPIView):
                             status=status.HTTP_400_BAD_REQUEST)
         serializer.save()
         # Return the success message with OK HTTP status
-        return Response({"success": "Password reset e-mail has been sent."},
-                         status=status.HTTP_200_OK)
+        return Response(
+            {"success": "Password reset e-mail has been sent."},
+            status=status.HTTP_200_OK
+        )
 
 
 class PasswordResetConfirm(GenericAPIView):
@@ -134,8 +140,9 @@ class PasswordResetConfirm(GenericAPIView):
     def post(self, request):
         serializer = self.get_serializer(data=request.DATA)
         if not serializer.is_valid():
-            return Response(serializer.errors,
-                status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                serializer.errors, status=status.HTTP_400_BAD_REQUEST
+            )
         serializer.save()
         return Response({"success": "Password has been reset with the new password."})
 
@@ -155,7 +162,8 @@ class PasswordChange(GenericAPIView):
     def post(self, request):
         serializer = self.get_serializer(data=request.DATA)
         if not serializer.is_valid():
-            return Response(serializer.errors,
-                status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                serializer.errors, status=status.HTTP_400_BAD_REQUEST
+            )
         serializer.save()
         return Response({"success": "New password has been saved."})

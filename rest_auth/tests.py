@@ -35,7 +35,7 @@ class BaseAPITestCase(object):
     def send_request(self, request_method, *args, **kwargs):
         request_func = getattr(self.client, request_method)
         status_code = None
-        if not 'content_type' in kwargs and request_method != 'get':
+        if 'content_type' not in kwargs and request_method != 'get':
             kwargs['content_type'] = 'application/json'
         if 'data' in kwargs and request_method != 'get' and kwargs['content_type'] == 'application/json':
             data = kwargs.get('data', '')
@@ -216,8 +216,11 @@ class APITestCase1(TestCase, BaseAPITestCase):
             "new_password1": "new_person",
             "new_password2": "new_person"
         }
-        self.post(self.password_change_url, data=new_password_payload,
-            status_code=200)
+        self.post(
+            self.password_change_url,
+            data=new_password_payload,
+            status_code=200
+        )
 
         # user should not be able to login using old password
         self.post(self.login_url, data=login_payload, status_code=400)
@@ -231,8 +234,11 @@ class APITestCase1(TestCase, BaseAPITestCase):
             "new_password1": "new_person1",
             "new_password2": "new_person"
         }
-        self.post(self.password_change_url, data=new_password_payload,
-            status_code=400)
+        self.post(
+            self.password_change_url,
+            data=new_password_payload,
+            status_code=400
+        )
 
         # send empty payload
         self.post(self.password_change_url, data={}, status_code=400)
@@ -252,16 +258,22 @@ class APITestCase1(TestCase, BaseAPITestCase):
             "new_password1": "new_person",
             "new_password2": "new_person"
         }
-        self.post(self.password_change_url, data=new_password_payload,
-            status_code=400)
+        self.post(
+            self.password_change_url,
+            data=new_password_payload,
+            status_code=400
+        )
 
         new_password_payload = {
             "old_password": self.PASS,
             "new_password1": "new_person",
             "new_password2": "new_person"
         }
-        self.post(self.password_change_url, data=new_password_payload,
-            status_code=200)
+        self.post(
+            self.password_change_url,
+            data=new_password_payload,
+            status_code=200
+        )
 
         # user should not be able to login using old password
         self.post(self.login_url, data=login_payload, status_code=400)
@@ -364,11 +376,17 @@ class APITestCase1(TestCase, BaseAPITestCase):
         mail_count = len(mail.outbox)
 
         # test empty payload
-        self.post(self.register_url, data={},
-            status_code=status.HTTP_400_BAD_REQUEST)
+        self.post(
+            self.register_url,
+            data={},
+            status_code=status.HTTP_400_BAD_REQUEST
+        )
 
-        self.post(self.register_url, data=self.REGISTRATION_DATA_WITH_EMAIL,
-            status_code=status.HTTP_201_CREATED)
+        self.post(
+            self.register_url,
+            data=self.REGISTRATION_DATA_WITH_EMAIL,
+            status_code=status.HTTP_201_CREATED
+        )
         self.assertEqual(get_user_model().objects.all().count(), user_count + 1)
         self.assertEqual(len(mail.outbox), mail_count + 1)
         new_user = get_user_model().objects.latest('id')
@@ -379,14 +397,20 @@ class APITestCase1(TestCase, BaseAPITestCase):
             "username": self.USERNAME,
             "password": self.PASS
         }
-        self.post(self.login_url, data=payload,
-            status=status.HTTP_400_BAD_REQUEST)
+        self.post(
+            self.login_url,
+            data=payload,
+            status=status.HTTP_400_BAD_REQUEST
+        )
 
-        # veirfy email
+        # verify email
         email_confirmation = new_user.emailaddress_set.get(email=self.EMAIL)\
             .emailconfirmation_set.order_by('-created')[0]
-        self.post(self.veirfy_email_url, data={"key": email_confirmation.key},
-            status_code=status.HTTP_200_OK)
+        self.post(
+            self.veirfy_email_url,
+            data={"key": email_confirmation.key},
+            status_code=status.HTTP_200_OK
+        )
 
         # try to login again
         self._login()
@@ -423,8 +447,13 @@ class TestSocialAuth(TestCase, BaseAPITestCase):
     @responses.activate
     def test_failed_social_auth(self):
         # fake response
-        responses.add(responses.GET, self.graph_api_url, body='', status=400,
-            content_type='application/json')
+        responses.add(
+            responses.GET,
+            self.graph_api_url,
+            body='',
+            status=400,
+            content_type='application/json'
+        )
 
         payload = {
             'access_token': 'abc123'
@@ -434,9 +463,14 @@ class TestSocialAuth(TestCase, BaseAPITestCase):
     @responses.activate
     def test_social_auth(self):
         # fake response for facebook call
-        resp_body = '{"id":"123123123123","first_name":"John","gender":"male","last_name":"Smith","link":"https:\\/\\/www.facebook.com\\/john.smith","locale":"en_US","name":"John Smith","timezone":2,"updated_time":"2014-08-13T10:14:38+0000","username":"john.smith","verified":true}'
-        responses.add(responses.GET, self.graph_api_url, body=resp_body,
-            status=200, content_type='application/json')
+        resp_body = '{"id":"123123123123","first_name":"John","gender":"male","last_name":"Smith","link":"https:\\/\\/www.facebook.com\\/john.smith","locale":"en_US","name":"John Smith","timezone":2,"updated_time":"2014-08-13T10:14:38+0000","username":"john.smith","verified":true}'  # noqa
+        responses.add(
+            responses.GET,
+            self.graph_api_url,
+            body=resp_body,
+            status=200,
+            content_type='application/json'
+        )
 
         users_count = get_user_model().objects.all().count()
         payload = {
@@ -459,24 +493,34 @@ class TestSocialAuth(TestCase, BaseAPITestCase):
         REST_SESSION_LOGIN=False
     )
     def test_edge_case(self):
-        resp_body = '{"id":"123123123123","first_name":"John","gender":"male","last_name":"Smith","link":"https:\\/\\/www.facebook.com\\/john.smith","locale":"en_US","name":"John Smith","timezone":2,"updated_time":"2014-08-13T10:14:38+0000","username":"john.smith","verified":true,"email":"%s"}'
-        responses.add(responses.GET, self.graph_api_url,
+        resp_body = '{"id":"123123123123","first_name":"John","gender":"male","last_name":"Smith","link":"https:\\/\\/www.facebook.com\\/john.smith","locale":"en_US","name":"John Smith","timezone":2,"updated_time":"2014-08-13T10:14:38+0000","username":"john.smith","verified":true,"email":"%s"}'  # noqa
+        responses.add(
+            responses.GET,
+            self.graph_api_url,
             body=resp_body % self.EMAIL,
-            status=200, content_type='application/json')
+            status=200,
+            content_type='application/json'
+        )
 
         # test empty payload
         self.post(self.register_url, data={}, status_code=400)
 
-        self.post(self.register_url, data=self.REGISTRATION_DATA,
-            status_code=201)
+        self.post(
+            self.register_url,
+            data=self.REGISTRATION_DATA,
+            status_code=201
+        )
         new_user = get_user_model().objects.latest('id')
         self.assertEqual(new_user.username, self.REGISTRATION_DATA['username'])
 
-        # veirfy email
+        # verify email
         email_confirmation = new_user.emailaddress_set.get(email=self.EMAIL)\
             .emailconfirmation_set.order_by('-created')[0]
-        self.post(self.veirfy_email_url, data={"key": email_confirmation.key},
-            status_code=status.HTTP_200_OK)
+        self.post(
+            self.veirfy_email_url,
+            data={"key": email_confirmation.key},
+            status_code=status.HTTP_200_OK
+        )
 
         self._login()
         self._logout()
