@@ -27,6 +27,7 @@ class EverybodyCanAuthentication(SessionAuthentication):
 
 
 class Login(GenericAPIView):
+
     """
     Check the credentials and return the REST Token
     and the user object

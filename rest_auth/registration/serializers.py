@@ -18,8 +18,7 @@ class SocialLoginSerializer(serializers.Serializer):
 
         if not view:
             raise serializers.ValidationError(
-                'View is not defined, pass it ' +
-                'as a context variable'
+                'View is not defined, pass it as a context variable'
             )
         self.adapter_class = getattr(view, 'adapter_class', None)
 
