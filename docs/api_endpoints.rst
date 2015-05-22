@@ -29,6 +29,7 @@ Basic
 
     - new_password1
     - new_password2
+    - old_password
 
 - /rest-auth/user/ (GET)
 
