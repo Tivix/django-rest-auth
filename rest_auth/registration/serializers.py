@@ -13,7 +13,7 @@ class SocialLoginSerializer(serializers.Serializer):
             request = request._request
         return request
 
-    def get_social_account(self, adapter, app, token, response):
+    def get_social_login(self, adapter, app, token, response):
         """
 
         :param adapter: allauth.socialaccount Adapter subclass. Usually OAuthAdapter or Auth2Adapter
@@ -47,7 +47,7 @@ class SocialLoginSerializer(serializers.Serializer):
         token.app = app
 
         try:
-            login = self.get_social_account(adapter, app, token, access_token)
+            login = self.get_social_login(adapter, app, token, access_token)
             complete_social_login(request, login)
         except HTTPError:
             raise serializers.ValidationError('Incorrect value')
