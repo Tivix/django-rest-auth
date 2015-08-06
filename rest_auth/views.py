@@ -50,7 +50,7 @@ class Login(GenericAPIView):
         )
 
     def post(self, request, *args, **kwargs):
-        self.serializer = self.get_serializer(data=self.request.DATA)
+        self.serializer = self.get_serializer(data=self.request.data)
         if not self.serializer.is_valid():
             return self.get_error_response()
         self.login()
@@ -110,8 +110,8 @@ class PasswordReset(GenericAPIView):
     permission_classes = (AllowAny,)
 
     def post(self, request, *args, **kwargs):
-        # Create a serializer with request.DATA
-        serializer = self.get_serializer(data=request.DATA)
+        # Create a serializer with request.data
+        serializer = self.get_serializer(data=request.data)
 
         if not serializer.is_valid():
             return Response(serializer.errors,
@@ -138,7 +138,7 @@ class PasswordResetConfirm(GenericAPIView):
     permission_classes = (AllowAny,)
 
     def post(self, request):
-        serializer = self.get_serializer(data=request.DATA)
+        serializer = self.get_serializer(data=request.data)
         if not serializer.is_valid():
             return Response(
                 serializer.errors, status=status.HTTP_400_BAD_REQUEST
@@ -160,7 +160,7 @@ class PasswordChange(GenericAPIView):
     permission_classes = (IsAuthenticated,)
 
     def post(self, request):
-        serializer = self.get_serializer(data=request.DATA)
+        serializer = self.get_serializer(data=request.data)
         if not serializer.is_valid():
             return Response(
                 serializer.errors, status=status.HTTP_400_BAD_REQUEST
