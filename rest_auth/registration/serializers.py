@@ -10,7 +10,8 @@ except ImportError:
 
 
 class SocialLoginSerializer(serializers.Serializer):
-    access_token = serializers.CharField(required=True)
+    access_token = serializers.CharField(required=False)
+    code = serializers.CharField(required=False)
 
     def _get_request(self):
         request = self.context.get('request')
@@ -33,7 +34,6 @@ class SocialLoginSerializer(serializers.Serializer):
         return social_login
 
     def validate(self, attrs):
-        access_token = attrs.get('access_token')
         view = self.context.get('view')
         request = self._get_request()
 
@@ -48,6 +48,44 @@ class SocialLoginSerializer(serializers.Serializer):
 
         adapter = adapter_class()
         app = adapter.get_provider().get_app(request)
+
+        # More info on code vs access_token
+        # http://stackoverflow.com/questions/8666316/facebook-oauth-2-0-code-and-token
+
+        # Case 1: We received the access_token
+        if('access_token' in attrs):
+            access_token = attrs.get('access_token')
+
+        # Case 2: We received the authorization code
+        elif('code' in attrs):
+            self.callback_url = getattr(view, 'callback_url', None)
+            self.client_class = getattr(view, 'client_class', None)
+
+            if not self.callback_url:
+                raise serializers.ValidationError(
+                    'Define callback_url in view'
+                )
+            if not self.client_class:
+                raise serializers.ValidationError(
+                    'Define client_class in view'
+                )
+
+            code = attrs.get('code')
+
+            provider = self.adapter.get_provider()
+            scope = provider.get_scope(request)
+            client = self.client_class(
+                request,
+                app.client_id,
+                app.secret,
+                self.adapter.access_token_method,
+                self.adapter.access_token_url,
+                self.callback_url,
+                scope
+            )
+            token = client.get_access_token(code)
+            access_token = token['access_token']
+
         token = adapter.parse_token({'access_token': access_token})
         token.app = app
 

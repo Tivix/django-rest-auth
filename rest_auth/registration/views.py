@@ -3,21 +3,33 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from rest_framework import status
+from rest_framework.authtoken.models import Token
 
 from allauth.account.views import SignupView, ConfirmEmailView
 from allauth.account.utils import complete_signup
 from allauth.account import app_settings
 
-from rest_auth.app_settings import UserDetailsSerializer
+from rest_auth.app_settings import UserDetailsSerializer, TokenSerializer
 from rest_auth.registration.serializers import SocialLoginSerializer
 from rest_auth.views import Login
 
 
 class Register(APIView, SignupView):
+    """
+    Accepts the credentials and creates a new user
+    if user does not exist already
+    Return the REST Token if the credentials are valid and authenticated.
+    Calls allauth complete_signup method
+
+    Accept the following POST parameters: username, email, password
+    Return the REST Framework Token Object's key.
+    """
 
     permission_classes = (AllowAny,)
-    user_serializer_class = UserDetailsSerializer
+    # user_serializer_class = UserDetailsSerializer
     allowed_methods = ('POST', 'OPTIONS', 'HEAD')
+    token_model = Token
+    serializer_class = TokenSerializer
 
     def get(self, *args, **kwargs):
         return Response({}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
@@ -27,6 +39,9 @@ class Register(APIView, SignupView):
 
     def form_valid(self, form):
         self.user = form.save(self.request)
+        self.token, created = self.token_model.objects.get_or_create(
+            user=self.user
+        )
         if isinstance(self.request, HttpRequest):
             request = self.request
         else:
@@ -47,7 +62,8 @@ class Register(APIView, SignupView):
             return self.get_response_with_errors()
 
     def get_response(self):
-        serializer = self.user_serializer_class(instance=self.user)
+        # serializer = self.user_serializer_class(instance=self.user)
+        serializer = self.serializer_class(instance=self.token)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def get_response_with_errors(self):
@@ -72,11 +88,25 @@ class VerifyEmail(APIView, ConfirmEmailView):
 class SocialLogin(Login):
     """
     class used for social authentications
-    example usage for facebook
-
+    example usage for facebook with access_token
+    -------------
     from allauth.socialaccount.providers.facebook.views import FacebookOAuth2Adapter
+
     class FacebookLogin(SocialLogin):
         adapter_class = FacebookOAuth2Adapter
+    -------------
+
+    example usage for facebook with code
+
+    -------------
+    from allauth.socialaccount.providers.facebook.views import FacebookOAuth2Adapter
+    from allauth.socialaccount.providers.oauth2.client import OAuth2Client
+
+    class FacebookLogin(SocialLogin):
+        adapter_class = FacebookOAuth2Adapter
+         client_class = OAuth2Client
+         callback_url = 'localhost:8000'
+    -------------
     """
 
     serializer_class = SocialLoginSerializer
