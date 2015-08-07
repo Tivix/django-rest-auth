@@ -26,7 +26,6 @@ class Register(APIView, SignupView):
     """
 
     permission_classes = (AllowAny,)
-    # user_serializer_class = UserDetailsSerializer
     allowed_methods = ('POST', 'OPTIONS', 'HEAD')
     token_model = Token
     serializer_class = TokenSerializer
