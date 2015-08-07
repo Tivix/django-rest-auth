@@ -6,17 +6,17 @@ Configuration
     You can define your custom serializers for each endpoint without overriding urls and views by adding ``REST_AUTH_SERIALIZERS`` dictionary in your django settings.
     Possible key values:
 
-        - LOGIN_SERIALIZER - serializer class in ``rest_auth.views.Login``, default value ``rest_auth.serializers.LoginSerializer``
+        - LOGIN_SERIALIZER - serializer class in ``rest_auth.views.LoginView``, default value ``rest_auth.serializers.LoginSerializer``
 
-        - TOKEN_SERIALIZER - response for successful authentication in ``rest_auth.views.Login``, default value ``rest_auth.serializers.TokenSerializer``
+        - TOKEN_SERIALIZER - response for successful authentication in ``rest_auth.views.LoginView``, default value ``rest_auth.serializers.TokenSerializer``
 
-        - USER_DETAILS_SERIALIZER - serializer class in ``rest_auth.views.UserDetails``, default value ``rest_auth.serializers.UserDetailsSerializer``
+        - USER_DETAILS_SERIALIZER - serializer class in ``rest_auth.views.UserDetailsView``, default value ``rest_auth.serializers.UserDetailsSerializer``
 
-        - PASSWORD_RESET_SERIALIZER - serializer class in ``rest_auth.views.PasswordReset``, default value ``rest_auth.serializers.PasswordResetSerializer``
+        - PASSWORD_RESET_SERIALIZER - serializer class in ``rest_auth.views.PasswordResetView``, default value ``rest_auth.serializers.PasswordResetSerializer``
 
-        - PASSWORD_RESET_CONFIRM_SERIALIZER - serializer class in ``rest_auth.views.PasswordResetConfirm``, default value ``rest_auth.serializers.PasswordResetConfirmSerializer``
+        - PASSWORD_RESET_CONFIRM_SERIALIZER - serializer class in ``rest_auth.views.PasswordResetConfirmView``, default value ``rest_auth.serializers.PasswordResetConfirmSerializer``
 
-        - PASSWORD_CHANGE_SERIALIZER - serializer class in ``rest_auth.views.PasswordChange``, default value ``rest_auth.serializers.PasswordChangeSerializer``
+        - PASSWORD_CHANGE_SERIALIZER - serializer class in ``rest_auth.views.PasswordChangeView``, default value ``rest_auth.serializers.PasswordChangeSerializer``
 
 
     Example configuration:

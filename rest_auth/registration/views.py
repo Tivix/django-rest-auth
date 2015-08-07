@@ -11,10 +11,10 @@ from allauth.account import app_settings
 
 from rest_auth.app_settings import UserDetailsSerializer, TokenSerializer
 from rest_auth.registration.serializers import SocialLoginSerializer
-from rest_auth.views import Login
+from rest_auth.views import LoginView
 
 
-class Register(APIView, SignupView):
+class RegisterView(APIView, SignupView):
     """
     Accepts the credentials and creates a new user
     if user does not exist already
@@ -69,7 +69,7 @@ class Register(APIView, SignupView):
         return Response(self.form.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class VerifyEmail(APIView, ConfirmEmailView):
+class VerifyEmailView(APIView, ConfirmEmailView):
 
     permission_classes = (AllowAny,)
     allowed_methods = ('POST', 'OPTIONS', 'HEAD')
@@ -84,14 +84,14 @@ class VerifyEmail(APIView, ConfirmEmailView):
         return Response({'message': 'ok'}, status=status.HTTP_200_OK)
 
 
-class SocialLogin(Login):
+class SocialLoginView(LoginView):
     """
     class used for social authentications
     example usage for facebook with access_token
     -------------
     from allauth.socialaccount.providers.facebook.views import FacebookOAuth2Adapter
 
-    class FacebookLogin(SocialLogin):
+    class FacebookLogin(SocialLoginView):
         adapter_class = FacebookOAuth2Adapter
     -------------
 
@@ -101,7 +101,7 @@ class SocialLogin(Login):
     from allauth.socialaccount.providers.facebook.views import FacebookOAuth2Adapter
     from allauth.socialaccount.providers.oauth2.client import OAuth2Client
 
-    class FacebookLogin(SocialLogin):
+    class FacebookLogin(SocialLoginView):
         adapter_class = FacebookOAuth2Adapter
          client_class = OAuth2Client
          callback_url = 'localhost:8000'

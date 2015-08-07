@@ -31,7 +31,7 @@ FAQ
             # custom fields for user
             company_name = models.CharField(max_length=100)
 
-    To allow update user details within one request send to rest_auth.views.UserDetails view, create serializer like this:
+    To allow update user details within one request send to rest_auth.views.UserDetailsView view, create serializer like this:
 
     .. code-block:: python
 

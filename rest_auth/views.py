@@ -16,7 +16,7 @@ from .app_settings import (
 )
 
 
-class Login(GenericAPIView):
+class LoginView(GenericAPIView):
 
     """
     Check the credentials and return the REST Token
@@ -57,7 +57,7 @@ class Login(GenericAPIView):
         return self.get_response()
 
 
-class Logout(APIView):
+class LogoutView(APIView):
 
     """
     Calls Django logout method and delete the Token object
@@ -79,7 +79,7 @@ class Logout(APIView):
                         status=status.HTTP_200_OK)
 
 
-class UserDetails(RetrieveUpdateAPIView):
+class UserDetailsView(RetrieveUpdateAPIView):
 
     """
     Returns User's details in JSON format.
@@ -97,7 +97,7 @@ class UserDetails(RetrieveUpdateAPIView):
         return self.request.user
 
 
-class PasswordReset(GenericAPIView):
+class PasswordResetView(GenericAPIView):
 
     """
     Calls Django Auth PasswordResetForm save method.
@@ -124,7 +124,7 @@ class PasswordReset(GenericAPIView):
         )
 
 
-class PasswordResetConfirm(GenericAPIView):
+class PasswordResetConfirmView(GenericAPIView):
 
     """
     Password reset e-mail link is confirmed, therefore this resets the user's password.
@@ -147,7 +147,7 @@ class PasswordResetConfirm(GenericAPIView):
         return Response({"success": "Password has been reset with the new password."})
 
 
-class PasswordChange(GenericAPIView):
+class PasswordChangeView(GenericAPIView):
 
     """
     Calls Django Auth SetPasswordForm save method.

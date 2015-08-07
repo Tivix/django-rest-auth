@@ -5,10 +5,10 @@ import rest_auth.django_test_urls
 from allauth.socialaccount.providers.facebook.views import FacebookOAuth2Adapter
 
 from rest_auth.urls import urlpatterns
-from rest_auth.registration.views import SocialLogin
+from rest_auth.registration.views import SocialLoginView
 
 
-class FacebookLogin(SocialLogin):
+class FacebookLogin(SocialLoginView):
     adapter_class = FacebookOAuth2Adapter
 
 urlpatterns += patterns(
