@@ -51,7 +51,7 @@ class RegisterView(APIView, SignupView):
 
     def post(self, request, *args, **kwargs):
         self.initial = {}
-        self.request.POST = self.request.DATA.copy()
+        self.request.POST = self.request.data.copy()
         form_class = self.get_form_class()
         self.form = self.get_form(form_class)
         if self.form.is_valid():
@@ -78,7 +78,7 @@ class VerifyEmailView(APIView, ConfirmEmailView):
         return Response({}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
     def post(self, request, *args, **kwargs):
-        self.kwargs['key'] = self.request.DATA.get('key', '')
+        self.kwargs['key'] = self.request.data.get('key', '')
         confirmation = self.get_object()
         confirmation.confirm(self.request)
         return Response({'message': 'ok'}, status=status.HTTP_200_OK)
