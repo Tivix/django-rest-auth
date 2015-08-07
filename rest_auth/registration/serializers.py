@@ -1,7 +1,12 @@
 from django.http import HttpRequest
 from rest_framework import serializers
 from requests.exceptions import HTTPError
-from allauth.socialaccount.helpers import complete_social_login
+# Import is needed only if we are using social login, in which
+# case the allauth.socialaccount will be declared
+try:
+    from allauth.socialaccount.helpers import complete_social_login
+except ImportError:
+    pass
 
 
 class SocialLoginSerializer(serializers.Serializer):
