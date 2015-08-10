@@ -72,14 +72,14 @@ class SocialLoginSerializer(serializers.Serializer):
 
             code = attrs.get('code')
 
-            provider = self.adapter.get_provider()
+            provider = adapter.get_provider()
             scope = provider.get_scope(request)
             client = self.client_class(
                 request,
                 app.client_id,
                 app.secret,
-                self.adapter.access_token_method,
-                self.adapter.access_token_url,
+                adapter.access_token_method,
+                adapter.access_token_url,
                 self.callback_url,
                 scope
             )
