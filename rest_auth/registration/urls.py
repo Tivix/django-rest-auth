@@ -1,12 +1,12 @@
 from django.views.generic import TemplateView
 from django.conf.urls import patterns, url
 
-from .views import Register, VerifyEmail
+from .views import RegisterView, VerifyEmailView
 
 urlpatterns = patterns(
     '',
-    url(r'^$', Register.as_view(), name='rest_register'),
-    url(r'^verify-email/$', VerifyEmail.as_view(), name='rest_verify_email'),
+    url(r'^$', RegisterView.as_view(), name='rest_register'),
+    url(r'^verify-email/$', VerifyEmailView.as_view(), name='rest_verify_email'),
 
     # This url is used by django-allauth and empty TemplateView is
     # defined just to allow reverse() call inside app, for example when email

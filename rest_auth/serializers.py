@@ -1,4 +1,4 @@
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model, authenticate
 from django.conf import settings
 from django.contrib.auth.forms import PasswordResetForm, SetPasswordForm
 try:
@@ -7,24 +7,75 @@ except:
     # make compatible with django 1.5
     from django.utils.http import base36_to_int as uid_decoder
 from django.contrib.auth.tokens import default_token_generator
+from django.utils.translation import ugettext_lazy as _
 
-from rest_framework import serializers
+from rest_framework import serializers, exceptions
 from rest_framework.authtoken.models import Token
 from rest_framework.authtoken.serializers import AuthTokenSerializer
 from rest_framework.exceptions import ValidationError
 
 
-class LoginSerializer(AuthTokenSerializer):
+class LoginSerializer(serializers.Serializer):
+    username = serializers.CharField(required=False)
+    email = serializers.EmailField(required=False)
+    password = serializers.CharField(style={'input_type': 'password'})
 
     def validate(self, attrs):
-        attrs = super(LoginSerializer, self).validate(attrs)
+        username = attrs.get('username')
+        email = attrs.get('email')
+        password = attrs.get('password')
+
+        if 'allauth' in settings.INSTALLED_APPS:
+            from allauth.account import app_settings
+            # Authentication through email
+            if app_settings.AUTHENTICATION_METHOD == app_settings.AuthenticationMethod.EMAIL:
+                if email and password:
+                    user = authenticate(email=email, password=password)
+                else:
+                    msg = _('Must include "email" and "password".')
+                    raise exceptions.ValidationError(msg)
+            # Authentication through username
+            elif app_settings.AUTHENTICATION_METHOD == app_settings.AuthenticationMethod.USERNAME:
+                if username and password:
+                    user = authenticate(username=username, password=password)
+                else:
+                    msg = _('Must include "username" and "password".')
+                    raise exceptions.ValidationError(msg)
+            # Authentication through either username or email
+            else:
+                if email and password:
+                    user = authenticate(email=email, password=password)
+                elif username and password:
+                    user = authenticate(username=username, password=password)
+                else:
+                    msg = _('Must include either "username" or "email" and "password".')
+                    raise exceptions.ValidationError(msg)
+
+        elif username and password:
+            user = authenticate(username=username, password=password)
+
+        else:
+            msg = _('Must include "username" and "password".')
+            raise exceptions.ValidationError(msg)
+
+        # Did we get back an active user?
+        if user:
+            if not user.is_active:
+                msg = _('User account is disabled.')
+                raise exceptions.ValidationError(msg)
+        else:
+            msg = _('Unable to log in with provided credentials.')
+            raise exceptions.ValidationError(msg)
+
+        # If required, is the email verified?
         if 'rest_auth.registration' in settings.INSTALLED_APPS:
             from allauth.account import app_settings
             if app_settings.EMAIL_VERIFICATION == app_settings.EmailVerificationMethod.MANDATORY:
-                user = attrs['user']
                 email_address = user.emailaddress_set.get(email=user.email)
                 if not email_address.verified:
                     raise serializers.ValidationError('E-mail is not verified.')
+
+        attrs['user'] = user
         return attrs
 
 

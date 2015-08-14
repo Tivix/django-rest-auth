@@ -91,14 +91,14 @@ Using ``django-allauth``, ``django-rest-auth`` provides helpful class for creati
 
 3. Add Social Application in django admin panel
 
-4. Create new view as a subclass of ``rest_auth.registration.views.SocialLogin`` with ``FacebookOAuth2Adapter`` adapter as an attribute:
+4. Create new view as a subclass of ``rest_auth.registration.views.SocialLoginView`` with ``FacebookOAuth2Adapter`` adapter as an attribute:
 
 .. code-block:: python
 
     from allauth.socialaccount.providers.facebook.views import FacebookOAuth2Adapter
-    from rest_auth.registration.views import SocialLogin
+    from rest_auth.registration.views import SocialLoginView
 
-    class FacebookLogin(SocialLogin):
+    class FacebookLogin(SocialLoginView):
         adapter_class = FacebookOAuth2Adapter
 
 5. Create url for FacebookLogin view:
