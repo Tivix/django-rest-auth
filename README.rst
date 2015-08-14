@@ -9,10 +9,6 @@ Welcome to django-rest-auth
     :target: https://coveralls.io/r/Tivix/django-rest-auth?branch=master
 
 
-.. image:: https://requires.io/github/Tivix/django-rest-auth/requirements.png?branch=master
-    :target: https://requires.io/github/Tivix/django-rest-auth/requirements/?branch=master
-
-
 .. image:: https://readthedocs.org/projects/django-rest-auth/badge/?version=latest
     :target: https://readthedocs.org/projects/django-rest-auth/?badge=latest
 
