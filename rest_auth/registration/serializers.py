@@ -85,7 +85,7 @@ class SocialLoginSerializer(serializers.Serializer):
             )
             token = client.get_access_token(code)
             access_token = token['access_token']
-        
+
         else:
             raise serializers.ValidationError('Incorrect input. access_token or code is required.')
 

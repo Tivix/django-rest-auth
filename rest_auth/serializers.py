@@ -11,7 +11,6 @@ from django.utils.translation import ugettext_lazy as _
 
 from rest_framework import serializers, exceptions
 from rest_framework.authtoken.models import Token
-from rest_framework.authtoken.serializers import AuthTokenSerializer
 from rest_framework.exceptions import ValidationError
 
 
