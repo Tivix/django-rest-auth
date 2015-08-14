@@ -29,6 +29,10 @@ Basic
 
     - new_password1
     - new_password2
+    - old_password
+    
+    
+    .. note:: ``OLD_PASSWORD_FIELD_ENABLED = True`` to use old_password.
 
 - /rest-auth/user/ (GET)
 
