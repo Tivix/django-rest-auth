@@ -10,8 +10,8 @@ except ImportError:
 
 
 class SocialLoginSerializer(serializers.Serializer):
-    access_token = serializers.CharField(required=False)
-    code = serializers.CharField(required=False)
+    access_token = serializers.CharField(required=False, allow_blank=True)
+    code = serializers.CharField(required=False, allow_blank=True)
 
     def _get_request(self):
         request = self.context.get('request')
