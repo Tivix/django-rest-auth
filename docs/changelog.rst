@@ -1,6 +1,13 @@
 Changelog
 =========
 
+0.5.0
+-----
+- replaced request.DATA with request.data for compatibility with DRF 3.2
+- authorization codes for social login
+- view classes rename (appended "View" to all of them)
+- bugfixes
+
 0.4.0
 -----
 - Django 1.8 compatiblity fixes
