@@ -34,3 +34,6 @@ Configuration
 
 
 - **OLD_PASSWORD_FIELD_ENABLED** - set it to True if you want to have old password verification on password change enpoint (default: False)
+
+
+- **NEW_PASSWORD_2_FIELD_ENABLED** - set it to False if you don't need new password confirmation (default: True)

@@ -182,10 +182,17 @@ class PasswordChangeSerializer(serializers.Serializer):
         self.old_password_field_enabled = getattr(
             settings, 'OLD_PASSWORD_FIELD_ENABLED', False
         )
+
+        self.new_password_2_field_enabled = getattr(
+            settings, 'NEW_PASSWORD_2_FIELD_ENABLED', True
+        )
         super(PasswordChangeSerializer, self).__init__(*args, **kwargs)
 
         if not self.old_password_field_enabled:
             self.fields.pop('old_password')
+
+        if not self.new_password_2_field_enabled:
+            self.fields.pop('new_password2')
 
         self.request = self.context.get('request')
         self.user = getattr(self.request, 'user', None)
@@ -202,6 +209,10 @@ class PasswordChangeSerializer(serializers.Serializer):
         return value
 
     def validate(self, attrs):
+
+        if not self.new_password_2_field_enabled:
+            attrs['new_password2'] = attrs['new_password1']
+
         self.set_password_form = self.set_password_form_class(
             user=self.user, data=attrs
         )
