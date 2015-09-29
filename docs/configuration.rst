@@ -8,6 +8,8 @@ Configuration
 
         - LOGIN_SERIALIZER - serializer class in ``rest_auth.views.LoginView``, default value ``rest_auth.serializers.LoginSerializer``
 
+        - SIMPLE_LOGIN_SERIALIZER - serializer class in ``rest_auth.views.SimpleLoginView``, default value ``rest_auth.serializers.SimpleLoginSerializer``
+
         - TOKEN_SERIALIZER - response for successful authentication in ``rest_auth.views.LoginView``, default value ``rest_auth.serializers.TokenSerializer``
 
         - USER_DETAILS_SERIALIZER - serializer class in ``rest_auth.views.UserDetailsView``, default value ``rest_auth.serializers.UserDetailsSerializer``
@@ -34,3 +36,12 @@ Configuration
 
 
 - **OLD_PASSWORD_FIELD_ENABLED** - set it to True if you want to have old password verification on password change enpoint (default: False)
+
+
+- **NEW_PASSWORD_2_FIELD_ENABLED** - set it to False if you don't need new password confirmation (default: True)
+
+
+- **USER_DETAILS_INCLUDED** - is user details urls are needed
+
+
+- **SIMPLE_LOGIN** - is simplified is used

@@ -14,6 +14,34 @@ from rest_framework.authtoken.models import Token
 from rest_framework.exceptions import ValidationError
 
 
+class SimpleLoginSerializer(serializers.Serializer):
+    username = serializers.CharField()
+    password = serializers.CharField(style={'input_type': 'password'})
+
+    def validate(self, attrs):
+        username = attrs.get('username')
+        password = attrs.get('password')
+
+        if username and password:
+            user = authenticate(username=username, password=password)
+
+        else:
+            msg = _('Must include "username" and "password".')
+            raise exceptions.ValidationError(msg)
+
+        # Did we get back an active user?
+        if user:
+            if not user.is_active:
+                msg = _('User account is disabled.')
+                raise exceptions.ValidationError(msg)
+        else:
+            msg = _('Unable to log in with provided credentials.')
+            raise exceptions.ValidationError(msg)
+
+        attrs['user'] = user
+        return attrs
+
+
 class LoginSerializer(serializers.Serializer):
     username = serializers.CharField(required=False, allow_blank=True)
     email = serializers.EmailField(required=False, allow_blank=True)
@@ -172,9 +200,9 @@ class PasswordResetConfirmSerializer(serializers.Serializer):
 
 class PasswordChangeSerializer(serializers.Serializer):
 
-    old_password = serializers.CharField(max_length=128)
-    new_password1 = serializers.CharField(max_length=128)
-    new_password2 = serializers.CharField(max_length=128)
+    old_password = serializers.CharField(max_length=128, required=False)
+    new_password1 = serializers.CharField(max_length=128, required=False)
+    new_password2 = serializers.CharField(max_length=128, required=False)
 
     set_password_form_class = SetPasswordForm
 
@@ -182,13 +210,29 @@ class PasswordChangeSerializer(serializers.Serializer):
         self.old_password_field_enabled = getattr(
             settings, 'OLD_PASSWORD_FIELD_ENABLED', False
         )
+
+        self.new_password_2_field_enabled = getattr(
+            settings, 'NEW_PASSWORD_2_FIELD_ENABLED', True
+        )
         super(PasswordChangeSerializer, self).__init__(*args, **kwargs)
 
         if not self.old_password_field_enabled:
             self.fields.pop('old_password')
 
+        if not self.new_password_2_field_enabled:
+            self.fields.pop('new_password2')
+
         self.request = self.context.get('request')
         self.user = getattr(self.request, 'user', None)
+
+    def get_fields(self):
+        if self.fields:
+            for field in self.fields:
+                self.fields[field].required = True
+            fields = self.fields
+        else:
+            fields = super(PasswordChangeSerializer, self).get_fields()
+        return fields
 
     def validate_old_password(self, value):
         invalid_password_conditions = (
@@ -202,6 +246,10 @@ class PasswordChangeSerializer(serializers.Serializer):
         return value
 
     def validate(self, attrs):
+
+        if not self.new_password_2_field_enabled:
+            attrs['new_password2'] = attrs['new_password1']
+
         self.set_password_form = self.set_password_form_class(
             user=self.user, data=attrs
         )
