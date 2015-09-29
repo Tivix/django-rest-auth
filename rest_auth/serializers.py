@@ -200,9 +200,9 @@ class PasswordResetConfirmSerializer(serializers.Serializer):
 
 class PasswordChangeSerializer(serializers.Serializer):
 
-    old_password = serializers.CharField(max_length=128)
-    new_password1 = serializers.CharField(max_length=128)
-    new_password2 = serializers.CharField(max_length=128)
+    old_password = serializers.CharField(max_length=128, required=False)
+    new_password1 = serializers.CharField(max_length=128, required=False)
+    new_password2 = serializers.CharField(max_length=128, required=False)
 
     set_password_form_class = SetPasswordForm
 
@@ -224,6 +224,15 @@ class PasswordChangeSerializer(serializers.Serializer):
 
         self.request = self.context.get('request')
         self.user = getattr(self.request, 'user', None)
+
+    def get_fields(self):
+        if self.fields:
+            for field in self.fields:
+                self.fields[field].required = True
+            fields = self.fields
+        else:
+            fields = super(PasswordChangeSerializer, self).get_fields()
+        return fields
 
     def validate_old_password(self, value):
         invalid_password_conditions = (
