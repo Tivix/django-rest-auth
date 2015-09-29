@@ -8,6 +8,8 @@ Configuration
 
         - LOGIN_SERIALIZER - serializer class in ``rest_auth.views.LoginView``, default value ``rest_auth.serializers.LoginSerializer``
 
+        - SIMPLE_LOGIN_SERIALIZER - serializer class in ``rest_auth.views.SimpleLoginView``, default value ``rest_auth.serializers.SimpleLoginSerializer``
+
         - TOKEN_SERIALIZER - response for successful authentication in ``rest_auth.views.LoginView``, default value ``rest_auth.serializers.TokenSerializer``
 
         - USER_DETAILS_SERIALIZER - serializer class in ``rest_auth.views.UserDetailsView``, default value ``rest_auth.serializers.UserDetailsSerializer``
@@ -40,3 +42,6 @@ Configuration
 
 
 - **USER_DETAILS_INCLUDED** - is user details urls are needed
+
+
+- **SIMPLE_LOGIN** - is simplified is used

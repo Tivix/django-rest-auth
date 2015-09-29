@@ -10,10 +10,40 @@ from rest_framework.authtoken.models import Token
 from rest_framework.generics import RetrieveUpdateAPIView
 
 from .app_settings import (
-    TokenSerializer, UserDetailsSerializer, LoginSerializer,
-    PasswordResetSerializer, PasswordResetConfirmSerializer,
+    TokenSerializer, UserDetailsSerializer, SimpleLoginSerializer,
+    LoginSerializer, PasswordResetSerializer, PasswordResetConfirmSerializer,
     PasswordChangeSerializer
 )
+
+class SimpleLoginView(GenericAPIView):
+
+    """
+    Check the credentials and authenticated if the credentials are valid .
+    Calls Django Auth login method to register User ID
+    in Django session framework
+
+    Accept the following POST parameters: username, password
+    """
+    permission_classes = (AllowAny,)
+    serializer_class = SimpleLoginSerializer
+
+    def login(self):
+        self.user = self.serializer.validated_data['user']
+
+        if getattr(settings, 'REST_SESSION_LOGIN', True):
+            login(self.request, self.user)
+
+    def get_error_response(self):
+        return Response(
+            self.serializer.errors, status=status.HTTP_400_BAD_REQUEST
+        )
+
+    def post(self, request, *args, **kwargs):
+        self.serializer = self.get_serializer(data=self.request.data)
+        if not self.serializer.is_valid():
+            return self.get_error_response()
+        self.login()
+        return Response({}, status=status.HTTP_200_OK)
 
 
 class LoginView(GenericAPIView):
