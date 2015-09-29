@@ -37,3 +37,6 @@ Configuration
 
 
 - **NEW_PASSWORD_2_FIELD_ENABLED** - set it to False if you don't need new password confirmation (default: True)
+
+
+- **USER_DETAILS_INCLUDED** - is user details urls are needed
