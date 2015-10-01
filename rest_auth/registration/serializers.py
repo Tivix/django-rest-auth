@@ -4,7 +4,10 @@ from requests.exceptions import HTTPError
 # Import is needed only if we are using social login, in which
 # case the allauth.socialaccount will be declared
 try:
+    apps.get_app_config('allauth.socialaccount')
     from allauth.socialaccount.helpers import complete_social_login
+except LookupError:
+    pass
 except ImportError:
     pass
 
