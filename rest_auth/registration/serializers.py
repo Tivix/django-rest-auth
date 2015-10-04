@@ -1,15 +1,17 @@
 from django.http import HttpRequest
+from django.conf import settings
+
 from rest_framework import serializers
 from requests.exceptions import HTTPError
 # Import is needed only if we are using social login, in which
 # case the allauth.socialaccount will be declared
 try:
-    apps.get_app_config('allauth.socialaccount')
     from allauth.socialaccount.helpers import complete_social_login
-except LookupError:
-    pass
 except ImportError:
-    pass
+    raise ImportError('allauth.socialaccount needs to be installed.')
+
+if 'allauth.socialaccount' not in settings.INSTALLED_APPS:
+    raise ImportError('allauth.socialaccount needs to be added to INSTALLED_APPS.')
 
 
 class SocialLoginSerializer(serializers.Serializer):
