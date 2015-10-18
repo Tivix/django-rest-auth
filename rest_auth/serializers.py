@@ -216,5 +216,5 @@ class PasswordChangeSerializer(serializers.Serializer):
 
     def save(self):
         self.set_password_form.save()
-        if self.logout_on_password_change:
+        if not self.logout_on_password_change:
             update_session_auth_hash(self.request, self.user)
