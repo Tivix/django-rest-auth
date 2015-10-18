@@ -30,9 +30,10 @@ Basic
     - new_password1
     - new_password2
     - old_password
-    
-    
+
+
     .. note:: ``OLD_PASSWORD_FIELD_ENABLED = True`` to use old_password.
+    .. note:: ``LOGOUT_ON_PASSWORD_CHANGE = False`` to keep the user logged in after password change
 
 - /rest-auth/user/ (GET)
 
