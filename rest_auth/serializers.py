@@ -12,6 +12,7 @@ from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers, exceptions
 from rest_framework.authtoken.models import Token
 from rest_framework.exceptions import ValidationError
+from django.contrib.auth import update_session_auth_hash
 
 
 class LoginSerializer(serializers.Serializer):
@@ -182,6 +183,9 @@ class PasswordChangeSerializer(serializers.Serializer):
         self.old_password_field_enabled = getattr(
             settings, 'OLD_PASSWORD_FIELD_ENABLED', False
         )
+        self.logout_on_password_change = getattr(
+            settings, 'LOGOUT_ON_PASSWORD_CHANGE', False
+        )
         super(PasswordChangeSerializer, self).__init__(*args, **kwargs)
 
         if not self.old_password_field_enabled:
@@ -212,3 +216,5 @@ class PasswordChangeSerializer(serializers.Serializer):
 
     def save(self):
         self.set_password_form.save()
+        if not self.logout_on_password_change:
+            update_session_auth_hash(self.request, self.user)
