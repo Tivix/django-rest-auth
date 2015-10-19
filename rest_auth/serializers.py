@@ -8,11 +8,11 @@ except:
     from django.utils.http import base36_to_int as uid_decoder
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.translation import ugettext_lazy as _
+from django import VERSION
 
 from rest_framework import serializers, exceptions
 from rest_framework.authtoken.models import Token
 from rest_framework.exceptions import ValidationError
-from django.contrib.auth import update_session_auth_hash
 
 
 class LoginSerializer(serializers.Serializer):
@@ -216,5 +216,6 @@ class PasswordChangeSerializer(serializers.Serializer):
 
     def save(self):
         self.set_password_form.save()
-        if not self.logout_on_password_change:
+        if VERSION[1] > 6 and not self.logout_on_password_change:
+            from django.contrib.auth import update_session_auth_hash
             update_session_auth_hash(self.request, self.user)
