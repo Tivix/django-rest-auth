@@ -45,6 +45,13 @@ class RegisterView(APIView, SignupView):
             request = self.request
         else:
             request = self.request._request
+            # Be sure the submitted parameter stay in request.POST 
+            # Needed for authenticate().
+            if not hasattr(request, 'POST') or not request.POST:
+                from django.http import QueryDict
+                # Create mutable instance
+                setattr(request, 'POST', QueryDict('').copy())
+                request.POST.update(self.request.POST)
         return complete_signup(request, self.user,
                                app_settings.EMAIL_VERIFICATION,
                                self.get_success_url())
