@@ -45,7 +45,7 @@ class RegisterView(APIView, SignupView):
             request = self.request
         else:
             request = self.request._request
-            # Be sure the submitted parameter stay in request.POST 
+            # Be sure the submitted parameter stay in request.POST
             # Needed for authenticate().
             if not hasattr(request, 'POST') or not request.POST:
                 from django.http import QueryDict
