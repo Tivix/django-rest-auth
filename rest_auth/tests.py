@@ -49,7 +49,7 @@ class BaseAPITestCase(object):
 
         self.response = request_func(*args, **kwargs)
         is_json = bool(
-            filter(lambda x: 'json' in x, self.response._headers['content-type']))
+            [x for x in self.response._headers['content-type'] if 'json' in x])
         if is_json and self.response.content:
             self.response.json = json.loads(self.response.content)
         else:
