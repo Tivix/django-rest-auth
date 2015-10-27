@@ -62,7 +62,8 @@ class RegisterView(APIView, SignupView):
 
     def get_response(self):
         # serializer = self.user_serializer_class(instance=self.user)
-        serializer = self.serializer_class(instance=self.token)
+        serializer = self.serializer_class(instance=self.token,
+                context={'request': self.request})
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def get_response_with_errors(self):
