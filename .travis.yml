@@ -25,3 +25,4 @@ after_success:
   - coveralls
 before_script:
   - flake8 . --config=flake8
+cache: false
