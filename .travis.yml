@@ -1,20 +1,9 @@
 language: python
 python:
-  - "2.6"
   - "2.7"
 env:
-  - DJANGO=1.5.12
-  - DJANGO=1.6.11
   - DJANGO=1.7.7
   - DJANGO=1.8
-matrix:
-  exclude:
-    - python: "2.6"
-      env: DJANGO=1.5.12
-    - python: "2.6"
-      env: DJANGO=1.7.7
-    - python: "2.6"
-      env: DJANGO=1.8
 install:
   - pip install -q Django==$DJANGO --use-mirrors
   - pip install coveralls
@@ -25,4 +14,3 @@ after_success:
   - coveralls
 before_script:
   - flake8 . --config=flake8
-cache: false
