@@ -10,7 +10,7 @@ from rest_framework.authtoken.models import Token
 from rest_framework.generics import RetrieveUpdateAPIView
 
 from .app_settings import (
-    TokenSerializer, UserDetailsSerializer, LoginSerializer,
+    UserDetailsSerializer, LoginSerializer,
     PasswordResetSerializer, PasswordResetConfirmSerializer,
     PasswordChangeSerializer
 )
