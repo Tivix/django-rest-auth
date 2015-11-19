@@ -30,7 +30,7 @@ class LoginView(GenericAPIView):
     permission_classes = (AllowAny,)
     serializer_class = LoginSerializer
     token_model = Token
-    response_serializer = TokenSerializer
+    response_serializer = UserDetailsSerializer
 
     def login(self):
         self.user = self.serializer.validated_data['user']
@@ -41,7 +41,7 @@ class LoginView(GenericAPIView):
 
     def get_response(self):
         return Response(
-            self.response_serializer(self.token).data, status=status.HTTP_200_OK
+            self.response_serializer(self.user).data, status=status.HTTP_200_OK
         )
 
     def get_error_response(self):

@@ -184,8 +184,8 @@ class APITestCase1(TestCase, BaseAPITestCase):
         user = get_user_model().objects.create_user(self.USERNAME, '', self.PASS)
 
         self.post(self.login_url, data=payload, status_code=200)
-        self.assertEqual('key' in self.response.json.keys(), True)
-        self.token = self.response.json['key']
+        self.assertEqual('token' in self.response.json.keys(), True)
+        self.token = self.response.json['token']
 
         self.post(self.password_change_url, status_code=400)
 
@@ -211,7 +211,7 @@ class APITestCase1(TestCase, BaseAPITestCase):
         }
         get_user_model().objects.create_user(self.USERNAME, '', self.PASS)
         self.post(self.login_url, data=login_payload, status_code=200)
-        self.token = self.response.json['key']
+        self.token = self.response.json['token']
 
         new_password_payload = {
             "new_password1": "new_person",
@@ -252,7 +252,7 @@ class APITestCase1(TestCase, BaseAPITestCase):
         }
         get_user_model().objects.create_user(self.USERNAME, '', self.PASS)
         self.post(self.login_url, data=login_payload, status_code=200)
-        self.token = self.response.json['key']
+        self.token = self.response.json['token']
 
         new_password_payload = {
             "old_password": "%s!" % self.PASS,  # wrong password
@@ -345,7 +345,7 @@ class APITestCase1(TestCase, BaseAPITestCase):
             "password": self.PASS
         }
         self.post(self.login_url, data=payload, status_code=200)
-        self.token = self.response.json['key']
+        self.token = self.response.json['token']
         self.get(self.user_url, status_code=200)
 
         self.patch(self.user_url, data=self.BASIC_USER_DATA, status_code=200)
@@ -479,12 +479,12 @@ class TestSocialAuth(TestCase, BaseAPITestCase):
         }
 
         self.post(self.fb_login_url, data=payload, status_code=200)
-        self.assertIn('key', self.response.json.keys())
+        self.assertIn('token', self.response.json.keys())
         self.assertEqual(get_user_model().objects.all().count(), users_count + 1)
 
         # make sure that second request will not create a new user
         self.post(self.fb_login_url, data=payload, status_code=200)
-        self.assertIn('key', self.response.json.keys())
+        self.assertIn('token', self.response.json.keys())
         self.assertEqual(get_user_model().objects.all().count(), users_count + 1)
 
     @responses.activate
@@ -531,4 +531,4 @@ class TestSocialAuth(TestCase, BaseAPITestCase):
         }
 
         self.post(self.fb_login_url, data=payload, status_code=200)
-        self.assertIn('key', self.response.json.keys())
+        self.assertIn('token', self.response.json.keys())
