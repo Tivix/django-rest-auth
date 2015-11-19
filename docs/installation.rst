@@ -87,11 +87,9 @@ Using ``django-allauth``, ``django-rest-auth`` provides helpful class for creati
         'allauth.socialaccount.providers.facebook',
     )
 
-2. Add ``allauth.socialaccount.context_processors.socialaccount`` to TEMPLATE_CONTEXT_PROCESSORS in django settings
+2. Add Social Application in django admin panel
 
-3. Add Social Application in django admin panel
-
-4. Create new view as a subclass of ``rest_auth.registration.views.SocialLoginView`` with ``FacebookOAuth2Adapter`` adapter as an attribute:
+3. Create new view as a subclass of ``rest_auth.registration.views.SocialLoginView`` with ``FacebookOAuth2Adapter`` adapter as an attribute:
 
 .. code-block:: python
 
@@ -101,7 +99,7 @@ Using ``django-allauth``, ``django-rest-auth`` provides helpful class for creati
     class FacebookLogin(SocialLoginView):
         adapter_class = FacebookOAuth2Adapter
 
-5. Create url for FacebookLogin view:
+4. Create url for FacebookLogin view:
 
 .. code-block:: python
 
@@ -109,3 +107,5 @@ Using ``django-allauth``, ``django-rest-auth`` provides helpful class for creati
         ...,
         url(r'^rest-auth/facebook/$', FacebookLogin.as_view(), name='fb_login')
     )
+
+.. note:: Starting from v0.21.0, django-allauth has dropped support for context processors. Check out http://django-allauth.readthedocs.org/en/latest/changelog.html#from-0-21-0 for more details.

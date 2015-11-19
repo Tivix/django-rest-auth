@@ -29,8 +29,10 @@ ALLOWED_HOSTS = []
 TEMPLATE_CONTEXT_PROCESSORS = (
     'django.contrib.auth.context_processors.auth',
     "django.core.context_processors.request",
-    "allauth.account.context_processors.account",
-    "allauth.socialaccount.context_processors.socialaccount",
+
+    # Disabling due to alluth>=0.21.0 changes
+    # "allauth.account.context_processors.account",
+    # "allauth.socialaccount.context_processors.socialaccount",
 )
 
 # Application definition
@@ -51,6 +53,8 @@ INSTALLED_APPS = (
     'allauth',
     'allauth.account',
     'rest_auth.registration',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.facebook',
 )
 
 MIDDLEWARE_CLASSES = (

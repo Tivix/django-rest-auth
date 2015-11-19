@@ -1,4 +1,4 @@
-django>=1.5.0
+django>=1.7.0
 django-rest-auth==0.5.0
-django-allauth==0.19.1
+django-allauth==0.24.1
 six==1.9.0
