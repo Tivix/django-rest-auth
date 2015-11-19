@@ -25,7 +25,7 @@ class LoginView(GenericAPIView):
     in Django session framework
 
     Accept the following POST parameters: username, password
-    Return the REST Framework Token Object's key.
+    Return user details and DRF's token key.
     """
     permission_classes = (AllowAny,)
     serializer_class = LoginSerializer
@@ -88,7 +88,7 @@ class UserDetailsView(RetrieveUpdateAPIView):
     Accepts the following POST parameters:
         Required: token
         Optional: email, first_name, last_name and UserProfile fields
-    Returns the updated UserProfile and/or User object.
+    Returns DRF's token key with updated UserProfile and/or User object.
     """
     serializer_class = UserDetailsSerializer
     permission_classes = (IsAuthenticated,)
