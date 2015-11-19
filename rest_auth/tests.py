@@ -8,6 +8,7 @@ from django.contrib.auth import get_user_model
 from django.core import mail
 from django.test.utils import override_settings
 from django.contrib.sites.models import Site
+from django.utils.encoding import force_text
 
 from allauth.socialaccount.models import SocialApp
 from allauth.socialaccount.providers.facebook.provider import GRAPH_API_URL
@@ -51,7 +52,7 @@ class BaseAPITestCase(object):
         is_json = bool(
             [x for x in self.response._headers['content-type'] if 'json' in x])
         if is_json and self.response.content:
-            self.response.json = json.loads(self.response.content)
+            self.response.json = json.loads(force_text(self.response.content))
         else:
             self.response.json = {}
         if status_code:
@@ -298,7 +299,7 @@ class APITestCase1(TestCase, BaseAPITestCase):
         data = {
             'new_password1': self.NEW_PASS,
             'new_password2': self.NEW_PASS,
-            'uid': url_kwargs['uid'],
+            'uid': force_text(url_kwargs['uid']),
             'token': '-wrong-token-'
         }
         self.post(url, data=data, status_code=400)
@@ -325,7 +326,7 @@ class APITestCase1(TestCase, BaseAPITestCase):
         data = {
             'new_password1': self.NEW_PASS,
             'new_password2': self.NEW_PASS,
-            'uid': url_kwargs['uid'],
+            'uid': force_text(url_kwargs['uid']),
             'token': url_kwargs['token']
         }
         url = reverse('rest_password_reset_confirm')

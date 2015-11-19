@@ -1,4 +1,3 @@
-import django
 import os
 import sys
 
@@ -18,15 +17,12 @@ IS_STAGING = False
 IS_PROD = False
 IS_TEST = 'test' in sys.argv or 'test_coverage' in sys.argv
 
-if django.VERSION[:2] >= (1, 3):
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': ':memory:',
-        }
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': ':memory:',
     }
-else:
-    DATABASE_ENGINE = 'sqlite3'
+}
 
 MIDDLEWARE_CLASSES = [
     'django.middleware.common.CommonMiddleware',
