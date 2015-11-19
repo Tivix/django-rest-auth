@@ -25,3 +25,7 @@ Source code
 -----------
 https://github.com/Tivix/django-rest-auth
 
+
+StackOverflow
+-----------
+http://stackoverflow.com/questions/tagged/django-rest-auth
