@@ -9,7 +9,7 @@ from allauth.account.views import SignupView, ConfirmEmailView
 from allauth.account.utils import complete_signup
 from allauth.account import app_settings
 
-from rest_auth.app_settings import TokenSerializer
+from rest_auth.app_settings import UserDetailsSerializer
 from rest_auth.registration.serializers import SocialLoginSerializer
 from rest_auth.views import LoginView
 
@@ -22,13 +22,13 @@ class RegisterView(APIView, SignupView):
     Calls allauth complete_signup method
 
     Accept the following POST parameters: username, email, password
-    Return the REST Framework Token Object's key.
+    Return user details and DRF's token key.
     """
 
     permission_classes = (AllowAny,)
     allowed_methods = ('POST', 'OPTIONS', 'HEAD')
     token_model = Token
-    serializer_class = TokenSerializer
+    response_serializer = UserDetailsSerializer
 
     def get(self, *args, **kwargs):
         return Response({}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
@@ -65,9 +65,10 @@ class RegisterView(APIView, SignupView):
             return self.get_response_with_errors()
 
     def get_response(self):
-        # serializer = self.user_serializer_class(instance=self.user)
-        serializer = self.serializer_class(instance=self.token,
-                                           context={'request': self.request})
+        serializer = self.response_serializer(
+            instance=self.user,
+            context={'request': self.request}
+        )
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def get_response_with_errors(self):

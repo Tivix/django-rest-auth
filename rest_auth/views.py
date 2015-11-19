@@ -10,7 +10,7 @@ from rest_framework.authtoken.models import Token
 from rest_framework.generics import RetrieveUpdateAPIView
 
 from .app_settings import (
-    TokenSerializer, UserDetailsSerializer, LoginSerializer,
+    UserDetailsSerializer, LoginSerializer,
     PasswordResetSerializer, PasswordResetConfirmSerializer,
     PasswordChangeSerializer
 )
@@ -25,12 +25,12 @@ class LoginView(GenericAPIView):
     in Django session framework
 
     Accept the following POST parameters: username, password
-    Return the REST Framework Token Object's key.
+    Return user details and DRF's token key.
     """
     permission_classes = (AllowAny,)
     serializer_class = LoginSerializer
     token_model = Token
-    response_serializer = TokenSerializer
+    response_serializer = UserDetailsSerializer
 
     def login(self):
         self.user = self.serializer.validated_data['user']
@@ -41,7 +41,7 @@ class LoginView(GenericAPIView):
 
     def get_response(self):
         return Response(
-            self.response_serializer(self.token).data, status=status.HTTP_200_OK
+            self.response_serializer(self.user).data, status=status.HTTP_200_OK
         )
 
     def get_error_response(self):
@@ -88,7 +88,7 @@ class UserDetailsView(RetrieveUpdateAPIView):
     Accepts the following POST parameters:
         Required: token
         Optional: email, first_name, last_name and UserProfile fields
-    Returns the updated UserProfile and/or User object.
+    Returns DRF's token key with updated UserProfile and/or User object.
     """
     serializer_class = UserDetailsSerializer
     permission_classes = (IsAuthenticated,)

@@ -89,18 +89,18 @@ class TokenSerializer(serializers.ModelSerializer):
 
 
 class UserDetailsSerializer(serializers.ModelSerializer):
-
     """
     User model w/o password
     """
+    token = serializers.ReadOnlyField(source='auth_token.key')
+
     class Meta:
         model = get_user_model()
-        fields = ('username', 'email', 'first_name', 'last_name')
+        fields = ('username', 'email', 'first_name', 'last_name', 'token',)
         read_only_fields = ('email', )
 
 
 class PasswordResetSerializer(serializers.Serializer):
-
     """
     Serializer for requesting a password reset e-mail.
     """
