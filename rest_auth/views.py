@@ -1,5 +1,6 @@
 from django.contrib.auth import login, logout
 from django.conf import settings
+from django.core.exceptions import ObjectDoesNotExist
 
 from rest_framework import status
 from rest_framework.views import APIView
@@ -64,7 +65,7 @@ class LogoutView(APIView):
     def post(self, request):
         try:
             request.user.auth_token.delete()
-        except:
+        except (AttributeError, ObjectDoesNotExist):
             pass
 
         logout(request)
