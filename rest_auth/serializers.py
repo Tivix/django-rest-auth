@@ -94,7 +94,7 @@ class UserDetailsSerializer(serializers.ModelSerializer):
     User model w/o password
     """
     class Meta:
-        model = get_user_model()
+        model = UserModel
         fields = ('username', 'email', 'first_name', 'last_name')
         read_only_fields = ('email', )
 
@@ -113,7 +113,11 @@ class PasswordResetSerializer(serializers.Serializer):
         # Create PasswordResetForm with the serializer
         self.reset_form = self.password_reset_form_class(data=self.initial_data)
         if not self.reset_form.is_valid():
-            raise serializers.ValidationError('Error')
+            raise serializers.ValidationError(_('Error'))
+
+        if not UserModel.objects.filter(email=value).exists():
+            raise serializers.ValidationError(_('Invalid e-mail address'))
+
         return value
 
     def save(self):
