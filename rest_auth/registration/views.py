@@ -35,7 +35,7 @@ class RegisterView(CreateAPIView):
         Token.objects.get_or_create(user=user)
         complete_signup(self.request._request, user,
                         allauth_settings.EMAIL_VERIFICATION,
-                        '/')
+                        None)
         return user
 
 
