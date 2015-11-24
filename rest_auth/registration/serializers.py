@@ -146,11 +146,17 @@ class RegisterSerializer(serializers.Serializer):
     def custom_signup(self, request, user):
         pass
 
+    def get_cleaned_data(self):
+        return {
+            'username': self.validated_data.get('username', ''),
+            'password1': self.validated_data.get('password', ''),
+            'email': self.validated_data.get('email', '')
+        }
+
     def save(self, request):
         adapter = get_adapter()
         user = adapter.new_user(request)
-        self.cleaned_data = self.validated_data
-        self.cleaned_data['password1'] = self.cleaned_data['password']
+        self.cleaned_data = self.get_cleaned_data()
         adapter.save_user(request, user, self)
         self.custom_signup(request, user)
         setup_user_email(request, user, [])
