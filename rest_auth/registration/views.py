@@ -19,6 +19,7 @@ from rest_auth.views import LoginView
 
 class RegisterView(CreateAPIView):
     serializer_class = RegisterSerializer
+    permission_classes = (AllowAny, )
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
