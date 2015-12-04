@@ -7,7 +7,7 @@ env:
 install:
   - pip install -q Django==$DJANGO --use-mirrors
   - pip install coveralls
-  - pip install -r test_requirements.pip
+  - pip install -r rest_auth/tests/requirements.pip
 script:
   - coverage run --source=rest_auth setup.py test
 after_success:
