@@ -50,11 +50,11 @@ class LoginSerializer(serializers.Serializer):
                     msg = _('Must include either "username" or "email" and "password".')
                     raise exceptions.ValidationError(msg)
 
-        elif username and password:
+        elif username or email and password:
             user = authenticate(username=username, password=password)
 
         else:
-            msg = _('Must include "username" and "password".')
+            msg = _('Must include either "username" or "email" and "password".')
             raise exceptions.ValidationError(msg)
 
         # Did we get back an active user?
