@@ -50,11 +50,18 @@ class LoginSerializer(serializers.Serializer):
                     msg = _('Must include either "username" or "email" and "password".')
                     raise exceptions.ValidationError(msg)
 
-        elif username and password:
-            user = authenticate(username=username, password=password)
+        elif username or email and password:
+            # Try get username if we have in request email
+            if email and not username:
+                try:
+                    username = UserModel.objects.get(email__iexact=email).username
+                except UserModel.DoesNotExist:
+                    user = None
+            if username:
+                user = authenticate(username=username, password=password)
 
         else:
-            msg = _('Must include "username" and "password".')
+            msg = _('Must include either "username" or "email" and "password".')
             raise exceptions.ValidationError(msg)
 
         # Did we get back an active user?
