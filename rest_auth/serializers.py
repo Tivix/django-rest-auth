@@ -115,7 +115,7 @@ class PasswordResetSerializer(serializers.Serializer):
         if not self.reset_form.is_valid():
             raise serializers.ValidationError(_('Error'))
 
-        if not UserModel.objects.filter(email=value).exists():
+        if not UserModel.objects.filter(email__iexact=value).exists():
             raise serializers.ValidationError(_('Invalid e-mail address'))
 
         return value

@@ -1,6 +1,16 @@
 Changelog
 =========
 
+0.6.0
+-----
+- dropped support for Python 2.6
+- dropped support for Django 1.6
+- fixed demo code
+- added better validation support for serializers
+- added optional logout after password change
+- compatibility fixes
+- bugfixes
+
 0.5.0
 -----
 - replaced request.DATA with request.data for compatibility with DRF 3.2
