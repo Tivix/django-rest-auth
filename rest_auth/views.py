@@ -7,14 +7,14 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.generics import GenericAPIView
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from rest_framework.authtoken.models import Token
 from rest_framework.generics import RetrieveUpdateAPIView
 
 from .app_settings import (
     TokenSerializer, UserDetailsSerializer, LoginSerializer,
     PasswordResetSerializer, PasswordResetConfirmSerializer,
-    PasswordChangeSerializer
+    PasswordChangeSerializer, create_token
 )
+from .models import TokenModel
 
 
 class LoginView(GenericAPIView):
@@ -30,13 +30,12 @@ class LoginView(GenericAPIView):
     """
     permission_classes = (AllowAny,)
     serializer_class = LoginSerializer
-    token_model = Token
+    token_model = TokenModel
     response_serializer = TokenSerializer
 
     def login(self):
         self.user = self.serializer.validated_data['user']
-        self.token, created = self.token_model.objects.get_or_create(
-            user=self.user)
+        self.token = create_token(self.token_model, self.serializer)
         if getattr(settings, 'REST_SESSION_LOGIN', True):
             login(self.request, self.user)
 

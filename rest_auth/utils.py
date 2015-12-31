@@ -9,3 +9,9 @@ def import_callable(path_or_callable):
         assert isinstance(path_or_callable, string_types)
         package, attr = path_or_callable.rsplit('.', 1)
         return getattr(import_module(package), attr)
+
+
+def default_create_token(token_model, serializer):
+    user = serializer.validated_data['user']
+    token, _ = token_model.objects.get_or_create(user=user)
+    return token
