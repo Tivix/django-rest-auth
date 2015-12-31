@@ -3,7 +3,6 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from rest_framework import status
-from rest_framework.authtoken.models import Token
 
 from allauth.account.views import SignupView, ConfirmEmailView
 from allauth.account.utils import complete_signup
@@ -12,6 +11,7 @@ from allauth.account import app_settings
 from rest_auth.app_settings import TokenSerializer
 from rest_auth.registration.serializers import SocialLoginSerializer
 from rest_auth.views import LoginView
+from rest_auth.models import TokenModel
 
 
 class RegisterView(APIView, SignupView):
@@ -27,7 +27,7 @@ class RegisterView(APIView, SignupView):
 
     permission_classes = (AllowAny,)
     allowed_methods = ('POST', 'OPTIONS', 'HEAD')
-    token_model = Token
+    token_model = TokenModel
     serializer_class = TokenSerializer
 
     def get(self, *args, **kwargs):
