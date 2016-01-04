@@ -1,6 +1,10 @@
 Changelog
 =========
 
+0.7.0
+-----
+- added support for django-rest-framework-jwt
+
 0.6.0
 -----
 - dropped support for Python 2.6
