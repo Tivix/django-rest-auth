@@ -87,7 +87,6 @@ class TokenSerializer(serializers.ModelSerializer):
         model = Token
         fields = ('key',)
 
-
 class UserDetailsSerializer(serializers.ModelSerializer):
 
     """
@@ -98,6 +97,12 @@ class UserDetailsSerializer(serializers.ModelSerializer):
         fields = ('username', 'email', 'first_name', 'last_name')
         read_only_fields = ('email', )
 
+class JWTSerializer(serializers.Serializer):
+    """
+    Serializer for JWT authentication.
+    """
+    token = serializers.CharField()
+    user = UserDetailsSerializer()
 
 class PasswordResetSerializer(serializers.Serializer):
 

@@ -90,6 +90,19 @@ class APITestCase1(TestCase, BaseAPITestCase):
         # test empty payload
         self.post(self.login_url, data={}, status_code=400)
 
+    @override_settings(REST_USE_JWT=True)
+    def test_login_jwt(self):
+        payload = {
+            "username": self.USERNAME,
+            "password": self.PASS
+        }
+        # no users in db so it should throw an error
+        user = get_user_model().objects.create_user(self.USERNAME, '', self.PASS)
+        self.post(self.login_url, data=payload, status_code=200)
+        self.assertEqual('user' in self.response.json.keys(), True)
+        self.assertEqual('token' in self.response.json.keys(), True)
+
+
     def test_password_change(self):
         login_payload = {
             "username": self.USERNAME,
@@ -250,6 +263,23 @@ class APITestCase1(TestCase, BaseAPITestCase):
         }
         self.post(self.login_url, data=payload, status_code=200)
         self.token = self.response.json['key']
+        self.get(self.user_url, status_code=200)
+
+        self.patch(self.user_url, data=self.BASIC_USER_DATA, status_code=200)
+        user = get_user_model().objects.get(pk=user.pk)
+        self.assertEqual(user.first_name, self.response.json['first_name'])
+        self.assertEqual(user.last_name, self.response.json['last_name'])
+        self.assertEqual(user.email, self.response.json['email'])
+
+    @override_settings(REST_USE_JWT=True)
+    def test_user_details_jwt(self):
+        user = get_user_model().objects.create_user(self.USERNAME, self.EMAIL, self.PASS)
+        payload = {
+            'username': self.USERNAME,
+            'password': self.PASS
+        }
+        self.post(self.login_url, data=payload, status_code=200)
+        self.token = self.response.json['token']
         self.get(self.user_url, status_code=200)
 
         self.patch(self.user_url, data=self.BASIC_USER_DATA, status_code=200)

@@ -29,10 +29,12 @@ Configuration
             ...
         }
 
-
 - **REST_SESSION_LOGIN** - Enable session login in Login API view (default: True)
 
 
 - **OLD_PASSWORD_FIELD_ENABLED** - set it to True if you want to have old password verification on password change enpoint (default: False)
 
 - **LOGOUT_ON_PASSWORD_CHANGE** - set to False if you want to keep the current user logged in after a password change
+
+- **REST_USE_JWT** - If enabled, this will use `django-rest-framework-jwt <http://getblimp.github.io/django-rest-framework-jwt/>` as a backend, and instead of session based tokens or Social Login keys, it will return a JWT. 
+

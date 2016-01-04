@@ -1,4 +1,6 @@
 from django.http import HttpRequest
+from django.conf import settings
+
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
@@ -12,6 +14,8 @@ from allauth.account import app_settings
 from rest_auth.app_settings import TokenSerializer
 from rest_auth.registration.serializers import SocialLoginSerializer
 from rest_auth.views import LoginView
+
+from rest_auth.utils import jwt_encode
 
 
 class RegisterView(APIView, SignupView):
@@ -28,7 +32,12 @@ class RegisterView(APIView, SignupView):
     permission_classes = (AllowAny,)
     allowed_methods = ('POST', 'OPTIONS', 'HEAD')
     token_model = Token
-    serializer_class = TokenSerializer
+    
+    def get_serializer_class(self):
+        if getattr(settings, 'REST_USE_JWT', False):
+            return JWTSerializer
+        else:
+            return TokenSerializer
 
     def get(self, *args, **kwargs):
         return Response({}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
@@ -38,9 +47,14 @@ class RegisterView(APIView, SignupView):
 
     def form_valid(self, form):
         self.user = form.save(self.request)
-        self.token, created = self.token_model.objects.get_or_create(
-            user=self.user
-        )
+
+        if getattr(settings, 'REST_USE_JWT', False):
+            self.token = jwt_encode(self.user)
+
+        else:
+            self.token, created = self.token_model.objects.get_or_create(
+                user=self.user
+            )
         if isinstance(self.request, HttpRequest):
             request = self.request
         else:
@@ -65,9 +79,19 @@ class RegisterView(APIView, SignupView):
             return self.get_response_with_errors()
 
     def get_response(self):
-        # serializer = self.user_serializer_class(instance=self.user)
-        serializer = self.serializer_class(instance=self.token,
-                                           context={'request': self.request})
+        serializer_class = self.get_serializer_class()
+
+        if getattr(settings, 'REST_USE_JWT', False):
+            data = {
+                'user': self.user,
+                'token': self.token
+            }
+            serializer = serializer_class(instance=data, 
+                                    context={'request': self.request})
+        else:
+            serializer = serializer_class(instance=self.token,
+                                        context={'request': self.request})
+
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def get_response_with_errors(self):

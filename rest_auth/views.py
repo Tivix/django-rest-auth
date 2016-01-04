@@ -13,8 +13,10 @@ from rest_framework.generics import RetrieveUpdateAPIView
 from .app_settings import (
     TokenSerializer, UserDetailsSerializer, LoginSerializer,
     PasswordResetSerializer, PasswordResetConfirmSerializer,
-    PasswordChangeSerializer
+    PasswordChangeSerializer, JWTSerializer
 )
+
+from .utils import jwt_encode
 
 
 class LoginView(GenericAPIView):
@@ -31,19 +33,38 @@ class LoginView(GenericAPIView):
     permission_classes = (AllowAny,)
     serializer_class = LoginSerializer
     token_model = Token
-    response_serializer = TokenSerializer
+
+    def get_response_serializer(self):
+        if getattr(settings, 'REST_USE_JWT', False):
+            response_serializer = JWTSerializer
+        else:
+            response_serializer = TokenSerializer
+        return response_serializer
 
     def login(self):
         self.user = self.serializer.validated_data['user']
-        self.token, created = self.token_model.objects.get_or_create(
-            user=self.user)
-        if getattr(settings, 'REST_SESSION_LOGIN', True):
-            login(self.request, self.user)
+
+        if getattr(settings, 'REST_USE_JWT', False):
+            self.token = jwt_encode(self.user)
+        else:
+            self.token, created = self.token_model.objects.get_or_create(
+                user=self.user)
+            if getattr(settings, 'REST_SESSION_LOGIN', True):
+                login(self.request, self.user)
 
     def get_response(self):
-        return Response(
-            self.response_serializer(self.token).data, status=status.HTTP_200_OK
-        )
+        serializer_class = self.get_response_serializer()
+
+        if getattr(settings, 'REST_USE_JWT', False):
+            data = {
+                'user': self.user,
+                'token': self.token
+            }
+            serializer = serializer_class(instance=data)
+        else:
+            serializer = serializer_class(instance=self.token)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request, *args, **kwargs):
         self.serializer = self.get_serializer(data=self.request.data)
