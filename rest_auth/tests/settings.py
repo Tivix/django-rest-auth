@@ -70,7 +70,3 @@ INSTALLED_APPS = [
 SECRET_KEY = "38dh*skf8sjfhs287dh&^hd8&3hdg*j2&sd"
 ACCOUNT_ACTIVATION_DAYS = 1
 SITE_ID = 1
-
-MIGRATION_MODULES = {
-    'authtoken': 'authtoken.migrations',
-}
