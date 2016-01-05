@@ -225,7 +225,7 @@ class APITestCase1(TestCase, BaseAPITestCase):
         self.post(self.login_url, data=payload, status_code=200)
 
     def test_password_reset_with_email_in_different_case(self):
-        user = get_user_model().objects.create_user(self.USERNAME, self.EMAIL.lower(), self.PASS)
+        get_user_model().objects.create_user(self.USERNAME, self.EMAIL.lower(), self.PASS)
 
         # call password reset in upper case
         mail_count = len(mail.outbox)
