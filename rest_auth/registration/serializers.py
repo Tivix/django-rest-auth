@@ -122,11 +122,13 @@ class SocialLoginSerializer(serializers.Serializer):
 
 class RegisterSerializer(serializers.Serializer):
     username = serializers.CharField(
-                               max_length=get_username_max_length(),
-                               min_length=allauth_settings.USERNAME_MIN_LENGTH,
-                               required=allauth_settings.USERNAME_REQUIRED)
+        max_length=get_username_max_length(),
+        min_length=allauth_settings.USERNAME_MIN_LENGTH,
+        required=allauth_settings.USERNAME_REQUIRED
+    )
     email = serializers.EmailField(required=allauth_settings.EMAIL_REQUIRED)
-    password = serializers.CharField(required=True, write_only=True)
+    password1 = serializers.CharField(required=True, write_only=True)
+    password2 = serializers.CharField(required=True, write_only=True)
 
     def validate_username(self, username):
         username = get_adapter().clean_username(username)
@@ -140,8 +142,13 @@ class RegisterSerializer(serializers.Serializer):
                     "A user is already registered with this e-mail address.")
         return email
 
-    def validate_password(self, password):
+    def validate_password1(self, password):
         return get_adapter().clean_password(password)
+
+    def validate(self, data):
+        if data['password1'] != data['password2']:
+            raise serializers.ValidationError("The two password fields didn't match.")
+        return data
 
     def custom_signup(self, request, user):
         pass
@@ -149,7 +156,7 @@ class RegisterSerializer(serializers.Serializer):
     def get_cleaned_data(self):
         return {
             'username': self.validated_data.get('username', ''),
-            'password1': self.validated_data.get('password', ''),
+            'password1': self.validated_data.get('password1', ''),
             'email': self.validated_data.get('email', '')
         }
 

@@ -21,7 +21,8 @@ class TestSocialAuth(TestCase, BaseAPITestCase):
     EMAIL = "person1@world.com"
     REGISTRATION_DATA = {
         "username": USERNAME,
-        "password": PASS,
+        "password1": PASS,
+        "password2": PASS,
         "email": EMAIL
     }
 

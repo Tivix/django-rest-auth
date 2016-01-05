@@ -28,7 +28,8 @@ class APITestCase1(TestCase, BaseAPITestCase):
     # data without user profile
     REGISTRATION_DATA = {
         "username": USERNAME,
-        "password": PASS,
+        "password1": PASS,
+        "password2": PASS
     }
 
     REGISTRATION_DATA_WITH_EMAIL = REGISTRATION_DATA.copy()
@@ -270,6 +271,12 @@ class APITestCase1(TestCase, BaseAPITestCase):
 
         self._login()
         self._logout()
+
+    def test_registration_with_invalid_password(self):
+        data = self.REGISTRATION_DATA.copy()
+        data['password2'] = 'foobar'
+
+        self.post(self.register_url, data=data, status_code=400)
 
     @override_settings(
         ACCOUNT_EMAIL_VERIFICATION='mandatory',

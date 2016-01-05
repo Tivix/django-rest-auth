@@ -51,7 +51,8 @@ Registration
 - /rest-auth/registration/ (POST)
 
     - username
-    - password
+    - password1
+    - password2
     - email
 
 - /rest-auth/registration/verify-email/ (POST)
