@@ -21,8 +21,7 @@ class TestSocialAuth(TestCase, BaseAPITestCase):
     EMAIL = "person1@world.com"
     REGISTRATION_DATA = {
         "username": USERNAME,
-        "password1": PASS,
-        "password2": PASS,
+        "password": PASS,
         "email": EMAIL
     }
 
@@ -99,7 +98,6 @@ class TestSocialAuth(TestCase, BaseAPITestCase):
 
         # test empty payload
         self.post(self.register_url, data={}, status_code=400)
-
         self.post(
             self.register_url,
             data=self.REGISTRATION_DATA,

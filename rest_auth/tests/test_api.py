@@ -29,8 +29,7 @@ class APITestCase1(TestCase, BaseAPITestCase):
     # data without user profile
     REGISTRATION_DATA = {
         "username": USERNAME,
-        "password1": PASS,
-        "password2": PASS
+        "password": PASS,
     }
 
     REGISTRATION_DATA_WITH_EMAIL = REGISTRATION_DATA.copy()
