@@ -29,6 +29,14 @@ Configuration
             ...
         }
 
+- **REST_AUTH_REGISTRATION_SERIALIZERS**
+
+    You can define your custom serializers for registration endpoint.
+    Possible key values:
+
+        - REGISTER_SERIALIZER - serializer class in ``rest_auth.register.views.RegisterView``, default value ``rest_auth.register.serializers.RegisterSerializer``
+
+
 
 - **REST_SESSION_LOGIN** - Enable session login in Login API view (default: True)
 
