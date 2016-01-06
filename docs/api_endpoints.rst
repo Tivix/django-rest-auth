@@ -7,6 +7,7 @@ Basic
 - /rest-auth/login/ (POST)
 
     - username (string)
+    - email (string)
     - password (string)
 
 
