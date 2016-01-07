@@ -20,4 +20,5 @@ urlpatterns = [
     # djang-allauth https://github.com/pennersr/django-allauth/blob/master/allauth/account/views.py#L190
     url(r'^account-confirm-email/(?P<key>\w+)/$', TemplateView.as_view(),
         name='account_confirm_email'),
+    url(r'^change-email/$', VerifyEmailView.as_view(), name='rest_email_change'),
 ]

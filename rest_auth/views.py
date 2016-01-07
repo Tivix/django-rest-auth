@@ -154,3 +154,21 @@ class PasswordChangeView(GenericAPIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response({"success": "New password has been saved."})
+
+ class EmailChangeView(GenericAPIView):
+
+    """
+    Calls Django Auth SetPasswordForm save method.
+
+    Accepts the following POST parameters: new_password1, new_password2
+    Returns the success/fail message.
+    """
+
+    serializer_class = EmailChangeSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response({"success": "New Email has been saved."})       

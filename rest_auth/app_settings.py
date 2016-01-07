@@ -6,7 +6,8 @@ from rest_auth.serializers import (
     LoginSerializer as DefaultLoginSerializer,
     PasswordResetSerializer as DefaultPasswordResetSerializer,
     PasswordResetConfirmSerializer as DefaultPasswordResetConfirmSerializer,
-    PasswordChangeSerializer as DefaultPasswordChangeSerializer)
+    PasswordChangeSerializer as DefaultPasswordChangeSerializer
+    EmailChangeSerializer as DefaultEmailChangeSerializer)
 from .utils import import_callable
 
 
@@ -41,5 +42,12 @@ PasswordChangeSerializer = import_callable(
     serializers.get(
         'PASSWORD_CHANGE_SERIALIZER',
         DefaultPasswordChangeSerializer
+    )
+    )
+
+EmailChangeSerializer = import_callable(
+    serializers.get(
+        'EMAIL_CHANGE_SERIALIZER',
+        DefaultEmailChangeSerializer)
     )
 )

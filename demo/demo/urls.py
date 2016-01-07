@@ -24,6 +24,9 @@ urlpatterns = [
     url(r'^password-change/$',
         TemplateView.as_view(template_name="password_change.html"),
         name='password-change'),
+    url(r'^email-change/$',
+        TemplateView.as_view(template_name="email_change.html"),
+        name='email-change'),
 
 
     # this url is used to generate email content

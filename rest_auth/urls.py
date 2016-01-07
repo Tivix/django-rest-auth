@@ -2,7 +2,7 @@ from django.conf.urls import url
 
 from rest_auth.views import (
     LoginView, LogoutView, UserDetailsView, PasswordChangeView,
-    PasswordResetView, PasswordResetConfirmView
+    PasswordResetView, PasswordResetConfirmView, EmailChangeView,
 )
 
 urlpatterns = [
@@ -17,4 +17,6 @@ urlpatterns = [
     url(r'^user/$', UserDetailsView.as_view(), name='rest_user_details'),
     url(r'^password/change/$', PasswordChangeView.as_view(),
         name='rest_password_change'),
+    url(r'^email/change/$', EmailChangeView.as_view(),
+        name='rest_email_change'),
 ]

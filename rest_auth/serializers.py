@@ -85,7 +85,7 @@ class TokenSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Token
-        fields = ('key',)
+        fields = ('key')
 
 
 class UserDetailsSerializer(serializers.ModelSerializer):
@@ -96,7 +96,6 @@ class UserDetailsSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserModel
         fields = ('username', 'email', 'first_name', 'last_name')
-        read_only_fields = ('email', )
 
 
 class PasswordResetSerializer(serializers.Serializer):
@@ -219,5 +218,35 @@ class PasswordChangeSerializer(serializers.Serializer):
     def save(self):
         self.set_password_form.save()
         if not self.logout_on_password_change:
+            from django.contrib.auth import update_session_auth_hash
+            update_session_auth_hash(self.request, self.user)
+
+
+class EmailChangeSerializer(serializers.Serializer):
+
+    email_address = serializers.CharField(max_length=128)
+
+    set_email_form_class = SetEmailForm
+
+    def __init__(self, *args, **kwargs):
+        self.old_email_field_enabled = getattr(
+            settings, 'OLD_EMAIL_FIELD_ENABLED', False
+        )
+        self.logout_on_email_change = getattr(
+            settings, 'LOGOUT_ON_EMAIL_CHANGE', False
+        )
+        super(EmailChangeSerializer, self).__init__(*args, **kwargs)
+
+        if not self.old_email_field_enabled:
+            self.fields.pop('old_email')
+
+        self.request = self.context.get('request')
+        self.user = getattr(self.request, 'user', None)
+
+
+
+    def save(self):
+        self.set_email_form.save()
+        if not self.logout_on_email_change:
             from django.contrib.auth import update_session_auth_hash
             update_session_auth_hash(self.request, self.user)
