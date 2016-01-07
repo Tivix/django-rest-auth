@@ -35,7 +35,7 @@ class LoginView(GenericAPIView):
 
     def login(self):
         self.user = self.serializer.validated_data['user']
-        self.token = create_token(self.token_model, self.serializer)
+        self.token = create_token(self.token_model, self.user, self.serializer)
         if getattr(settings, 'REST_SESSION_LOGIN', True):
             login(self.request, self.user)
 

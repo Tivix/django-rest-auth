@@ -29,6 +29,13 @@ Configuration
             ...
         }
 
+- **REST_AUTH_REGISTRATION_SERIALIZERS**
+
+    You can define your custom serializers for registration endpoint.
+    Possible key values:
+
+        - REGISTER_SERIALIZER - serializer class in ``rest_auth.register.views.RegisterView``, default value ``rest_auth.register.serializers.RegisterSerializer``
+
 - **REST_AUTH_TOKEN_MODEL** - model class for tokens, default value ``rest_framework.authtoken.models``
 
 - **REST_AUTH_TOKEN_CREATOR** - callable to create tokens, default value ``rest_auth.utils.default_create_token``.
