@@ -32,6 +32,13 @@ setup(
         'djangorestframework>=3.1.0',
         'six>=1.9.0',
     ],
+    extras_require={
+        'with_social': ['django-allauth>=0.24.1'],
+    },
+    tests_require=[
+        'responses>=0.5.0',
+        'django-allauth>=0.24.1',
+    ],
     test_suite='runtests.runtests',
     include_package_data=True,
     # cmdclass={},

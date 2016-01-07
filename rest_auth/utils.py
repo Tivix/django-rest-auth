@@ -11,7 +11,6 @@ def import_callable(path_or_callable):
         return getattr(import_module(package), attr)
 
 
-def default_create_token(token_model, serializer):
-    user = serializer.validated_data['user']
+def default_create_token(token_model, user, serializer):
     token, _ = token_model.objects.get_or_create(user=user)
     return token

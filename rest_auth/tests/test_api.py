@@ -2,6 +2,7 @@ from django.core.urlresolvers import reverse
 from django.test import TestCase
 from django.contrib.auth import get_user_model
 from django.core import mail
+from django.conf import settings
 from django.test.utils import override_settings
 from django.utils.encoding import force_text
 
@@ -83,6 +84,51 @@ class APITestCase1(TestCase, BaseAPITestCase):
         # test wrong username/password
         payload = {
             "username": self.USERNAME + '?',
+            "password": self.PASS
+        }
+        self.post(self.login_url, data=payload, status_code=400)
+
+        # test empty payload
+        self.post(self.login_url, data={}, status_code=400)
+
+    def test_login_by_email(self):
+        # starting test without allauth app
+        settings.INSTALLED_APPS.remove('allauth')
+
+        payload = {
+            "email": self.EMAIL.lower(),
+            "password": self.PASS
+        }
+        # there is no users in db so it should throw error (400)
+        self.post(self.login_url, data=payload, status_code=400)
+
+        self.post(self.password_change_url, status_code=403)
+
+        # create user
+        user = get_user_model().objects.create_user(self.USERNAME, self.EMAIL, self.PASS)
+
+        # test auth by email
+        self.post(self.login_url, data=payload, status_code=200)
+        self.assertEqual('key' in self.response.json.keys(), True)
+        self.token = self.response.json['key']
+
+        # test auth by email in different case
+        payload = {
+            "email": self.EMAIL.upper(),
+            "password": self.PASS
+        }
+        self.post(self.login_url, data=payload, status_code=200)
+        self.assertEqual('key' in self.response.json.keys(), True)
+        self.token = self.response.json['key']
+
+        # test inactive user
+        user.is_active = False
+        user.save()
+        self.post(self.login_url, data=payload, status_code=400)
+
+        # test wrong email/password
+        payload = {
+            "email": 't' + self.EMAIL,
             "password": self.PASS
         }
         self.post(self.login_url, data=payload, status_code=400)
@@ -225,7 +271,7 @@ class APITestCase1(TestCase, BaseAPITestCase):
         self.post(self.login_url, data=payload, status_code=200)
 
     def test_password_reset_with_email_in_different_case(self):
-        user = get_user_model().objects.create_user(self.USERNAME, self.EMAIL.lower(), self.PASS)
+        get_user_model().objects.create_user(self.USERNAME, self.EMAIL.lower(), self.PASS)
 
         # call password reset in upper case
         mail_count = len(mail.outbox)
@@ -271,6 +317,12 @@ class APITestCase1(TestCase, BaseAPITestCase):
 
         self._login()
         self._logout()
+
+    def test_registration_with_invalid_password(self):
+        data = self.REGISTRATION_DATA.copy()
+        data['password2'] = 'foobar'
+
+        self.post(self.register_url, data=data, status_code=400)
 
     @override_settings(
         ACCOUNT_EMAIL_VERIFICATION='mandatory',
