@@ -3,23 +3,25 @@ from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from rest_framework.generics import CreateAPIView
 from rest_framework import status
-from rest_framework.authtoken.models import Token
 from rest_framework.exceptions import MethodNotAllowed
 
 from allauth.account.views import ConfirmEmailView
 from allauth.account.utils import complete_signup
 from allauth.account import app_settings as allauth_settings
 
-from rest_auth.app_settings import TokenSerializer
+from rest_auth.app_settings import (TokenSerializer,
+                                    create_token)
 from rest_auth.registration.serializers import (SocialLoginSerializer,
                                                 VerifyEmailSerializer)
-from .app_settings import RegisterSerializer
 from rest_auth.views import LoginView
+from rest_auth.models import TokenModel
+from .app_settings import RegisterSerializer
 
 
 class RegisterView(CreateAPIView):
     serializer_class = RegisterSerializer
     permission_classes = (AllowAny, )
+    token_model = TokenModel
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -32,7 +34,7 @@ class RegisterView(CreateAPIView):
 
     def perform_create(self, serializer):
         user = serializer.save(self.request)
-        Token.objects.get_or_create(user=user)
+        create_token(self.token_model, user, serializer)
         complete_signup(self.request._request, user,
                         allauth_settings.EMAIL_VERIFICATION,
                         None)

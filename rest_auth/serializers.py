@@ -6,8 +6,9 @@ from django.utils.http import urlsafe_base64_decode as uid_decoder
 from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import force_text
 
+from .models import TokenModel
+
 from rest_framework import serializers, exceptions
-from rest_framework.authtoken.models import Token
 from rest_framework.exceptions import ValidationError
 
 # Get the UserModel
@@ -114,7 +115,7 @@ class TokenSerializer(serializers.ModelSerializer):
     """
 
     class Meta:
-        model = Token
+        model = TokenModel
         fields = ('key',)
 
 
