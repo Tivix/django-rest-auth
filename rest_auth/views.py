@@ -9,6 +9,8 @@ from rest_framework.generics import GenericAPIView
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.generics import RetrieveUpdateAPIView
 
+from allauth.account import app_settings as allauth_settings
+
 from .app_settings import (
     TokenSerializer, UserDetailsSerializer, LoginSerializer,
     PasswordResetSerializer, PasswordResetConfirmSerializer,
@@ -61,7 +63,23 @@ class LogoutView(APIView):
     """
     permission_classes = (AllowAny,)
 
+    def get(self, request, *args, **kwargs):
+        try:
+            if allauth_settings.LOGOUT_ON_GET:
+                response = self.logout(request)
+            else:
+                response = self.http_method_not_allowed(request, *args, **kwargs)
+        except Exception as exc:
+            response = self.handle_exception(exc)
+
+        return self.finalize_response(request, response, *args, **kwargs)
+        self.response = self.finalize_response(request, response, *args, **kwargs)
+        return self.response
+
     def post(self, request):
+        return self.logout(request)
+
+    def logout(self, request):
         try:
             request.user.auth_token.delete()
         except (AttributeError, ObjectDoesNotExist):

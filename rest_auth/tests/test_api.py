@@ -372,3 +372,29 @@ class APITestCase1(TestCase, BaseAPITestCase):
         # try to login again
         self._login()
         self._logout()
+
+    @override_settings(ACCOUNT_LOGOUT_ON_GET=True)
+    def test_logout_on_get(self):
+        payload = {
+            "username": self.USERNAME,
+            "password": self.PASS
+        }
+
+        # create user
+        user = get_user_model().objects.create_user(self.USERNAME, '', self.PASS)
+
+        self.post(self.login_url, data=payload, status_code=200)
+        self.get(self.logout_url, status=status.HTTP_200_OK)
+
+    @override_settings(ACCOUNT_LOGOUT_ON_GET=False)
+    def test_logout_on_post_only(self):
+        payload = {
+            "username": self.USERNAME,
+            "password": self.PASS
+        }
+
+        # create user
+        user = get_user_model().objects.create_user(self.USERNAME, '', self.PASS)
+
+        self.post(self.login_url, data=payload, status_code=status.HTTP_200_OK)
+        self.get(self.logout_url, status_code=status.HTTP_405_METHOD_NOT_ALLOWED)
