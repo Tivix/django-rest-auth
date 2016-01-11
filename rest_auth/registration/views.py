@@ -23,14 +23,20 @@ class RegisterView(CreateAPIView):
     permission_classes = (AllowAny, )
     token_model = TokenModel
 
+    def get_response_data(self, user):
+        if allauth_settings.EMAIL_VERIFICATION == \
+                allauth_settings.EmailVerificationMethod.MANDATORY:
+            return {}
+
+        return TokenSerializer(user.auth_token).data
+
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
-        return Response(TokenSerializer(user.auth_token).data,
-                        status=status.HTTP_201_CREATED,
-                        headers=headers)
+
+        return Response(self.get_response_data(user), status=status.HTTP_201_CREATED, headers=headers)
 
     def perform_create(self, serializer):
         user = serializer.save(self.request)

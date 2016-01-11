@@ -310,8 +310,10 @@ class APITestCase1(TestCase, BaseAPITestCase):
         # test empty payload
         self.post(self.register_url, data={}, status_code=400)
 
-        self.post(self.register_url, data=self.REGISTRATION_DATA, status_code=201)
+        result = self.post(self.register_url, data=self.REGISTRATION_DATA, status_code=201)
+        self.assertIn('key', result.data)
         self.assertEqual(get_user_model().objects.all().count(), user_count + 1)
+
         new_user = get_user_model().objects.latest('id')
         self.assertEqual(new_user.username, self.REGISTRATION_DATA['username'])
 
@@ -339,11 +341,12 @@ class APITestCase1(TestCase, BaseAPITestCase):
             status_code=status.HTTP_400_BAD_REQUEST
         )
 
-        self.post(
+        result = self.post(
             self.register_url,
             data=self.REGISTRATION_DATA_WITH_EMAIL,
             status_code=status.HTTP_201_CREATED
         )
+        self.assertNotIn('key', result.data)
         self.assertEqual(get_user_model().objects.all().count(), user_count + 1)
         self.assertEqual(len(mail.outbox), mail_count + 1)
         new_user = get_user_model().objects.latest('id')
