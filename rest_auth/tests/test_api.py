@@ -280,12 +280,15 @@ class APITestCase1(TestCase, BaseAPITestCase):
         self.assertEqual(len(mail.outbox), mail_count + 1)
 
     def test_password_reset_with_invalid_email(self):
+        """
+        Invalid email should not raise error, as this would leak users
+        """
         get_user_model().objects.create_user(self.USERNAME, self.EMAIL, self.PASS)
 
         # call password reset
         mail_count = len(mail.outbox)
         payload = {'email': 'nonexisting@email.com'}
-        self.post(self.password_reset_url, data=payload, status_code=400)
+        self.post(self.password_reset_url, data=payload, status_code=200)
         self.assertEqual(len(mail.outbox), mail_count)
 
     def test_user_details(self):
