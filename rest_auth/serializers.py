@@ -20,73 +20,23 @@ class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField(required=False, allow_blank=True)
     password = serializers.CharField(style={'input_type': 'password'})
 
-    def _validate_email(self, email, password):
-        user = None
-
-        if email and password:
-            user = authenticate(email=email, password=password)
-        else:
-            msg = _('Must include "email" and "password".')
-            raise exceptions.ValidationError(msg)
-
-        return user
-
-    def _validate_username(self, username, password):
-        user = None
-
-        if username and password:
-            user = authenticate(username=username, password=password)
-        else:
-            msg = _('Must include "username" and "password".')
-            raise exceptions.ValidationError(msg)
-
-        return user
-
-    def _validate_username_email(self, username, email, password):
-        user = None
-
-        if email and password:
-            user = authenticate(email=email, password=password)
-        elif username and password:
-            user = authenticate(username=username, password=password)
-        else:
-            msg = _('Must include either "username" or "email" and "password".')
-            raise exceptions.ValidationError(msg)
-
-        return user
-
     def validate(self, attrs):
         username = attrs.get('username')
         email = attrs.get('email')
         password = attrs.get('password')
 
-        user = None
-
         if 'allauth' in settings.INSTALLED_APPS:
-            from allauth.account import app_settings
-
-            # Authentication through email
-            if app_settings.AUTHENTICATION_METHOD == app_settings.AuthenticationMethod.EMAIL:
-                user = self._validate_email(email, password)
-
-            # Authentication through username
-            if app_settings.AUTHENTICATION_METHOD == app_settings.AuthenticationMethod.USERNAME:
-                user = self._validate_username(username, password)
-
-            # Authentication through either username or email
-            else:
-                user = self._validate_username_email(username, email, password)
-
+            user = authenticate(username=username, email=email, password=password)
         else:
             # Authentication without using allauth
             if email:
-                try:
-                    username = UserModel.objects.get(email__iexact=email).username
-                except UserModel.DoesNotExist:
-                    pass
-
-            if username:
-                user = self._validate_username_email(username, '', password)
+                user = authenticate(email=email, password=password)
+            elif username:
+                credentials = {
+                    UserModel.USERNAME_FIELD: username,
+                    'password': password
+                }
+                user = authenticate(**credentials)
 
         # Did we get back an active user?
         if user:
