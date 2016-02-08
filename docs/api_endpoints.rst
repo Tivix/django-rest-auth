@@ -13,6 +13,8 @@ Basic
 
 - /rest-auth/logout/ (POST)
 
+    - token
+
 - /rest-auth/password/reset/ (POST)
 
     - email
