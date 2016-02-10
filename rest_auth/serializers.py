@@ -149,7 +149,7 @@ class PasswordResetSerializer(serializers.Serializer):
         # Create PasswordResetForm with the serializer
         self.reset_form = self.password_reset_form_class(data=self.initial_data)
         if not self.reset_form.is_valid():
-            raise serializers.ValidationError(_('Error'))
+            raise serializers.ValidationError(self.reset_form.errors)
 
         return value
 
