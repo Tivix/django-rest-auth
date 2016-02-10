@@ -65,6 +65,7 @@ class VerifyEmailView(APIView, ConfirmEmailView):
 
 
 class SocialLoginView(LoginView):
+
     """
     class used for social authentications
     example usage for facebook with access_token

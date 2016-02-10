@@ -50,7 +50,8 @@ class LoginSerializer(serializers.Serializer):
         elif username and password:
             user = authenticate(username=username, password=password)
         else:
-            msg = _('Must include either "username" or "email" and "password".')
+            msg = _(
+                'Must include either "username" or "email" and "password".')
             raise exceptions.ValidationError(msg)
 
         return user
@@ -81,7 +82,8 @@ class LoginSerializer(serializers.Serializer):
             # Authentication without using allauth
             if email:
                 try:
-                    username = UserModel.objects.get(email__iexact=email).username
+                    username = UserModel.objects.get(
+                        email__iexact=email).username
                 except UserModel.DoesNotExist:
                     pass
 
@@ -103,13 +105,15 @@ class LoginSerializer(serializers.Serializer):
             if app_settings.EMAIL_VERIFICATION == app_settings.EmailVerificationMethod.MANDATORY:
                 email_address = user.emailaddress_set.get(email=user.email)
                 if not email_address.verified:
-                    raise serializers.ValidationError('E-mail is not verified.')
+                    raise serializers.ValidationError(_(
+                        'E-mail is not verified.'))
 
         attrs['user'] = user
         return attrs
 
 
 class TokenSerializer(serializers.ModelSerializer):
+
     """
     Serializer for Token model.
     """
@@ -147,7 +151,8 @@ class PasswordResetSerializer(serializers.Serializer):
 
     def validate_email(self, value):
         # Create PasswordResetForm with the serializer
-        self.reset_form = self.password_reset_form_class(data=self.initial_data)
+        self.reset_form = self.password_reset_form_class(
+            data=self.initial_data)
         if not self.reset_form.is_valid():
             raise serializers.ValidationError(_('Error'))
 
@@ -167,6 +172,7 @@ class PasswordResetSerializer(serializers.Serializer):
 
 
 class PasswordResetConfirmSerializer(serializers.Serializer):
+
     """
     Serializer for requesting a password reset e-mail.
     """
@@ -190,7 +196,7 @@ class PasswordResetConfirmSerializer(serializers.Serializer):
             uid = force_text(uid_decoder(attrs['uid']))
             self.user = UserModel._default_manager.get(pk=uid)
         except (TypeError, ValueError, OverflowError, UserModel.DoesNotExist):
-            raise ValidationError({'uid': ['Invalid value']})
+            raise ValidationError({'uid': [_('Invalid value')]})
 
         self.custom_validation(attrs)
         # Construct SetPasswordForm instance
@@ -200,7 +206,7 @@ class PasswordResetConfirmSerializer(serializers.Serializer):
         if not self.set_password_form.is_valid():
             raise serializers.ValidationError(self.set_password_form.errors)
         if not default_token_generator.check_token(self.user, attrs['token']):
-            raise ValidationError({'token': ['Invalid value']})
+            raise ValidationError({'token': [_('Invalid value')]})
 
         return attrs
 
@@ -239,7 +245,7 @@ class PasswordChangeSerializer(serializers.Serializer):
         )
 
         if all(invalid_password_conditions):
-            raise serializers.ValidationError('Invalid password')
+            raise serializers.ValidationError(_('Invalid password'))
         return value
 
     def validate(self, attrs):

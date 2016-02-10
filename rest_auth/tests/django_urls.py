@@ -14,9 +14,11 @@ from django.views.decorators.cache import never_cache
 
 
 class CustomRequestAuthenticationForm(AuthenticationForm):
+
     def __init__(self, request, *args, **kwargs):
         assert isinstance(request, HttpRequest)
-        super(CustomRequestAuthenticationForm, self).__init__(request, *args, **kwargs)
+        super(CustomRequestAuthenticationForm, self).__init__(
+            request, *args, **kwargs)
 
 
 @never_cache
@@ -70,13 +72,18 @@ def custom_request_auth_login(request):
 
 # special urls for auth test cases
 urlpatterns += [
-    url(r'^logout/custom_query/$', views.logout, dict(redirect_field_name='follow')),
+    url(r'^logout/custom_query/$', views.logout,
+        dict(redirect_field_name='follow')),
     url(r'^logout/next_page/$', views.logout, dict(next_page='/somewhere/')),
-    url(r'^logout/next_page/named/$', views.logout, dict(next_page='password_reset')),
+    url(r'^logout/next_page/named/$', views.logout,
+        dict(next_page='password_reset')),
     url(r'^remote_user/$', remote_user_auth_view),
-    url(r'^password_reset_from_email/$', views.password_reset, dict(from_email='staffmember@example.com')),
-    url(r'^password_reset/custom_redirect/$', views.password_reset, dict(post_reset_redirect='/custom/')),
-    url(r'^password_reset/custom_redirect/named/$', views.password_reset, dict(post_reset_redirect='password_reset')),
+    url(r'^password_reset_from_email/$', views.password_reset,
+        dict(from_email='staffmember@example.com')),
+    url(r'^password_reset/custom_redirect/$', views.password_reset,
+        dict(post_reset_redirect='/custom/')),
+    url(r'^password_reset/custom_redirect/named/$', views.password_reset,
+        dict(post_reset_redirect='password_reset')),
     url(r'^password_reset/html_email_template/$', views.password_reset,
         dict(html_email_template_name='registration/html_password_reset_email.html')),
     url(r'^reset/custom/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$',
@@ -85,11 +92,15 @@ urlpatterns += [
     url(r'^reset/custom/named/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$',
         views.password_reset_confirm,
         dict(post_reset_redirect='password_reset')),
-    url(r'^password_change/custom/$', views.password_change, dict(post_change_redirect='/custom/')),
-    url(r'^password_change/custom/named/$', views.password_change, dict(post_change_redirect='password_reset')),
-    url(r'^admin_password_reset/$', views.password_reset, dict(is_admin_site=True)),
+    url(r'^password_change/custom/$', views.password_change,
+        dict(post_change_redirect='/custom/')),
+    url(r'^password_change/custom/named/$', views.password_change,
+        dict(post_change_redirect='password_reset')),
+    url(r'^admin_password_reset/$',
+        views.password_reset, dict(is_admin_site=True)),
     url(r'^login_required/$', login_required(views.password_reset)),
-    url(r'^login_required_login_url/$', login_required(views.password_reset, login_url='/somewhere/')),
+    url(r'^login_required_login_url/$',
+        login_required(views.password_reset, login_url='/somewhere/')),
 
     url(r'^auth_processor_no_attr_access/$', auth_processor_no_attr_access),
     url(r'^auth_processor_attr_access/$', auth_processor_attr_access),
@@ -100,6 +111,7 @@ urlpatterns += [
     url(r'^custom_request_auth_login/$', custom_request_auth_login),
     url(r'^userpage/(.+)/$', userpage, name="userpage"),
 
-    # This line is only required to render the password reset with is_admin=True
+    # This line is only required to render the password reset with
+    # is_admin=True
     url(r'^admin/', include(admin.site.urls)),
 ]
