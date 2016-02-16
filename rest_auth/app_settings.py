@@ -8,8 +8,10 @@ from rest_auth.serializers import (
     PasswordResetSerializer as DefaultPasswordResetSerializer,
     PasswordResetConfirmSerializer as DefaultPasswordResetConfirmSerializer,
     PasswordChangeSerializer as DefaultPasswordChangeSerializer)
-from .utils import import_callable
+from .utils import import_callable, default_create_token
 
+create_token = import_callable(
+    getattr(settings, 'REST_AUTH_TOKEN_CREATOR', default_create_token))
 
 serializers = getattr(settings, 'REST_AUTH_SERIALIZERS', {})
 

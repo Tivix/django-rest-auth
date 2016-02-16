@@ -7,6 +7,7 @@ Basic
 - /rest-auth/login/ (POST)
 
     - username (string)
+    - email (string)
     - password (string)
 
 
@@ -54,16 +55,6 @@ Registration
     - password1
     - password2
     - email
-
-    .. note:: This endpoint is based on ``allauth.account.views.SignupView`` and uses the same form as in this view. To override fields you have to create custom Signup Form and define it in django settings:
-
-        .. code-block:: python
-
-            ACCOUNT_FORMS = {
-                'signup': 'path.to.custom.SignupForm'
-            }
-
-        See allauth documentation for more details.
 
 - /rest-auth/registration/verify-email/ (POST)
 

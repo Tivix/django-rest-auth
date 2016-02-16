@@ -29,12 +29,19 @@ Configuration
             ...
         }
 
-- **REST_SESSION_LOGIN** - Enable session login in Login API view (default: True)
+- **REST_AUTH_REGISTRATION_SERIALIZERS**
 
+    You can define your custom serializers for registration endpoint.
+    Possible key values:
+
+        - REGISTER_SERIALIZER - serializer class in ``rest_auth.register.views.RegisterView``, default value ``rest_auth.register.serializers.RegisterSerializer``
+
+- **REST_AUTH_TOKEN_MODEL** - model class for tokens, default value ``rest_framework.authtoken.models``
+
+- **REST_AUTH_TOKEN_CREATOR** - callable to create tokens, default value ``rest_auth.utils.default_create_token``.
+
+- **REST_SESSION_LOGIN** - Enable session login in Login API view (default: True)
 
 - **OLD_PASSWORD_FIELD_ENABLED** - set it to True if you want to have old password verification on password change enpoint (default: False)
 
 - **LOGOUT_ON_PASSWORD_CHANGE** - set to False if you want to keep the current user logged in after a password change
-
-- **REST_USE_JWT** - If enabled, this will use `django-rest-framework-jwt <http://getblimp.github.io/django-rest-framework-jwt/>` as a backend, and instead of session based tokens or Social Login keys, it will return a JWT. 
-

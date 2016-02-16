@@ -7,14 +7,14 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.generics import GenericAPIView
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from rest_framework.authtoken.models import Token
 from rest_framework.generics import RetrieveUpdateAPIView
 
 from .app_settings import (
     TokenSerializer, UserDetailsSerializer, LoginSerializer,
     PasswordResetSerializer, PasswordResetConfirmSerializer,
-    PasswordChangeSerializer, JWTSerializer
+    PasswordChangeSerializer, create_token
 )
+from .models import TokenModel
 
 from .utils import jwt_encode
 
@@ -32,7 +32,7 @@ class LoginView(GenericAPIView):
     """
     permission_classes = (AllowAny,)
     serializer_class = LoginSerializer
-    token_model = Token
+    token_model = TokenModel
 
     def get_response_serializer(self):
         if getattr(settings, 'REST_USE_JWT', False):
@@ -43,6 +43,9 @@ class LoginView(GenericAPIView):
 
     def login(self):
         self.user = self.serializer.validated_data['user']
+        self.token = create_token(self.token_model, self.user, self.serializer)
+        if getattr(settings, 'REST_SESSION_LOGIN', True):
+            login(self.request, self.user)
 
         if getattr(settings, 'REST_USE_JWT', False):
             self.token = jwt_encode(self.user)

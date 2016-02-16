@@ -38,7 +38,7 @@ You're good to go now!
 Registration (optional)
 -----------------------
 
-1. If you want to enable standard registration process you will need to install ``django-allauth`` - see this doc for installation http://django-allauth.readthedocs.org/en/latest/installation.html.
+1. If you want to enable standard registration process you will need to install ``django-allauth`` by using ``pip install django-rest-auth[extras]`` or ``pip install django-rest-auth[with_social]``.
 
 2. Add ``allauth``, ``allauth.account`` and ``rest_auth.registration`` apps to INSTALLED_APPS in your django settings.py:
 

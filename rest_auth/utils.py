@@ -10,6 +10,11 @@ def import_callable(path_or_callable):
         package, attr = path_or_callable.rsplit('.', 1)
         return getattr(import_module(package), attr)
 
+
+def default_create_token(token_model, user, serializer):
+    token, _ = token_model.objects.get_or_create(user=user)
+    return token
+
 def jwt_encode(user):
     try: 
         from rest_framework_jwt.settings import api_settings
