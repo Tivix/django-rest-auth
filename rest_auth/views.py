@@ -12,7 +12,7 @@ from rest_framework.generics import RetrieveUpdateAPIView
 from .app_settings import (
     TokenSerializer, UserDetailsSerializer, LoginSerializer,
     PasswordResetSerializer, PasswordResetConfirmSerializer,
-    PasswordChangeSerializer, create_token
+    PasswordChangeSerializer, JWTSerializer, create_token
 )
 from .models import TokenModel
 
@@ -43,17 +43,15 @@ class LoginView(GenericAPIView):
 
     def login(self):
         self.user = self.serializer.validated_data['user']
-        self.token = create_token(self.token_model, self.user, self.serializer)
-        if getattr(settings, 'REST_SESSION_LOGIN', True):
-            login(self.request, self.user)
-
+        
         if getattr(settings, 'REST_USE_JWT', False):
             self.token = jwt_encode(self.user)
         else:
-            self.token, created = self.token_model.objects.get_or_create(
-                user=self.user)
-            if getattr(settings, 'REST_SESSION_LOGIN', True):
-                login(self.request, self.user)
+            self.token = create_token(self.token_model, self.user, self.serializer)
+
+        if getattr(settings, 'REST_SESSION_LOGIN', True):
+            login(self.request, self.user)
+
 
     def get_response(self):
         serializer_class = self.get_response_serializer()

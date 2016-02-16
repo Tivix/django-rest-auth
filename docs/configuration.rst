@@ -10,6 +10,8 @@ Configuration
 
         - TOKEN_SERIALIZER - response for successful authentication in ``rest_auth.views.LoginView``, default value ``rest_auth.serializers.TokenSerializer``
 
+        - JWT_SERIALIZER - (Using REST_USE_JWT=True) response for successful authentication in ``rest_auth.views.LoginView``, default value ``rest_auth.serializers.JWTSerializer``
+
         - USER_DETAILS_SERIALIZER - serializer class in ``rest_auth.views.UserDetailsView``, default value ``rest_auth.serializers.UserDetailsSerializer``
 
         - PASSWORD_RESET_SERIALIZER - serializer class in ``rest_auth.views.PasswordResetView``, default value ``rest_auth.serializers.PasswordResetSerializer``
@@ -41,6 +43,8 @@ Configuration
 - **REST_AUTH_TOKEN_CREATOR** - callable to create tokens, default value ``rest_auth.utils.default_create_token``.
 
 - **REST_SESSION_LOGIN** - Enable session login in Login API view (default: True)
+
+- **REST_USE_JWT** - Enable JWT Authentication instead of Token/Session based. This is built on top of django-rest-framework-jwt http://getblimp.github.io/django-rest-framework-jwt/ , which much also be installed. (default: False)
 
 - **OLD_PASSWORD_FIELD_ENABLED** - set it to True if you want to have old password verification on password change enpoint (default: False)
 

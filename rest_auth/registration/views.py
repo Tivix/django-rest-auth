@@ -12,6 +12,7 @@ from allauth.account.utils import complete_signup
 from allauth.account import app_settings as allauth_settings
 
 from rest_auth.app_settings import (TokenSerializer,
+                                    JWTSerializer,
                                     create_token)
 from rest_auth.registration.serializers import (SocialLoginSerializer,
                                                 VerifyEmailSerializer)
@@ -31,7 +32,14 @@ class RegisterView(CreateAPIView):
                 allauth_settings.EmailVerificationMethod.MANDATORY:
             return {}
 
-        return TokenSerializer(user.auth_token).data
+        if getattr(settings, 'REST_USE_JWT', False):
+            data = {
+                'user': user,
+                'token': self.token
+            }
+            return JWTSerializer(data).data
+        else:
+            return TokenSerializer(user.auth_token).data
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -43,7 +51,10 @@ class RegisterView(CreateAPIView):
 
     def perform_create(self, serializer):
         user = serializer.save(self.request)
-        create_token(self.token_model, user, serializer)
+        if getattr(settings, 'REST_USE_JWT', False):
+            self.token = jwt_encode(user)
+        else:
+            create_token(self.token_model, user, serializer)
         complete_signup(self.request._request, user,
                         allauth_settings.EMAIL_VERIFICATION,
                         None)
