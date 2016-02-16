@@ -1,8 +1,8 @@
-from django.conf.urls import patterns, include, url
+from django.conf.urls import include, url
 from django.contrib import admin
 from django.views.generic import TemplateView, RedirectView
 
-urlpatterns = patterns('',
+urlpatterns = [
     url(r'^$', TemplateView.as_view(template_name="home.html"), name='home'),
     url(r'^signup/$', TemplateView.as_view(template_name="signup.html"),
         name='signup'),
@@ -36,4 +36,4 @@ urlpatterns = patterns('',
     url(r'^account/', include('allauth.urls')),
     url(r'^admin/', include(admin.site.urls)),
     url(r'^accounts/profile/$', RedirectView.as_view(url='/', permanent=True), name='profile-redirect'),
-)
+]

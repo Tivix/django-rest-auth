@@ -17,7 +17,12 @@ FAQ
     djang-allauth https://github.com/pennersr/django-allauth/blob/master/allauth/account/views.py#L190
 
 
-2. How can I update UserProfile assigned to User model?
+2. I get an error: Reverse for 'password_reset_confirm' not found.
+
+    You need to add `password_reset_confirm` url into your ``urls.py`` (at the top of any other included urls). Please check the ``urls.py`` module inside demo app example for more details.
+
+
+3. How can I update UserProfile assigned to User model?
 
     Assuming you already have UserProfile model defined like this
 

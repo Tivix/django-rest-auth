@@ -1,4 +1,4 @@
-from django.conf.urls import patterns, url, include
+from django.conf.urls import url, include
 from django.views.generic import TemplateView
 from . import django_urls
 
@@ -11,8 +11,7 @@ from rest_auth.registration.views import SocialLoginView
 class FacebookLogin(SocialLoginView):
     adapter_class = FacebookOAuth2Adapter
 
-urlpatterns += patterns(
-    '',
+urlpatterns += [
     url(r'^rest-registration/', include('rest_auth.registration.urls')),
     url(r'^test-admin/', include(django_urls)),
     url(r'^account-email-verification-sent/$', TemplateView.as_view(),
@@ -21,4 +20,4 @@ urlpatterns += patterns(
         name='account_confirm_email'),
     url(r'^social-login/facebook/$', FacebookLogin.as_view(), name='fb_login'),
     url(r'^accounts/', include('allauth.socialaccount.urls'))
-)
+]
