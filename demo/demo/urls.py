@@ -11,6 +11,8 @@ urlpatterns = [
         name='email-verification'),
     url(r'^login/$', TemplateView.as_view(template_name="login.html"),
         name='login'),
+    url(r'^logout/$', TemplateView.as_view(template_name="logout.html"),
+        name='logout'),
     url(r'^password-reset/$',
         TemplateView.as_view(template_name="password_reset.html"),
         name='password-reset'),
