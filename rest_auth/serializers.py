@@ -81,7 +81,7 @@ class LoginSerializer(serializers.Serializer):
             # Authentication without using allauth
             if email:
                 try:
-                    username = UserModel.objects.get(email__iexact=email).username
+                    username = UserModel.objects.get(email__iexact=email).get_username()
                 except UserModel.DoesNotExist:
                     pass
 
