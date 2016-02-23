@@ -85,6 +85,8 @@ Using ``django-allauth``, ``django-rest-auth`` provides helpful class for creati
         ...,
         'allauth.socialaccount',
         'allauth.socialaccount.providers.facebook',
+        'allauth.socialaccount.providers.twitter',
+
     )
 
 2. Add Social Application in django admin panel
@@ -108,4 +110,28 @@ Using ``django-allauth``, ``django-rest-auth`` provides helpful class for creati
         url(r'^rest-auth/facebook/$', FacebookLogin.as_view(), name='fb_login')
     )
 
+5. If you are using Twitter for your social authentication, it is a bit different from 
+   Facebook since Twitter uses OAuth 1.0. 
+
+
+6. Create new view as a subclass of ``rest_auth.views.LoginView`` with ``TwitterOAuthAdapter`` adapter and  ``TwitterLoginSerializer`` as an attribute:
+
+.. code-block:: python
+
+    from allauth.socialaccount.providers.twitter.views import TwitterOAuthAdapter
+    from rest_auth.views import LoginView
+    from rest_auth.social_serializers import TwitterLoginSerializer
+
+    class TwitterLogin(LoginView):
+        serializer_class = TwitterLoginSerializer
+        adapter_class = TwitterOAuthAdapter
+
+7. Create url for TwitterLogin view:
+
+.. code-block:: python
+
+    urlpatterns += pattern('',
+        ...,
+        url(r'^rest-auth/twitter/$', TwitterLogin.as_view(), name='twitter_login')
+    )
 .. note:: Starting from v0.21.0, django-allauth has dropped support for context processors. Check out http://django-allauth.readthedocs.org/en/latest/changelog.html#from-0-21-0 for more details.
