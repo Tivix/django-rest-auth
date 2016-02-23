@@ -103,7 +103,7 @@ class LoginSerializer(serializers.Serializer):
             if app_settings.EMAIL_VERIFICATION == app_settings.EmailVerificationMethod.MANDATORY:
                 email_address = user.emailaddress_set.get(email=user.email)
                 if not email_address.verified:
-                    raise serializers.ValidationError('E-mail is not verified.')
+                    raise serializers.ValidationError(_('E-mail is not verified.'))
 
         attrs['user'] = user
         return attrs
