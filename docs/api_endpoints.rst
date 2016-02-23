@@ -7,10 +7,13 @@ Basic
 - /rest-auth/login/ (POST)
 
     - username (string)
+    - email (string)
     - password (string)
 
 
 - /rest-auth/logout/ (POST)
+
+    - token
 
 - /rest-auth/password/reset/ (POST)
 
@@ -30,9 +33,10 @@ Basic
     - new_password1
     - new_password2
     - old_password
-    
-    
+
+
     .. note:: ``OLD_PASSWORD_FIELD_ENABLED = True`` to use old_password.
+    .. note:: ``LOGOUT_ON_PASSWORD_CHANGE = False`` to keep the user logged in after password change
 
 - /rest-auth/user/ (GET)
 
@@ -53,16 +57,6 @@ Registration
     - password1
     - password2
     - email
-
-    .. note:: This endpoint is based on ``allauth.account.views.SignupView`` and uses the same form as in this view. To override fields you have to create custom Signup Form and define it in django settings:
-
-        .. code-block:: python
-
-            ACCOUNT_FORMS = {
-                'signup': 'path.to.custom.SignupForm'
-            }
-
-        See allauth documentation for more details.
 
 - /rest-auth/registration/verify-email/ (POST)
 

@@ -1,5 +1,5 @@
 <!-- Signup form -->
-<form class="form-horizontal" id="signup" role="form" action="{% url 'rest_user_details' %}">
+<form class="form-horizontal" id="signup" role="form" action="{% url 'rest_user_details' %}">{% csrf_token %}
 
   <div class="form-group">
     <label for="email" class="col-sm-2 control-label">Email</label>

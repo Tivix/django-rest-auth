@@ -1,5 +1,5 @@
 <!-- Signup form -->
-<form class="form-horizontal ajax-post" role="form" action="{% url 'rest_verify_email' %}">
+<form class="form-horizontal ajax-post" role="form" action="{% url 'rest_verify_email' %}">{% csrf_token %}
   <div class="form-group">
     <label for="key" class="col-sm-2 control-label">Key</label>
     <div class="col-sm-10">

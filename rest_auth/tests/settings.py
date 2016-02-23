@@ -1,8 +1,8 @@
-import django
 import os
 import sys
 
 PROJECT_ROOT = os.path.abspath(os.path.split(os.path.split(__file__)[0])[0])
+
 ROOT_URLCONF = 'urls'
 STATIC_URL = '/static/'
 STATIC_ROOT = '%s/staticserve' % PROJECT_ROOT
@@ -18,15 +18,12 @@ IS_STAGING = False
 IS_PROD = False
 IS_TEST = 'test' in sys.argv or 'test_coverage' in sys.argv
 
-if django.VERSION[:2] >= (1, 3):
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': ':memory:',
-        }
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': ':memory:',
     }
-else:
-    DATABASE_ENGINE = 'sqlite3'
+}
 
 MIDDLEWARE_CLASSES = [
     'django.middleware.common.CommonMiddleware',
@@ -73,7 +70,3 @@ INSTALLED_APPS = [
 SECRET_KEY = "38dh*skf8sjfhs287dh&^hd8&3hdg*j2&sd"
 ACCOUNT_ACTIVATION_DAYS = 1
 SITE_ID = 1
-
-MIGRATION_MODULES = {
-    'authtoken': 'authtoken.migrations',
-}
