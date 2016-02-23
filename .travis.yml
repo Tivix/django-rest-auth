@@ -2,8 +2,9 @@ language: python
 python:
   - "2.7"
 env:
-  - DJANGO=1.7.7
-  - DJANGO=1.8
+  - DJANGO=1.7.11
+  - DJANGO=1.8.9
+  - DJANGO=1.9.2
 install:
   - pip install -q Django==$DJANGO --use-mirrors
   - pip install coveralls

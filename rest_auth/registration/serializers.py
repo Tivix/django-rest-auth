@@ -22,7 +22,6 @@ if 'allauth.socialaccount' in settings.INSTALLED_APPS:
         pass
 
 
-
 class SocialLoginSerializer(serializers.Serializer):
     access_token = serializers.CharField(required=False, allow_blank=True)
     code = serializers.CharField(required=False, allow_blank=True)
