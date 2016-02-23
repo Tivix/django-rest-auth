@@ -126,4 +126,12 @@ Using ``django-allauth``, ``django-rest-auth`` provides helpful class for creati
         serializer_class = TwitterLoginSerializer
         adapter_class = TwitterOAuthAdapter
 
+7. Create url for TwitterLogin view:
+
+.. code-block:: python
+
+    urlpatterns += pattern('',
+        ...,
+        url(r'^rest-auth/twitter/$', TwitterLogin.as_view(), name='twitter_login')
+    )
 .. note:: Starting from v0.21.0, django-allauth has dropped support for context processors. Check out http://django-allauth.readthedocs.org/en/latest/changelog.html#from-0-21-0 for more details.
