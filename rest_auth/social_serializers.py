@@ -58,8 +58,8 @@ class TwitterLoginSerializer(serializers.Serializer):
             raise serializers.ValidationError('Incorrect input. access_token and token_secret are required.')
 
         request.session['oauth_api.twitter.com_access_token'] = {
-                'oauth_token': access_token,
-                'oauth_token_secret': token_secret,
+            'oauth_token': access_token,
+            'oauth_token_secret': token_secret,
         }
         token = SocialToken(token=access_token, token_secret=token_secret)
         token.app = app
