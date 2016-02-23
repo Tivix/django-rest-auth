@@ -70,3 +70,8 @@ Basing on example from installation section :doc:`Installation </installation>`
 
     - access_token
     - code
+
+- /rest-auth/twitter/ (POST)
+
+    - access_token
+    - token_secret
