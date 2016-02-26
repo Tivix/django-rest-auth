@@ -44,7 +44,7 @@ class LoginView(GenericAPIView):
 
     def get_response(self):
         return Response(
-            self.response_serializer(self.token).data, status=status.HTTP_200_OK
+            self.response_serializer(self.token, context=self.get_serializer_context()).data, status=status.HTTP_200_OK
         )
 
     def post(self, request, *args, **kwargs):
