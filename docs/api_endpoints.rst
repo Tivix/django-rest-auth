@@ -11,7 +11,9 @@ Basic
     - password (string)
 
 
-- /rest-auth/logout/ (POST)
+- /rest-auth/logout/ (POST, GET)
+
+    .. note:: ``ACCOUNT_LOGOUT_ON_GET = True`` to allow logout using GET (this is the exact same conf from allauth)
 
     - token
 
