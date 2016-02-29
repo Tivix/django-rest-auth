@@ -1,20 +1,25 @@
 from django.contrib.auth import login, logout
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
+from django.utils.translation import ugettext_lazy as _
 
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.generics import GenericAPIView
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from rest_framework.authtoken.models import Token
 from rest_framework.generics import RetrieveUpdateAPIView
+
+from allauth.account import app_settings as allauth_settings
 
 from .app_settings import (
     TokenSerializer, UserDetailsSerializer, LoginSerializer,
     PasswordResetSerializer, PasswordResetConfirmSerializer,
-    PasswordChangeSerializer
+    PasswordChangeSerializer, JWTSerializer, create_token
 )
+from .models import TokenModel
+
+from .utils import jwt_encode
 
 
 class LoginView(GenericAPIView):
@@ -30,20 +35,40 @@ class LoginView(GenericAPIView):
     """
     permission_classes = (AllowAny,)
     serializer_class = LoginSerializer
-    token_model = Token
-    response_serializer = TokenSerializer
+    token_model = TokenModel
+
+    def get_response_serializer(self):
+        if getattr(settings, 'REST_USE_JWT', False):
+            response_serializer = JWTSerializer
+        else:
+            response_serializer = TokenSerializer
+        return response_serializer
 
     def login(self):
         self.user = self.serializer.validated_data['user']
-        self.token, created = self.token_model.objects.get_or_create(
-            user=self.user)
+        
+        if getattr(settings, 'REST_USE_JWT', False):
+            self.token = jwt_encode(self.user)
+        else:
+            self.token = create_token(self.token_model, self.user, self.serializer)
+
         if getattr(settings, 'REST_SESSION_LOGIN', True):
             login(self.request, self.user)
 
+
     def get_response(self):
-        return Response(
-            self.response_serializer(self.token).data, status=status.HTTP_200_OK
-        )
+        serializer_class = self.get_response_serializer()
+
+        if getattr(settings, 'REST_USE_JWT', False):
+            data = {
+                'user': self.user,
+                'token': self.token
+            }
+            serializer = serializer_class(instance=data)
+        else:
+            serializer = serializer_class(instance=self.token)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request, *args, **kwargs):
         self.serializer = self.get_serializer(data=self.request.data)
@@ -62,7 +87,23 @@ class LogoutView(APIView):
     """
     permission_classes = (AllowAny,)
 
+    def get(self, request, *args, **kwargs):
+        try:
+            if allauth_settings.LOGOUT_ON_GET:
+                response = self.logout(request)
+            else:
+                response = self.http_method_not_allowed(request, *args, **kwargs)
+        except Exception as exc:
+            response = self.handle_exception(exc)
+
+        return self.finalize_response(request, response, *args, **kwargs)
+        self.response = self.finalize_response(request, response, *args, **kwargs)
+        return self.response
+
     def post(self, request):
+        return self.logout(request)
+
+    def logout(self, request):
         try:
             request.user.auth_token.delete()
         except (AttributeError, ObjectDoesNotExist):
@@ -70,12 +111,11 @@ class LogoutView(APIView):
 
         logout(request)
 
-        return Response({"success": "Successfully logged out."},
+        return Response({"success": _("Successfully logged out.")},
                         status=status.HTTP_200_OK)
 
 
 class UserDetailsView(RetrieveUpdateAPIView):
-
     """
     Returns User's details in JSON format.
 
@@ -112,13 +152,12 @@ class PasswordResetView(GenericAPIView):
         serializer.save()
         # Return the success message with OK HTTP status
         return Response(
-            {"success": "Password reset e-mail has been sent."},
+            {"success": _("Password reset e-mail has been sent.")},
             status=status.HTTP_200_OK
         )
 
 
 class PasswordResetConfirmView(GenericAPIView):
-
     """
     Password reset e-mail link is confirmed, therefore this resets the user's password.
 
@@ -134,11 +173,10 @@ class PasswordResetConfirmView(GenericAPIView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        return Response({"success": "Password has been reset with the new password."})
+        return Response({"success": _("Password has been reset with the new password.")})
 
 
 class PasswordChangeView(GenericAPIView):
-
     """
     Calls Django Auth SetPasswordForm save method.
 
@@ -171,4 +209,4 @@ class PasswordChangeView(GenericAPIView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        return Response({"success": "New Email has been saved."})       
+        return Response({"success": _("New password has been saved.")})

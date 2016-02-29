@@ -37,7 +37,10 @@ class BaseAPITestCase(object):
 
         # check_headers = kwargs.pop('check_headers', True)
         if hasattr(self, 'token'):
-            kwargs['HTTP_AUTHORIZATION'] = 'Token %s' % self.token
+            if getattr(settings, 'REST_USE_JWT', False):
+                kwargs['HTTP_AUTHORIZATION'] = 'JWT %s' % self.token
+            else:
+                kwargs['HTTP_AUTHORIZATION'] = 'Token %s' % self.token
 
         self.response = request_func(*args, **kwargs)
         is_json = bool(

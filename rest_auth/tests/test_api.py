@@ -91,6 +91,19 @@ class APITestCase1(TestCase, BaseAPITestCase):
         # test empty payload
         self.post(self.login_url, data={}, status_code=400)
 
+    @override_settings(REST_USE_JWT=True)
+    def test_login_jwt(self):
+        payload = {
+            "username": self.USERNAME,
+            "password": self.PASS
+        }
+        user = get_user_model().objects.create_user(self.USERNAME, '', self.PASS)
+
+        self.post(self.login_url, data=payload, status_code=200)
+        self.assertEqual('token' in self.response.json.keys(), True)
+        self.token = self.response.json['token']
+
+
     def test_login_by_email(self):
         # starting test without allauth app
         settings.INSTALLED_APPS.remove('allauth')
@@ -280,12 +293,15 @@ class APITestCase1(TestCase, BaseAPITestCase):
         self.assertEqual(len(mail.outbox), mail_count + 1)
 
     def test_password_reset_with_invalid_email(self):
+        """
+        Invalid email should not raise error, as this would leak users
+        """
         get_user_model().objects.create_user(self.USERNAME, self.EMAIL, self.PASS)
 
         # call password reset
         mail_count = len(mail.outbox)
         payload = {'email': 'nonexisting@email.com'}
-        self.post(self.password_reset_url, data=payload, status_code=400)
+        self.post(self.password_reset_url, data=payload, status_code=200)
         self.assertEqual(len(mail.outbox), mail_count)
 
     def test_user_details(self):
@@ -304,19 +320,51 @@ class APITestCase1(TestCase, BaseAPITestCase):
         self.assertEqual(user.last_name, self.response.json['last_name'])
         self.assertEqual(user.email, self.response.json['email'])
 
+    @override_settings(REST_USE_JWT=True)
+    def test_user_details_using_jwt(self):
+        user = get_user_model().objects.create_user(self.USERNAME, self.EMAIL, self.PASS)
+        payload = {
+            "username": self.USERNAME,
+            "password": self.PASS
+        }
+        self.post(self.login_url, data=payload, status_code=200)
+        self.token = self.response.json['token']
+        self.get(self.user_url, status_code=200)
+
+        self.patch(self.user_url, data=self.BASIC_USER_DATA, status_code=200)
+        user = get_user_model().objects.get(pk=user.pk)
+        self.assertEqual(user.email, self.response.json['email'])
+
+
     def test_registration(self):
         user_count = get_user_model().objects.all().count()
 
         # test empty payload
         self.post(self.register_url, data={}, status_code=400)
 
-        self.post(self.register_url, data=self.REGISTRATION_DATA, status_code=201)
+        result = self.post(self.register_url, data=self.REGISTRATION_DATA, status_code=201)
+        self.assertIn('key', result.data)
         self.assertEqual(get_user_model().objects.all().count(), user_count + 1)
+
         new_user = get_user_model().objects.latest('id')
         self.assertEqual(new_user.username, self.REGISTRATION_DATA['username'])
 
         self._login()
         self._logout()
+
+    @override_settings(REST_USE_JWT=True)
+    def test_registration_with_jwt(self):
+        user_count = get_user_model().objects.all().count()
+
+        self.post(self.register_url, data={}, status_code=400)
+
+        result = self.post(self.register_url, data=self.REGISTRATION_DATA, status_code=201)
+        self.assertIn('token', result.data)
+        self.assertEqual(get_user_model().objects.all().count(), user_count + 1)
+
+        self._login()
+        self._logout()
+
 
     def test_registration_with_invalid_password(self):
         data = self.REGISTRATION_DATA.copy()
@@ -339,11 +387,12 @@ class APITestCase1(TestCase, BaseAPITestCase):
             status_code=status.HTTP_400_BAD_REQUEST
         )
 
-        self.post(
+        result = self.post(
             self.register_url,
             data=self.REGISTRATION_DATA_WITH_EMAIL,
             status_code=status.HTTP_201_CREATED
         )
+        self.assertNotIn('key', result.data)
         self.assertEqual(get_user_model().objects.all().count(), user_count + 1)
         self.assertEqual(len(mail.outbox), mail_count + 1)
         new_user = get_user_model().objects.latest('id')
@@ -372,3 +421,29 @@ class APITestCase1(TestCase, BaseAPITestCase):
         # try to login again
         self._login()
         self._logout()
+
+    @override_settings(ACCOUNT_LOGOUT_ON_GET=True)
+    def test_logout_on_get(self):
+        payload = {
+            "username": self.USERNAME,
+            "password": self.PASS
+        }
+
+        # create user
+        user = get_user_model().objects.create_user(self.USERNAME, '', self.PASS)
+
+        self.post(self.login_url, data=payload, status_code=200)
+        self.get(self.logout_url, status=status.HTTP_200_OK)
+
+    @override_settings(ACCOUNT_LOGOUT_ON_GET=False)
+    def test_logout_on_post_only(self):
+        payload = {
+            "username": self.USERNAME,
+            "password": self.PASS
+        }
+
+        # create user
+        user = get_user_model().objects.create_user(self.USERNAME, '', self.PASS)
+
+        self.post(self.login_url, data=payload, status_code=status.HTTP_200_OK)
+        self.get(self.logout_url, status_code=status.HTTP_405_METHOD_NOT_ALLOWED)
