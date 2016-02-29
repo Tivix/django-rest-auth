@@ -4,6 +4,7 @@ Changelog
 0.8.0
 -----
 - added support for django-rest-framework-jwt
+
 0.7.0
 -----
 - Wrapped API returned strings in ugettext_lazy
@@ -67,4 +68,3 @@ Changelog
 - changed password reset confim url - uid and token should be sent in POST
 - increase test coverage
 - made compatibile with django 1.7
-- removed user profile support
