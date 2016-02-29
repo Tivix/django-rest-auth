@@ -68,3 +68,4 @@ Changelog
 - changed password reset confim url - uid and token should be sent in POST
 - increase test coverage
 - made compatibile with django 1.7
+- removed user profile support
