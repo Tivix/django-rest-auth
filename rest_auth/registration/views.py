@@ -1,4 +1,4 @@
-from django.conf import settings
+from django.utils.translation import ugettext_lazy as _
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -75,7 +75,7 @@ class VerifyEmailView(APIView, ConfirmEmailView):
         self.kwargs['key'] = serializer.validated_data['key']
         confirmation = self.get_object()
         confirmation.confirm(self.request)
-        return Response({'message': 'ok'}, status=status.HTTP_200_OK)
+        return Response({'message': _('ok')}, status=status.HTTP_200_OK)
 
 
 class SocialLoginView(LoginView):

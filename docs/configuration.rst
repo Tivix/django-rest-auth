@@ -31,7 +31,7 @@ Configuration
             ...
         }
 
-- **REST_AUTH_REGISTRATION_SERIALIZERS**
+- **REST_AUTH_REGISTER_SERIALIZERS**
 
     You can define your custom serializers for registration endpoint.
     Possible key values:
