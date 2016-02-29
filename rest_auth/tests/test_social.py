@@ -125,3 +125,29 @@ class TestSocialAuth(TestCase, BaseAPITestCase):
 
         self.post(self.fb_login_url, data=payload, status_code=200)
         self.assertIn('key', self.response.json.keys())
+
+    @responses.activate
+    @override_settings(
+        REST_USE_JWT=True
+    )
+    def test_jwt(self):
+        resp_body = '{"id":"123123123123","first_name":"John","gender":"male","last_name":"Smith","link":"https:\\/\\/www.facebook.com\\/john.smith","locale":"en_US","name":"John Smith","timezone":2,"updated_time":"2014-08-13T10:14:38+0000","username":"john.smith","verified":true}'  # noqa
+        responses.add(
+            responses.GET,
+            self.graph_api_url,
+            body=resp_body,
+            status=200,
+            content_type='application/json'
+        )
+
+        users_count = get_user_model().objects.all().count()
+        payload = {
+            'access_token': 'abc123'
+        }
+
+        self.post(self.fb_login_url, data=payload, status_code=200)
+        self.assertIn('token', self.response.json.keys())
+        self.assertIn('user', self.response.json.keys())
+        
+        self.assertEqual(get_user_model().objects.all().count(), users_count + 1)
+

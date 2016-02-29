@@ -1,6 +1,10 @@
 Changelog
 =========
 
+0.8.0
+-----
+- added support for django-rest-framework-jwt
+
 0.7.0
 -----
 - Wrapped API returned strings in ugettext_lazy

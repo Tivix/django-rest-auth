@@ -45,6 +45,13 @@ TEMPLATE_CONTEXT_PROCESSORS = [
     "allauth.socialaccount.context_processors.socialaccount",
 ]
 
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
+    )
+}
+
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -64,7 +71,9 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
 
     'rest_auth',
-    'rest_auth.registration'
+    'rest_auth.registration',
+
+    'rest_framework_jwt'
 ]
 
 SECRET_KEY = "38dh*skf8sjfhs287dh&^hd8&3hdg*j2&sd"
