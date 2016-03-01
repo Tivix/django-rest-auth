@@ -46,7 +46,7 @@ class LoginView(GenericAPIView):
 
     def login(self):
         self.user = self.serializer.validated_data['user']
-        
+
         if getattr(settings, 'REST_USE_JWT', False):
             self.token = jwt_encode(self.user)
         else:
@@ -54,7 +54,6 @@ class LoginView(GenericAPIView):
 
         if getattr(settings, 'REST_SESSION_LOGIN', True):
             login(self.request, self.user)
-
 
     def get_response(self):
         serializer_class = self.get_response_serializer()

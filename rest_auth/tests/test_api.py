@@ -97,12 +97,11 @@ class APITestCase1(TestCase, BaseAPITestCase):
             "username": self.USERNAME,
             "password": self.PASS
         }
-        user = get_user_model().objects.create_user(self.USERNAME, '', self.PASS)
+        get_user_model().objects.create_user(self.USERNAME, '', self.PASS)
 
         self.post(self.login_url, data=payload, status_code=200)
         self.assertEqual('token' in self.response.json.keys(), True)
         self.token = self.response.json['token']
-
 
     def test_login_by_email(self):
         # starting test without allauth app
@@ -335,7 +334,6 @@ class APITestCase1(TestCase, BaseAPITestCase):
         user = get_user_model().objects.get(pk=user.pk)
         self.assertEqual(user.email, self.response.json['email'])
 
-
     def test_registration(self):
         user_count = get_user_model().objects.all().count()
 
@@ -364,7 +362,6 @@ class APITestCase1(TestCase, BaseAPITestCase):
 
         self._login()
         self._logout()
-
 
     def test_registration_with_invalid_password(self):
         data = self.REGISTRATION_DATA.copy()
@@ -430,7 +427,7 @@ class APITestCase1(TestCase, BaseAPITestCase):
         }
 
         # create user
-        user = get_user_model().objects.create_user(self.USERNAME, '', self.PASS)
+        get_user_model().objects.create_user(self.USERNAME, '', self.PASS)
 
         self.post(self.login_url, data=payload, status_code=200)
         self.get(self.logout_url, status=status.HTTP_200_OK)
@@ -443,7 +440,7 @@ class APITestCase1(TestCase, BaseAPITestCase):
         }
 
         # create user
-        user = get_user_model().objects.create_user(self.USERNAME, '', self.PASS)
+        get_user_model().objects.create_user(self.USERNAME, '', self.PASS)
 
         self.post(self.login_url, data=payload, status_code=status.HTTP_200_OK)
         self.get(self.logout_url, status_code=status.HTTP_405_METHOD_NOT_ALLOWED)
