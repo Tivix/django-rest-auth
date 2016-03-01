@@ -10,12 +10,16 @@ from rest_framework.generics import GenericAPIView
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.generics import RetrieveUpdateAPIView
 
+from allauth.account import app_settings as allauth_settings
+
 from .app_settings import (
     TokenSerializer, UserDetailsSerializer, LoginSerializer,
     PasswordResetSerializer, PasswordResetConfirmSerializer,
-    PasswordChangeSerializer, create_token
+    PasswordChangeSerializer, JWTSerializer, create_token
 )
 from .models import TokenModel
+
+from .utils import jwt_encode
 
 
 class LoginView(GenericAPIView):
@@ -32,18 +36,39 @@ class LoginView(GenericAPIView):
     permission_classes = (AllowAny,)
     serializer_class = LoginSerializer
     token_model = TokenModel
-    response_serializer = TokenSerializer
+
+    def get_response_serializer(self):
+        if getattr(settings, 'REST_USE_JWT', False):
+            response_serializer = JWTSerializer
+        else:
+            response_serializer = TokenSerializer
+        return response_serializer
 
     def login(self):
         self.user = self.serializer.validated_data['user']
-        self.token = create_token(self.token_model, self.user, self.serializer)
+        
+        if getattr(settings, 'REST_USE_JWT', False):
+            self.token = jwt_encode(self.user)
+        else:
+            self.token = create_token(self.token_model, self.user, self.serializer)
+
         if getattr(settings, 'REST_SESSION_LOGIN', True):
             login(self.request, self.user)
 
+
     def get_response(self):
-        return Response(
-            self.response_serializer(self.token).data, status=status.HTTP_200_OK
-        )
+        serializer_class = self.get_response_serializer()
+
+        if getattr(settings, 'REST_USE_JWT', False):
+            data = {
+                'user': self.user,
+                'token': self.token
+            }
+            serializer = serializer_class(instance=data)
+        else:
+            serializer = serializer_class(instance=self.token)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request, *args, **kwargs):
         self.serializer = self.get_serializer(data=self.request.data)
@@ -62,7 +87,23 @@ class LogoutView(APIView):
     """
     permission_classes = (AllowAny,)
 
+    def get(self, request, *args, **kwargs):
+        try:
+            if allauth_settings.LOGOUT_ON_GET:
+                response = self.logout(request)
+            else:
+                response = self.http_method_not_allowed(request, *args, **kwargs)
+        except Exception as exc:
+            response = self.handle_exception(exc)
+
+        return self.finalize_response(request, response, *args, **kwargs)
+        self.response = self.finalize_response(request, response, *args, **kwargs)
+        return self.response
+
     def post(self, request):
+        return self.logout(request)
+
+    def logout(self, request):
         try:
             request.user.auth_token.delete()
         except (AttributeError, ObjectDoesNotExist):

@@ -140,3 +140,18 @@ If you are using Twitter for your social authentication, it is a bit different s
         url(r'^rest-auth/twitter/$', TwitterLogin.as_view(), name='twitter_login')
     )
 .. note:: Starting from v0.21.0, django-allauth has dropped support for context processors. Check out http://django-allauth.readthedocs.org/en/latest/changelog.html#from-0-21-0 for more details.
+
+
+JWT Support (optional)
+----------------------
+
+By default, ``django-rest-auth`` uses Django's Token-based authentication. If you want to use JWT authentication, you need to install the following:
+
+1. Install ``django-rest-framework-jwt`` http://getblimp.github.io/django-rest-framework-jwt/ . Right now this is the only supported JWT library. 
+
+2. Add the following to your settings 
+
+.. code-block:: python
+
+    REST_USE_JWT = True
+
