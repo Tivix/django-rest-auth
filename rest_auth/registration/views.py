@@ -23,6 +23,7 @@ from .app_settings import RegisterSerializer
 
 from rest_auth.utils import jwt_encode
 
+
 class RegisterView(CreateAPIView):
     serializer_class = RegisterSerializer
     permission_classes = (AllowAny, )
