@@ -96,8 +96,6 @@ class LogoutView(APIView):
             response = self.handle_exception(exc)
 
         return self.finalize_response(request, response, *args, **kwargs)
-        self.response = self.finalize_response(request, response, *args, **kwargs)
-        return self.response
 
     def post(self, request):
         return self.logout(request)
