@@ -37,6 +37,7 @@ Configuration
     Possible key values:
 
         - REGISTER_SERIALIZER - serializer class in ``rest_auth.register.views.RegisterView``, default value ``rest_auth.register.serializers.RegisterSerializer``
+        - SOCIAL_LOGIN_SERIALIZER - serializer class in ``rest_auth.register.views.SocialLoginView``, default value ``rest_auth.register.serializers.SocialLoginSerializer``
 
 - **REST_AUTH_TOKEN_MODEL** - model class for tokens, default value ``rest_framework.authtoken.models``
 
