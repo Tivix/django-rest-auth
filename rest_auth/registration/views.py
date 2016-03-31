@@ -77,7 +77,7 @@ class VerifyEmailView(APIView, ConfirmEmailView):
         self.kwargs['key'] = serializer.validated_data['key']
         confirmation = self.get_object()
         confirmation.confirm(self.request)
-        return Response({'message': _('ok')}, status=status.HTTP_200_OK)
+        return Response({'detail': _('ok')}, status=status.HTTP_200_OK)
 
 
 class SocialLoginView(LoginView):
