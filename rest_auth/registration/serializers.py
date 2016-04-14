@@ -15,12 +15,8 @@ from rest_framework import serializers
 from requests.exceptions import HTTPError
 # Import is needed only if we are using social login, in which
 # case the allauth.socialaccount will be declared
-
 if 'allauth.socialaccount' in settings.INSTALLED_APPS:
-    try:
-        from allauth.socialaccount.helpers import complete_social_login
-    except ImportError:
-        pass
+    from allauth.socialaccount.helpers import complete_social_login
 
 
 class SocialLoginSerializer(serializers.Serializer):
