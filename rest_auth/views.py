@@ -63,9 +63,9 @@ class LoginView(GenericAPIView):
                 'user': self.user,
                 'token': self.token
             }
-            serializer = serializer_class(instance=data)
+            serializer = serializer_class(instance=data, context={'request': self.request})
         else:
-            serializer = serializer_class(instance=self.token)
+            serializer = serializer_class(instance=self.token, context={'request': self.request})
 
         return Response(serializer.data, status=status.HTTP_200_OK)
 
