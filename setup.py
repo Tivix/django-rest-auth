@@ -33,11 +33,11 @@ setup(
         'six>=1.9.0',
     ],
     extras_require={
-        'with_social': ['django-allauth>=0.24.1'],
+        'with_social': ['django-allauth>=0.25.0'],
     },
     tests_require=[
         'responses>=0.5.0',
-        'django-allauth>=0.24.1',
+        'django-allauth>=0.25.0',
     ],
     test_suite='runtests.runtests',
     include_package_data=True,
