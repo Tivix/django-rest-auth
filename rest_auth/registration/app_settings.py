@@ -5,7 +5,7 @@ from rest_auth.registration.serializers import (
 from ..utils import import_callable
 
 
-serializers = getattr(settings, 'REST_AUTH_REGISTER_SERIALIZERS', {})
+serializers = getattr(settings, 'REST_AUTH_REGISTRATION_SERIALIZERS', {})
 
 RegisterSerializer = import_callable(
     serializers.get('REGISTER_SERIALIZER', DefaultRegisterSerializer))
