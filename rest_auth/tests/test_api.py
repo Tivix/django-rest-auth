@@ -1,16 +1,16 @@
 from django.core.urlresolvers import reverse
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.contrib.auth import get_user_model
 from django.core import mail
 from django.conf import settings
-from django.test.utils import override_settings
 from django.utils.encoding import force_text
 
 from rest_framework import status
-
+from allauth.account import app_settings as account_app_settings
 from .test_base import BaseAPITestCase
 
 
+@override_settings(ROOT_URLCONF="tests.urls")
 class APITestCase1(TestCase, BaseAPITestCase):
     """
     Case #1:
@@ -18,7 +18,7 @@ class APITestCase1(TestCase, BaseAPITestCase):
     - custom registration: backend defined
     """
 
-    urls = 'tests.urls'
+    # urls = 'tests.urls'
 
     USERNAME = 'person'
     PASS = 'person'
@@ -57,7 +57,36 @@ class APITestCase1(TestCase, BaseAPITestCase):
         result['token'] = default_token_generator.make_token(user)
         return result
 
-    def test_login(self):
+    @override_settings(ACCOUNT_AUTHENTICATION_METHOD=account_app_settings.AuthenticationMethod.EMAIL)
+    def test_login_failed_email_validation(self):
+        payload = {
+            "email": '',
+            "password": self.PASS
+        }
+
+        resp = self.post(self.login_url, data=payload, status_code=400)
+        self.assertEqual(resp.json['non_field_errors'][0], u'Must include "email" and "password".')
+
+    @override_settings(ACCOUNT_AUTHENTICATION_METHOD=account_app_settings.AuthenticationMethod.USERNAME)
+    def test_login_failed_username_validation(self):
+        payload = {
+            "username": '',
+            "password": self.PASS
+        }
+
+        resp = self.post(self.login_url, data=payload, status_code=400)
+        self.assertEqual(resp.json['non_field_errors'][0], u'Must include "username" and "password".')
+
+    @override_settings(ACCOUNT_AUTHENTICATION_METHOD=account_app_settings.AuthenticationMethod.USERNAME_EMAIL)
+    def test_login_failed_username_email_validation(self):
+        payload = {
+            "password": self.PASS
+        }
+
+        resp = self.post(self.login_url, data=payload, status_code=400)
+        self.assertEqual(resp.json['non_field_errors'][0], u'Must include either "username" or "email" and "password".')
+
+    def test_allauth_login_with_username(self):
         payload = {
             "username": self.USERNAME,
             "password": self.PASS
@@ -90,6 +119,22 @@ class APITestCase1(TestCase, BaseAPITestCase):
 
         # test empty payload
         self.post(self.login_url, data={}, status_code=400)
+
+    @override_settings(ACCOUNT_AUTHENTICATION_METHOD=account_app_settings.AuthenticationMethod.EMAIL)
+    def test_allauth_login_with_email(self):
+        payload = {
+            "email": self.EMAIL,
+            "password": self.PASS
+        }
+        # there is no users in db so it should throw error (400)
+        self.post(self.login_url, data=payload, status_code=400)
+
+        self.post(self.password_change_url, status_code=403)
+
+        # create user
+        user = get_user_model().objects.create_user(self.EMAIL, email=self.EMAIL, password=self.PASS)
+
+        self.post(self.login_url, data=payload, status_code=200)
 
     @override_settings(REST_USE_JWT=True)
     def test_login_jwt(self):
@@ -147,6 +192,9 @@ class APITestCase1(TestCase, BaseAPITestCase):
 
         # test empty payload
         self.post(self.login_url, data={}, status_code=400)
+
+        # bring back allauth
+        settings.INSTALLED_APPS.append('allauth')
 
     def test_password_change(self):
         login_payload = {

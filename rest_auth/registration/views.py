@@ -68,9 +68,6 @@ class VerifyEmailView(APIView, ConfirmEmailView):
     permission_classes = (AllowAny,)
     allowed_methods = ('POST', 'OPTIONS', 'HEAD')
 
-    def get(self, *args, **kwargs):
-        raise MethodNotAllowed('GET')
-
     def post(self, request, *args, **kwargs):
         serializer = VerifyEmailSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
