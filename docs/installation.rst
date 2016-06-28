@@ -40,16 +40,21 @@ Registration (optional)
 
 1. If you want to enable standard registration process you will need to install ``django-allauth`` by using ``pip install django-rest-auth[with_social]``.
 
-2. Add ``allauth``, ``allauth.account`` and ``rest_auth.registration`` apps to INSTALLED_APPS in your django settings.py:
+2. Add ``django.contrib.sites``, ``allauth``, ``allauth.account`` and ``rest_auth.registration`` apps to INSTALLED_APPS in your django settings.py:
+
+3. Add ``SITE_ID = 1``  to your django settings.py
 
 .. code-block:: python
 
     INSTALLED_APPS = (
         ...,
+        'django.contrib.sites',
         'allauth',
         'allauth.account',
         'rest_auth.registration',
     )
+    
+    SITE_ID = 1
 
 3. Add rest_auth.registration urls:
 
@@ -79,6 +84,7 @@ Using ``django-allauth``, ``django-rest-auth`` provides helpful class for creati
         'rest_framework.authtoken',
         'rest_auth'
         ...,
+        'django.contrib.sites',
         'allauth',
         'allauth.account',
         'rest_auth.registration',
