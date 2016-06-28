@@ -49,7 +49,7 @@ class BaseAPITestCase(object):
         self.response.json = {}
         if is_json and self.response.content:
             self.response.json = json.loads(force_text(self.response.content))
-            
+
         if status_code:
             self.assertEqual(self.response.status_code, status_code)
 

@@ -132,7 +132,7 @@ class APITestCase1(TestCase, BaseAPITestCase):
         self.post(self.password_change_url, status_code=403)
 
         # create user
-        user = get_user_model().objects.create_user(self.EMAIL, email=self.EMAIL, password=self.PASS)
+        get_user_model().objects.create_user(self.EMAIL, email=self.EMAIL, password=self.PASS)
 
         self.post(self.login_url, data=payload, status_code=200)
 

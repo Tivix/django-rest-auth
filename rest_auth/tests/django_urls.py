@@ -1,16 +1,9 @@
 # Moved in Django 1.8 from django to tests/auth_tests/urls.py
 
-from django.conf.urls import include, url
-from django.contrib import admin
+from django.conf.urls import url
 from django.contrib.auth import views
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.urls import urlpatterns
-from django.contrib.messages.api import info
-from django.http import HttpRequest, HttpResponse
-from django.shortcuts import render
-from django.template import RequestContext, Template
-from django.views.decorators.cache import never_cache
 
 
 # special urls for auth test cases
