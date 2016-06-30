@@ -46,7 +46,7 @@ class TwitterLoginSerializer(serializers.Serializer):
         if not adapter_class:
             raise serializers.ValidationError('Define adapter_class in view')
 
-        adapter = adapter_class()
+        adapter = adapter_class(request)
         app = adapter.get_provider().get_app(request)
 
         if('access_token' in attrs) and ('token_secret' in attrs):
