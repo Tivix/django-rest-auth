@@ -126,7 +126,7 @@ class TestSocialAuth(TestCase, BaseAPITestCase):
             'token_secret': '1111222233334444'
         }
 
-        resp = self.post(self.tw_login_url, data=payload)
+        self.post(self.tw_login_url, data=payload)
 
         self.assertIn('key', self.response.json.keys())
         self.assertEqual(get_user_model().objects.all().count(), users_count + 1)
