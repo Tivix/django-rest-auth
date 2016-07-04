@@ -105,8 +105,7 @@ class TestSocialAuth(TestCase, BaseAPITestCase):
         self.assertIn('key', self.response.json.keys())
         self.assertEqual(get_user_model().objects.all().count(), users_count + 1)
 
-    @responses.activate
-    def test_twitter_social_auth(self):
+    def _twitter_social_auth(self):
         # fake response for twitter call
         resp_body = {
             "id": "123123123123",
@@ -135,6 +134,16 @@ class TestSocialAuth(TestCase, BaseAPITestCase):
         self.post(self.tw_login_url, data=payload, status_code=200)
         self.assertIn('key', self.response.json.keys())
         self.assertEqual(get_user_model().objects.all().count(), users_count + 1)
+
+    @responses.activate
+    @override_settings(SOCIALACCOUNT_AUTO_SIGNUP=True)
+    def test_twitter_social_auth(self):
+        self._twitter_social_auth()
+
+    @responses.activate
+    @override_settings(SOCIALACCOUNT_AUTO_SIGNUP=False)
+    def test_twitter_social_auth_without_auto_singup(self):
+        self._twitter_social_auth()
 
     @responses.activate
     @override_settings(

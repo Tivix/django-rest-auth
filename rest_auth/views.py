@@ -11,6 +11,7 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.generics import RetrieveUpdateAPIView
 
 from allauth.account import app_settings as allauth_settings
+from allauth.account.adapter import get_adapter
 
 from .app_settings import (
     TokenSerializer, UserDetailsSerializer, LoginSerializer,
@@ -53,7 +54,7 @@ class LoginView(GenericAPIView):
             self.token = create_token(self.token_model, self.user, self.serializer)
 
         if getattr(settings, 'REST_SESSION_LOGIN', True):
-            login(self.request, self.user)
+            get_adapter(self.request).login(self.request, self.user)
 
     def get_response(self):
         serializer_class = self.get_response_serializer()
@@ -70,8 +71,10 @@ class LoginView(GenericAPIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request, *args, **kwargs):
+        self.request = request
         self.serializer = self.get_serializer(data=self.request.data)
         self.serializer.is_valid(raise_exception=True)
+
         self.login()
         return self.get_response()
 
