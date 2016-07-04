@@ -15,7 +15,7 @@ class FacebookLogin(SocialLoginView):
     adapter_class = FacebookOAuth2Adapter
 
 
-class TwitterLogin(LoginView):
+class TwitterLogin(SocialLoginView):
     adapter_class = TwitterOAuthAdapter
     serializer_class = TwitterLoginSerializer
 
