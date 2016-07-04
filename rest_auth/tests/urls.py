@@ -8,7 +8,6 @@ from allauth.socialaccount.providers.twitter.views import TwitterOAuthAdapter
 from rest_auth.urls import urlpatterns
 from rest_auth.registration.views import SocialLoginView
 from rest_auth.social_serializers import TwitterLoginSerializer
-from rest_auth.views import LoginView
 
 
 class FacebookLogin(SocialLoginView):
