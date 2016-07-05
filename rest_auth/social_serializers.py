@@ -49,11 +49,8 @@ class TwitterLoginSerializer(serializers.Serializer):
         adapter = adapter_class(request)
         app = adapter.get_provider().get_app(request)
 
-        if('access_token' in attrs) and ('token_secret' in attrs):
-            access_token = attrs.get('access_token')
-            token_secret = attrs.get('token_secret')
-        else:
-            raise serializers.ValidationError('Incorrect input. access_token and token_secret are required.')
+        access_token = attrs.get('access_token')
+        token_secret = attrs.get('token_secret')
 
         request.session['oauth_api.twitter.com_access_token'] = {
             'oauth_token': access_token,

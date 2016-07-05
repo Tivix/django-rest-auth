@@ -5,6 +5,8 @@ from . import django_urls
 from allauth.socialaccount.providers.facebook.views import FacebookOAuth2Adapter
 from allauth.socialaccount.providers.twitter.views import TwitterOAuthAdapter
 
+from rest_framework.decorators import api_view
+
 from rest_auth.urls import urlpatterns
 from rest_auth.registration.views import SocialLoginView
 from rest_auth.social_serializers import TwitterLoginSerializer
@@ -19,6 +21,23 @@ class TwitterLogin(SocialLoginView):
     serializer_class = TwitterLoginSerializer
 
 
+class TwitterLoginSerializerFoo(TwitterLoginSerializer):
+    pass
+
+
+@api_view(['POST'])
+def twitter_login_view(request):
+    serializer = TwitterLoginSerializerFoo(
+        data={'access_token': '11223344', 'token_secret': '55667788'},
+        context={'request': request}
+    )
+    serializer.is_valid(raise_exception=True)
+
+
+class TwitterLoginNoAdapter(SocialLoginView):
+    serializer_class = TwitterLoginSerializer
+
+
 urlpatterns += [
     url(r'^rest-registration/', include('rest_auth.registration.urls')),
     url(r'^test-admin/', include(django_urls)),
@@ -28,5 +47,7 @@ urlpatterns += [
         name='account_confirm_email'),
     url(r'^social-login/facebook/$', FacebookLogin.as_view(), name='fb_login'),
     url(r'^social-login/twitter/$', TwitterLogin.as_view(), name='tw_login'),
+    url(r'^social-login/twitter-no-view/$', twitter_login_view, name='tw_login_no_view'),
+    url(r'^social-login/twitter-no-adapter/$', TwitterLoginNoAdapter.as_view(), name='tw_login_no_adapter'),
     url(r'^accounts/', include('allauth.socialaccount.urls'))
 ]

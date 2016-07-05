@@ -146,6 +146,79 @@ class TestSocialAuth(TestCase, BaseAPITestCase):
         self._twitter_social_auth()
 
     @responses.activate
+    def test_twitter_social_auth_request_error(self):
+        # fake response for twitter call
+        resp_body = {
+            "id": "123123123123",
+        }
+
+        responses.add(
+            responses.GET,
+            'https://api.twitter.com/1.1/account/verify_credentials.json',
+            body=json.dumps(resp_body),
+            status=400,
+            content_type='application/json'
+        )
+
+        users_count = get_user_model().objects.all().count()
+        payload = {
+            'access_token': 'abc123',
+            'token_secret': '1111222233334444'
+        }
+
+        self.post(self.tw_login_url, data=payload, status_code=400)
+        self.assertNotIn('key', self.response.json.keys())
+        self.assertEqual(get_user_model().objects.all().count(), users_count)
+
+    @responses.activate
+    def test_twitter_social_auth_no_view_in_context(self):
+        # fake response for twitter call
+        resp_body = {
+            "id": "123123123123",
+        }
+
+        responses.add(
+            responses.GET,
+            'https://api.twitter.com/1.1/account/verify_credentials.json',
+            body=json.dumps(resp_body),
+            status=400,
+            content_type='application/json'
+        )
+
+        users_count = get_user_model().objects.all().count()
+        payload = {
+            'access_token': 'abc123',
+            'token_secret': '1111222233334444'
+        }
+
+        self.post(self.tw_login_no_view_url, data=payload, status_code=400)
+        self.assertEqual(get_user_model().objects.all().count(), users_count)
+
+    @responses.activate
+    def test_twitter_social_auth_no_adapter(self):
+        # fake response for twitter call
+        resp_body = {
+            "id": "123123123123",
+        }
+
+        responses.add(
+            responses.GET,
+            'https://api.twitter.com/1.1/account/verify_credentials.json',
+            body=json.dumps(resp_body),
+            status=400,
+            content_type='application/json'
+        )
+
+        users_count = get_user_model().objects.all().count()
+        payload = {
+            'access_token': 'abc123',
+            'token_secret': '1111222233334444'
+        }
+
+        self.post(self.tw_login_no_adapter_url, data=payload, status_code=400)
+        self.assertEqual(get_user_model().objects.all().count(), users_count)
+
+    @responses.activate
     @override_settings(
         ACCOUNT_EMAIL_VERIFICATION='mandatory',
         ACCOUNT_EMAIL_REQUIRED=True,

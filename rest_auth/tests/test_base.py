@@ -100,6 +100,8 @@ class BaseAPITestCase(object):
         self.veirfy_email_url = reverse('rest_verify_email')
         self.fb_login_url = reverse('fb_login')
         self.tw_login_url = reverse('tw_login')
+        self.tw_login_no_view_url = reverse('tw_login_no_view')
+        self.tw_login_no_adapter_url = reverse('tw_login_no_adapter')
 
     def _login(self):
         payload = {
