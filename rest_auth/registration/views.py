@@ -28,6 +28,7 @@ class RegisterView(CreateAPIView):
     serializer_class = RegisterSerializer
     permission_classes = (AllowAny, )
     token_model = TokenModel
+    throttle_scope = 'register_view'
 
     def get_response_data(self, user):
         if allauth_settings.EMAIL_VERIFICATION == \
