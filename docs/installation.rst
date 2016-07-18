@@ -114,7 +114,7 @@ Facebook
 
 .. code-block:: python
 
-    urlpatterns += pattern('',
+    urlpatterns += patterns('',
         ...,
         url(r'^rest-auth/facebook/$', FacebookLogin.as_view(), name='fb_login')
     )
@@ -141,7 +141,7 @@ If you are using Twitter for your social authentication, it is a bit different s
 
 .. code-block:: python
 
-    urlpatterns += pattern('',
+    urlpatterns += patterns('',
         ...,
         url(r'^rest-auth/twitter/$', TwitterLogin.as_view(), name='twitter_login')
     )
