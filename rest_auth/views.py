@@ -1,4 +1,7 @@
-from django.contrib.auth import login, logout
+from django.contrib.auth import (
+    login as django_login,
+    logout as django_logout
+)
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.translation import ugettext_lazy as _
@@ -37,6 +40,9 @@ class LoginView(GenericAPIView):
     serializer_class = LoginSerializer
     token_model = TokenModel
 
+    def process_login(self):
+        django_login(self.request, self.user)
+
     def get_response_serializer(self):
         if getattr(settings, 'REST_USE_JWT', False):
             response_serializer = JWTSerializer
@@ -53,7 +59,7 @@ class LoginView(GenericAPIView):
             self.token = create_token(self.token_model, self.user, self.serializer)
 
         if getattr(settings, 'REST_SESSION_LOGIN', True):
-            login(self.request, self.user)
+            self.process_login()
 
     def get_response(self):
         serializer_class = self.get_response_serializer()
@@ -70,8 +76,10 @@ class LoginView(GenericAPIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request, *args, **kwargs):
+        self.request = request
         self.serializer = self.get_serializer(data=self.request.data)
         self.serializer.is_valid(raise_exception=True)
+
         self.login()
         return self.get_response()
 
@@ -106,7 +114,7 @@ class LogoutView(APIView):
         except (AttributeError, ObjectDoesNotExist):
             pass
 
-        logout(request)
+        django_logout(request)
 
         return Response({"success": _("Successfully logged out.")},
                         status=status.HTTP_200_OK)
