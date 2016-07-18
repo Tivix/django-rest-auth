@@ -28,7 +28,7 @@ setup(
     keywords='django rest auth registration rest-framework django-registration api',
     zip_safe=False,
     install_requires=[
-        'Django>=1.7.0',
+        'Django>=1.8.0',
         'djangorestframework>=3.1.0',
         'six>=1.9.0',
     ],
