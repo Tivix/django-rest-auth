@@ -4,6 +4,7 @@ Changelog
 0.8.0
 -----
 - added support for django-rest-framework-jwt
+- bugfixes
 
 0.7.0
 -----
