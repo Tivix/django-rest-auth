@@ -14,8 +14,11 @@ FAQ
 
     You should override this view/url to handle it in your API client somehow and then, send post to /verify-email/ endpoint with proper key.
     If you don't want to use API on that step, then just use ConfirmEmailView view from:
-    djang-allauth https://github.com/pennersr/django-allauth/blob/master/allauth/account/views.py#L190
+    djang-allauth https://github.com/pennersr/django-allauth/blob/master/allauth/account/views.py
 
+    Note: After 0.25.2 version django-allauth introduced a new pattern for account_confirm_email
+    .. code-block:: python
+        url(r'^account-confirm-email/(?P<key>[-:\w]+)/$', TemplateView.as_view(),
 
 2. I get an error: Reverse for 'password_reset_confirm' not found.
 
