@@ -58,6 +58,7 @@ class RegisterView(CreateAPIView):
             self.token = jwt_encode(user)
         else:
             create_token(self.token_model, user, serializer)
+
         complete_signup(self.request._request, user,
                         allauth_settings.EMAIL_VERIFICATION,
                         None)

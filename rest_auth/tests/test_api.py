@@ -419,7 +419,8 @@ class APITestCase1(TestCase, BaseAPITestCase):
 
     @override_settings(
         ACCOUNT_EMAIL_VERIFICATION='mandatory',
-        ACCOUNT_EMAIL_REQUIRED=True
+        ACCOUNT_EMAIL_REQUIRED=True,
+        ACCOUNT_EMAIL_CONFIRMATION_HMAC=False
     )
     def test_registration_with_email_verification(self):
         user_count = get_user_model().objects.all().count()

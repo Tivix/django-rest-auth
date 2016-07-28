@@ -222,7 +222,8 @@ class TestSocialAuth(TestCase, BaseAPITestCase):
     @override_settings(
         ACCOUNT_EMAIL_VERIFICATION='mandatory',
         ACCOUNT_EMAIL_REQUIRED=True,
-        REST_SESSION_LOGIN=False
+        REST_SESSION_LOGIN=False,
+        ACCOUNT_EMAIL_CONFIRMATION_HMAC=False
     )
     def test_edge_case(self):
         resp_body = {
