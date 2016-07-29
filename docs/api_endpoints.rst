@@ -35,6 +35,7 @@ Basic
     - new_password1
     - new_password2
     - old_password
+    - token
 
 
     .. note:: ``OLD_PASSWORD_FIELD_ENABLED = True`` to use old_password.
@@ -48,6 +49,7 @@ Basic
     - first_name
     - last_name
     - email
+    - token
 
 
 Registration
