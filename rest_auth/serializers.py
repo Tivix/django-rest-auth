@@ -103,7 +103,7 @@ class LoginSerializer(serializers.Serializer):
             if app_settings.EMAIL_VERIFICATION == app_settings.EmailVerificationMethod.MANDATORY:
                 email_address = user.emailaddress_set.get(email=user.email)
                 if not email_address.verified:
-                    raise serializers.ValidationError('E-mail is not verified.')
+                    raise serializers.ValidationError(_('E-mail is not verified.'))
 
         attrs['user'] = user
         return attrs
@@ -130,6 +130,14 @@ class UserDetailsSerializer(serializers.ModelSerializer):
         read_only_fields = ('email', )
 
 
+class JWTSerializer(serializers.Serializer):
+    """
+    Serializer for JWT authentication.
+    """
+    token = serializers.CharField()
+    user = UserDetailsSerializer()
+
+
 class PasswordResetSerializer(serializers.Serializer):
 
     """
@@ -149,7 +157,7 @@ class PasswordResetSerializer(serializers.Serializer):
         # Create PasswordResetForm with the serializer
         self.reset_form = self.password_reset_form_class(data=self.initial_data)
         if not self.reset_form.is_valid():
-            raise serializers.ValidationError(_('Error'))
+            raise serializers.ValidationError(self.reset_form.errors)
 
         return value
 

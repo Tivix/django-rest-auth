@@ -1,6 +1,18 @@
 Changelog
 =========
 
+0.8.0
+-----
+- added support for django-rest-framework-jwt
+- bugfixes
+
+0.7.0
+-----
+- Wrapped API returned strings in ugettext_lazy
+- Fixed not using ``get_username`` which caused issues when using custom user model without username field
+- Django 1.9 support
+- Added ``TwitterLoginSerializer``
+
 0.6.0
 -----
 - dropped support for Python 2.6

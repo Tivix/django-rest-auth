@@ -18,7 +18,7 @@ f.close()
 
 setup(
     name='django-rest-auth',
-    version='0.6.0',
+    version='0.8.1',
     author='Sumit Chachra',
     author_email='chachra@tivix.com',
     url='http://github.com/Tivix/django-rest-auth',
@@ -28,16 +28,16 @@ setup(
     keywords='django rest auth registration rest-framework django-registration api',
     zip_safe=False,
     install_requires=[
-        'Django>=1.7.0',
+        'Django>=1.8.0',
         'djangorestframework>=3.1.0',
         'six>=1.9.0',
     ],
     extras_require={
-        'with_social': ['django-allauth>=0.24.1'],
+        'with_social': ['django-allauth>=0.25.0'],
     },
     tests_require=[
         'responses>=0.5.0',
-        'django-allauth>=0.24.1',
+        'django-allauth>=0.25.0',
     ],
     test_suite='runtests.runtests',
     include_package_data=True,

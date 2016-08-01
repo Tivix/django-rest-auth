@@ -2,6 +2,7 @@ from django.conf import settings
 
 from rest_auth.serializers import (
     TokenSerializer as DefaultTokenSerializer,
+    JWTSerializer as DefaultJWTSerializer,
     UserDetailsSerializer as DefaultUserDetailsSerializer,
     LoginSerializer as DefaultLoginSerializer,
     PasswordResetSerializer as DefaultPasswordResetSerializer,
@@ -16,6 +17,9 @@ serializers = getattr(settings, 'REST_AUTH_SERIALIZERS', {})
 
 TokenSerializer = import_callable(
     serializers.get('TOKEN_SERIALIZER', DefaultTokenSerializer))
+
+JWTSerializer = import_callable(
+    serializers.get('JWT_SERIALIZER', DefaultJWTSerializer))
 
 UserDetailsSerializer = import_callable(
     serializers.get('USER_DETAILS_SERIALIZER', DefaultUserDetailsSerializer)

@@ -1,0 +1,99 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2016-02-02 14:11+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: registration/serializers.py:54
+msgid "View is not defined, pass it as a context variable"
+msgstr "\"View\" ist nicht definiert, übergib es als Contextvariable"
+
+#: registration/serializers.py:59
+msgid "Define adapter_class in view"
+msgstr "Definier \"adapter_class\" in view"
+
+#: registration/serializers.py:78
+msgid "Define callback_url in view"
+msgstr "Definier \"callback_url\" in view"
+
+#: registration/serializers.py:82
+msgid "Define client_class in view"
+msgstr "Definier \"client_class\" in view"
+
+#: registration/serializers.py:102
+msgid "Incorrect input. access_token or code is required."
+msgstr "Falsche Eingabe. \"access_token\" oder \"code\" erforderlich."
+
+#: registration/serializers.py:111
+msgid "Incorrect value"
+msgstr "Falscher Wert."
+
+#: registration/serializers.py:140
+msgid "A user is already registered with this e-mail address."
+msgstr "Ein User mit dieser E-Mail Adresse ist schon registriert."
+
+#: registration/serializers.py:148
+msgid "The two password fields didn't match."
+msgstr "Die beiden Passwörter sind nicht identisch."
+
+#: registration/views.py:64
+msgid "ok"
+msgstr "Ok"
+
+#: serializers.py:29
+msgid "Must include \"email\" and \"password\"."
+msgstr "Muss \"email\" und \"password\" enthalten."
+
+#: serializers.py:40
+msgid "Must include \"username\" and \"password\"."
+msgstr "Muss \"username\" und \"password\" enthalten."
+
+#: serializers.py:53
+msgid "Must include either \"username\" or \"email\" and \"password\"."
+msgstr "Muss entweder \"username\" oder \"email\" und password \"password\""
+
+#: serializers.py:94
+msgid "User account is disabled."
+msgstr "Der Useraccount ist deaktiviert."
+
+#: serializers.py:97
+msgid "Unable to log in with provided credentials."
+msgstr "Kann nicht mit den angegeben Zugangsdaten anmelden."
+
+#: serializers.py:106
+msgid "E-mail is not verified."
+msgstr "E-Mail Adresse ist nicht verifiziert."
+
+#: serializers.py:152
+msgid "Error"
+msgstr "Fehler"
+
+#: views.py:71
+msgid "Successfully logged out."
+msgstr "Erfolgreich ausgeloggt."
+
+#: views.py:111
+msgid "Password reset e-mail has been sent."
+msgstr "Die E-Mail zum Zurücksetzen des Passwortes wurde verschickt."
+
+#: views.py:132
+msgid "Password has been reset with the new password."
+msgstr "Das Passwort wurde mit dem neuen Passwort ersetzt."
+
+#: views.py:150
+msgid "New password has been saved."
+msgstr "Das neue Passwort wurde gespeichert."

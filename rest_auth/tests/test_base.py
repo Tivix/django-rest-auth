@@ -37,17 +37,22 @@ class BaseAPITestCase(object):
 
         # check_headers = kwargs.pop('check_headers', True)
         if hasattr(self, 'token'):
-            kwargs['HTTP_AUTHORIZATION'] = 'Token %s' % self.token
+            if getattr(settings, 'REST_USE_JWT', False):
+                kwargs['HTTP_AUTHORIZATION'] = 'JWT %s' % self.token
+            else:
+                kwargs['HTTP_AUTHORIZATION'] = 'Token %s' % self.token
 
         self.response = request_func(*args, **kwargs)
         is_json = bool(
             [x for x in self.response._headers['content-type'] if 'json' in x])
+
+        self.response.json = {}
         if is_json and self.response.content:
             self.response.json = json.loads(force_text(self.response.content))
-        else:
-            self.response.json = {}
+
         if status_code:
             self.assertEqual(self.response.status_code, status_code)
+
         return self.response
 
     def post(self, *args, **kwargs):
@@ -94,6 +99,9 @@ class BaseAPITestCase(object):
         self.user_url = reverse('rest_user_details')
         self.veirfy_email_url = reverse('rest_verify_email')
         self.fb_login_url = reverse('fb_login')
+        self.tw_login_url = reverse('tw_login')
+        self.tw_login_no_view_url = reverse('tw_login_no_view')
+        self.tw_login_no_adapter_url = reverse('tw_login_no_adapter')
 
     def _login(self):
         payload = {
