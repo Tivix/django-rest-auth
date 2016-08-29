@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model, authenticate
+from django.core.exceptions import ObjectDoesNotExist
 from django.conf import settings
 from django.contrib.auth.forms import PasswordResetForm, SetPasswordForm
 from django.contrib.auth.tokens import default_token_generator
@@ -102,7 +103,10 @@ class LoginSerializer(serializers.Serializer):
         if 'rest_auth.registration' in settings.INSTALLED_APPS:
             from allauth.account import app_settings
             if app_settings.EMAIL_VERIFICATION == app_settings.EmailVerificationMethod.MANDATORY:
-                email_address = user.emailaddress_set.get(email=user.email)
+                try:
+                    email_address = user.emailaddress_set.get(email=user.email)
+                except ObjectDoesNotExist:
+                    raise serializers.ValidationError(_('E-mail for this user not created'))
                 if not email_address.verified:
                     raise serializers.ValidationError(_('E-mail is not verified.'))
 
