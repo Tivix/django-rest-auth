@@ -82,8 +82,7 @@ class LoginSerializer(serializers.Serializer):
             # Authentication without using allauth
             if email:
                 try:
-                    username = UserModel.objects.get(
-                        email__iexact=email).username
+                    username = UserModel.objects.get(email__iexact=email).get_username()
                 except UserModel.DoesNotExist:
                     pass
 
@@ -105,8 +104,7 @@ class LoginSerializer(serializers.Serializer):
             if app_settings.EMAIL_VERIFICATION == app_settings.EmailVerificationMethod.MANDATORY:
                 email_address = user.emailaddress_set.get(email=user.email)
                 if not email_address.verified:
-                    raise serializers.ValidationError(_(
-                        'E-mail is not verified.'))
+                    raise serializers.ValidationError(_('E-mail is not verified.'))
 
         attrs['user'] = user
         return attrs
@@ -134,6 +132,14 @@ class UserDetailsSerializer(serializers.ModelSerializer):
         read_only_fields = ('email', )
 
 
+class JWTSerializer(serializers.Serializer):
+    """
+    Serializer for JWT authentication.
+    """
+    token = serializers.CharField()
+    user = UserDetailsSerializer()
+
+
 class PasswordResetSerializer(serializers.Serializer):
 
     """
@@ -154,7 +160,7 @@ class PasswordResetSerializer(serializers.Serializer):
         self.reset_form = self.password_reset_form_class(
             data=self.initial_data)
         if not self.reset_form.is_valid():
-            raise serializers.ValidationError(_('Error'))
+            raise serializers.ValidationError(self.reset_form.errors)
 
         return value
 

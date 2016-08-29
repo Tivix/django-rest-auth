@@ -15,13 +15,8 @@ from rest_framework import serializers
 from requests.exceptions import HTTPError
 # Import is needed only if we are using social login, in which
 # case the allauth.socialaccount will be declared
-
 if 'allauth.socialaccount' in settings.INSTALLED_APPS:
-    try:
-        from allauth.socialaccount.helpers import complete_social_login
-    except ImportError:
-        pass
-
+    from allauth.socialaccount.helpers import complete_social_login
 
 class SocialLoginSerializer(serializers.Serializer):
     access_token = serializers.CharField(required=False, allow_blank=True)
@@ -59,10 +54,9 @@ class SocialLoginSerializer(serializers.Serializer):
 
         adapter_class = getattr(view, 'adapter_class', None)
         if not adapter_class:
-            raise serializers.ValidationError(
-                _('Define adapter_class in view'))
+            raise serializers.ValidationError(_('Define adapter_class in view'))
 
-        adapter = adapter_class()
+        adapter = adapter_class(request)
         app = adapter.get_provider().get_app(request)
 
         # More info on code vs access_token
@@ -103,8 +97,7 @@ class SocialLoginSerializer(serializers.Serializer):
             access_token = token['access_token']
 
         else:
-            raise serializers.ValidationError(
-                _('Incorrect input. access_token or code is required.'))
+            raise serializers.ValidationError(_('Incorrect input. access_token or code is required.'))
 
         token = adapter.parse_token({'access_token': access_token})
         token.app = app
@@ -113,7 +106,7 @@ class SocialLoginSerializer(serializers.Serializer):
             login = self.get_social_login(adapter, app, token, access_token)
             complete_social_login(request, login)
         except HTTPError:
-            raise serializers.ValidationError('Incorrect value')
+            raise serializers.ValidationError(_('Incorrect value'))
 
         if not login.is_existing:
             login.lookup()
@@ -150,8 +143,7 @@ class RegisterSerializer(serializers.Serializer):
 
     def validate(self, data):
         if data['password1'] != data['password2']:
-            raise serializers.ValidationError(
-                _("The two password fields didn't match."))
+            raise serializers.ValidationError(_("The two password fields didn't match."))
         return data
 
     def custom_signup(self, request, user):
