@@ -13,7 +13,8 @@ from rest_framework.generics import GenericAPIView
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.generics import RetrieveUpdateAPIView
 
-from allauth.account import app_settings as allauth_settings
+if 'allauth' in settings.INSTALLED_APPS:
+    from allauth.account import app_settings as allauth_settings
 
 from .app_settings import (
     TokenSerializer, UserDetailsSerializer, LoginSerializer,
