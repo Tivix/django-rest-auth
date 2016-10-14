@@ -150,11 +150,11 @@ class RegisterSerializer(serializers.Serializer):
         pass
 
     def get_cleaned_data(self):
-        return {
-            'username': self.validated_data.get('username', ''),
-            'password1': self.validated_data.get('password1', ''),
-            'email': self.validated_data.get('email', '')
-        }
+        data = self.validated_data
+        data.setdefault('username', '')
+        data.setdefault('password1', '')
+        data.setdefault('email', '')
+        return data
 
     def save(self, request):
         adapter = get_adapter()
