@@ -26,7 +26,7 @@ class TwitterLoginSerializer(serializers.Serializer):
         :param app: `allauth.socialaccount.SocialApp` instance
         :param token: `allauth.socialaccount.SocialToken` instance
         :param response: Provider's response for OAuth1. Not used in the
-        :return: :return: A populated instance of the `allauth.socialaccount.SocialLoginView` instance
+        :returns: A populated instance of the `allauth.socialaccount.SocialLoginView` instance
         """
         request = self._get_request()
         social_login = adapter.complete_login(request, app, token, response=response)

@@ -7,14 +7,14 @@ FAQ
 
     .. code-block:: python
 
-        url(r'^account-confirm-email/(?P<key>\w+)/$', TemplateView.as_view(),
+        url(r'^account-confirm-email/(?P<key>[-:\w]+)/$', TemplateView.as_view(),
             name='account_confirm_email'),
 
     This url is used by django-allauth. Empty TemplateView is defined just to allow reverse() call inside app - when email with verification link is being sent.
 
     You should override this view/url to handle it in your API client somehow and then, send post to /verify-email/ endpoint with proper key.
     If you don't want to use API on that step, then just use ConfirmEmailView view from:
-    djang-allauth https://github.com/pennersr/django-allauth/blob/master/allauth/account/views.py#L190
+    django-allauth https://github.com/pennersr/django-allauth/blob/master/allauth/account/views.py
 
 
 2. I get an error: Reverse for 'password_reset_confirm' not found.

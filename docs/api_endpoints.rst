@@ -77,6 +77,8 @@ Basing on example from installation section :doc:`Installation </installation>`
     - access_token
     - code
 
+    .. note:: ``access_token`` OR ``code`` can be used as standalone arguments, see https://github.com/Tivix/django-rest-auth/blob/master/rest_auth/registration/views.py
+
 - /rest-auth/twitter/ (POST)
 
     - access_token

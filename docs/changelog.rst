@@ -4,6 +4,7 @@ Changelog
 0.8.0
 -----
 - added support for django-rest-framework-jwt
+- added support for django-allauth hmac email confirmation pattern
 - bugfixes
 
 0.7.0
