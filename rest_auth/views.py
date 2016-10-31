@@ -9,9 +9,8 @@ from django.utils.translation import ugettext_lazy as _
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.generics import GenericAPIView
+from rest_framework.generics import GenericAPIView, RetrieveUpdateAPIView
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from rest_framework.generics import RetrieveUpdateAPIView
 
 if 'allauth' in settings.INSTALLED_APPS:
     from allauth.account import app_settings as allauth_settings
@@ -22,7 +21,6 @@ from .app_settings import (
     PasswordChangeSerializer, JWTSerializer, create_token
 )
 from .models import TokenModel
-
 from .utils import jwt_encode
 
 
@@ -123,13 +121,14 @@ class LogoutView(APIView):
 
 class UserDetailsView(RetrieveUpdateAPIView):
     """
-    Returns User's details in JSON format.
+    Reads and updates UserModel fields
+    Accepts GET, PUT, PATCH methods.
 
-    Accepts the following GET parameters: token
-    Accepts the following POST parameters:
-        Required: token
-        Optional: email, first_name, last_name and UserProfile fields
-    Returns the updated UserProfile and/or User object.
+    Default accepted fields: username, first_name, last_name
+    Default display fields: pk, username, email, first_name, last_name
+    Read-only fields: pk, email
+
+    Returns UserModel fields.
     """
     serializer_class = UserDetailsSerializer
     permission_classes = (IsAuthenticated,)

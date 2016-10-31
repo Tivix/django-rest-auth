@@ -63,11 +63,11 @@ class SocialLoginSerializer(serializers.Serializer):
         # http://stackoverflow.com/questions/8666316/facebook-oauth-2-0-code-and-token
 
         # Case 1: We received the access_token
-        if('access_token' in attrs):
+        if 'access_token' in attrs:
             access_token = attrs.get('access_token')
 
         # Case 2: We received the authorization code
-        elif('code' in attrs):
+        elif 'code' in attrs:
             self.callback_url = getattr(view, 'callback_url', None)
             self.client_class = getattr(view, 'client_class', None)
 
