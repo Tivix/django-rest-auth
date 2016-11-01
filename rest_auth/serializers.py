@@ -135,7 +135,16 @@ class JWTSerializer(serializers.Serializer):
     Serializer for JWT authentication.
     """
     token = serializers.CharField()
-    user = UserDetailsSerializer()
+
+    def __init__(self, *args, **kwargs):
+        """
+        Need to add `user` field dynamically, to allow using
+        custom UserDetailsSerializer
+        """
+        from app_settings import UserDetailsSerializer
+
+        super(JWTSerializer, self).__init__(*args, **kwargs)
+        self.fields['user'] = UserDetailsSerializer()
 
 
 class PasswordResetSerializer(serializers.Serializer):
