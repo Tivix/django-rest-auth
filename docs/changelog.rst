@@ -1,10 +1,18 @@
 Changelog
 =========
 
+0.8.2
+-----
+- fixed allauth import error
+- added swagger docs to demo project
+
+0.8.1
+-----
+- added support for django-allauth hmac email confirmation pattern
+
 0.8.0
 -----
 - added support for django-rest-framework-jwt
-- added support for django-allauth hmac email confirmation pattern
 - bugfixes
 
 0.7.0
