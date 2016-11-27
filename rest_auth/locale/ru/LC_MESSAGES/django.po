@@ -46,7 +46,7 @@ msgstr "Некорректное значение"
 
 #: registration/serializers.py:138
 msgid "A user is already registered with this e-mail address."
-msgstr "Пользователь с таким email уже зарегистрирован."
+msgstr "Пользователь с таким e-mail уже зарегистрирован."
 
 #: registration/serializers.py:146
 msgid "The two password fields didn't match."
@@ -78,7 +78,7 @@ msgstr "Невозможно войти в систему с указанным�
 
 #: serializers.py:106
 msgid "E-mail is not verified."
-msgstr "Email не подтверждён."
+msgstr "E-mail не подтверждён."
 
 #: views.py:118
 msgid "Successfully logged out."
@@ -86,7 +86,7 @@ msgstr "Успешно вышли."
 
 #: views.py:160
 msgid "Password reset e-mail has been sent."
-msgstr "Письмо с восстановлением пароля выслано."
+msgstr "Письмо с инструкциями по восстановлению пароля выслано."
 
 #: views.py:181
 msgid "Password has been reset with the new password."
