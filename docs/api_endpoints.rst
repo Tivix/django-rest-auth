@@ -13,7 +13,7 @@ Basic
 
 - /rest-auth/logout/ (POST, GET)
 
-    .. note:: ``ACCOUNT_LOGOUT_ON_GET = True`` to allow logout using GET (this is the exact same conf from allauth)
+    .. note:: (requires allauth) ``ACCOUNT_LOGOUT_ON_GET = True`` to allow logout using GET - this is the exact same conf from allauth. NOT recommended, see: http://django-allauth.readthedocs.io/en/latest/views.html#logout
 
     - token
 

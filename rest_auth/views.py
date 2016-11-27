@@ -94,13 +94,10 @@ class LogoutView(APIView):
     permission_classes = (AllowAny,)
 
     def get(self, request, *args, **kwargs):
-        try:
-            if allauth_settings.LOGOUT_ON_GET:
-                response = self.logout(request)
-            else:
-                response = self.http_method_not_allowed(request, *args, **kwargs)
-        except Exception as exc:
-            response = self.handle_exception(exc)
+        if 'allauth' in settings.INSTALLED_APPS and allauth_settings.LOGOUT_ON_GET:
+            response = self.logout(request)
+        else:
+            response = self.http_method_not_allowed(request, *args, **kwargs)
 
         return self.finalize_response(request, response, *args, **kwargs)
 
