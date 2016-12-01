@@ -13,9 +13,9 @@ Basic
 
 - /rest-auth/logout/ (POST, GET)
 
-    .. note:: ``ACCOUNT_LOGOUT_ON_GET = True`` to allow logout using GET (this is the exact same conf from allauth)
-
     - token
+
+    .. note:: ``ACCOUNT_LOGOUT_ON_GET = True`` to allow logout using GET - this is the exact same configuration from allauth. NOT recommended, see: http://django-allauth.readthedocs.io/en/latest/views.html#logout
 
 - /rest-auth/password/reset/ (POST)
 
@@ -36,7 +36,6 @@ Basic
     - new_password2
     - old_password
     - token
-
 
     .. note:: ``OLD_PASSWORD_FIELD_ENABLED = True`` to use old_password.
     .. note:: ``LOGOUT_ON_PASSWORD_CHANGE = False`` to keep the user logged in after password change
