@@ -131,8 +131,8 @@ class UserDetailsSerializer(serializers.ModelSerializer):
         read_only_fields = ('email', )
 
 
-# Required to allow using custom UserDetailsSerializer in
-# JWTSerializer
+# Required to allow using custom USER_DETAILS_SERIALIZER  in
+# JWTSerializer. Defining it here to avoid circular imports
 rest_auth_serializers = getattr(settings, 'REST_AUTH_SERIALIZERS', {})
 JWTUserDetailsSerializer = import_callable(
     rest_auth_serializers.get('USER_DETAILS_SERIALIZER', UserDetailsSerializer)
