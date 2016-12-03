@@ -99,11 +99,11 @@ class SocialLoginSerializer(serializers.Serializer):
         else:
             raise serializers.ValidationError(_('Incorrect input. access_token or code is required.'))
 
-        token = adapter.parse_token({'access_token': access_token})
-        token.app = app
+        social_token = adapter.parse_token({'access_token': access_token})
+        social_token.app = app
 
         try:
-            login = self.get_social_login(adapter, app, token, access_token)
+            login = self.get_social_login(adapter, app, social_token, access_token)
             complete_social_login(request, login)
         except HTTPError:
             raise serializers.ValidationError(_('Incorrect value'))
