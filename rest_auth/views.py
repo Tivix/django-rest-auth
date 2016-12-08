@@ -158,10 +158,11 @@ class PasswordResetView(GenericAPIView):
 
 class PasswordResetConfirmView(GenericAPIView):
     """
-    Password reset e-mail link is confirmed, therefore this resets the user's password.
+    Password reset e-mail link is confirmed, therefore
+    this resets the user's password.
 
-    Accepts the following POST parameters: new_password1, new_password2
-    Accepts the following Django URL arguments: token, uid
+    Accepts the following POST parameters: token, uid,
+        new_password1, new_password2
     Returns the success/fail message.
     """
 

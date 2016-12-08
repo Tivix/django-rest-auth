@@ -6,14 +6,13 @@ Basic
 
 - /rest-auth/login/ (POST)
 
-    - username (string)
-    - email (string)
-    - password (string)
+    - username
+    - email
+    - password
 
+    Returns Token Object's key
 
-- /rest-auth/logout/ (POST, GET)
-
-    - token
+- /rest-auth/logout/ (POST)
 
     .. note:: ``ACCOUNT_LOGOUT_ON_GET = True`` to allow logout using GET - this is the exact same configuration from allauth. NOT recommended, see: http://django-allauth.readthedocs.io/en/latest/views.html#logout
 
@@ -35,20 +34,17 @@ Basic
     - new_password1
     - new_password2
     - old_password
-    - token
 
     .. note:: ``OLD_PASSWORD_FIELD_ENABLED = True`` to use old_password.
     .. note:: ``LOGOUT_ON_PASSWORD_CHANGE = False`` to keep the user logged in after password change
 
-- /rest-auth/user/ (GET)
-
-- /rest-auth/user/ (PUT/PATCH)
+- /rest-auth/user/ (GET, PUT, PATCH)
 
     - username
     - first_name
     - last_name
-    - email
-    - token
+
+    Returns pk, username, email, first_name, last_name
 
 
 Registration
