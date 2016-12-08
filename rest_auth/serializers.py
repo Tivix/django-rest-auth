@@ -181,9 +181,8 @@ class PasswordResetConfirmSerializer(serializers.Serializer):
 
     new_password1 = serializers.CharField(max_length=128)
     new_password2 = serializers.CharField(max_length=128)
-
-    uid = serializers.CharField(required=True)
-    token = serializers.CharField(required=True)
+    uid = serializers.CharField()
+    token = serializers.CharField()
 
     set_password_form_class = SetPasswordForm
 
