@@ -6,10 +6,11 @@ from django.utils.http import urlsafe_base64_decode as uid_decoder
 from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import force_text
 
-from .models import TokenModel
-
 from rest_framework import serializers, exceptions
 from rest_framework.exceptions import ValidationError
+
+from .models import TokenModel
+from .utils import import_callable
 
 # Get the UserModel
 UserModel = get_user_model()
@@ -130,12 +131,20 @@ class UserDetailsSerializer(serializers.ModelSerializer):
         read_only_fields = ('email', )
 
 
+# Required to allow using custom USER_DETAILS_SERIALIZER  in
+# JWTSerializer. Defining it here to avoid circular imports
+rest_auth_serializers = getattr(settings, 'REST_AUTH_SERIALIZERS', {})
+JWTUserDetailsSerializer = import_callable(
+    rest_auth_serializers.get('USER_DETAILS_SERIALIZER', UserDetailsSerializer)
+)
+
+
 class JWTSerializer(serializers.Serializer):
     """
     Serializer for JWT authentication.
     """
     token = serializers.CharField()
-    user = UserDetailsSerializer()
+    user = JWTUserDetailsSerializer()
 
 
 class PasswordResetSerializer(serializers.Serializer):
