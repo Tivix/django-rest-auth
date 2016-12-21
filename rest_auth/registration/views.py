@@ -1,7 +1,7 @@
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 
-from rest_framework.views import APIView
+from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from rest_framework.generics import CreateAPIView
@@ -64,10 +64,9 @@ class RegisterView(CreateAPIView):
         return user
 
 
-class VerifyEmailView(APIView, ConfirmEmailView):
-
+class VerifyEmailView(GenericAPIView):
+    serializer_class = VerifyEmailSerializer
     permission_classes = (AllowAny,)
-    allowed_methods = ('POST', 'OPTIONS', 'HEAD')
 
     def get_serializer(self, *args, **kwargs):
         return VerifyEmailSerializer(*args, **kwargs)
@@ -75,8 +74,9 @@ class VerifyEmailView(APIView, ConfirmEmailView):
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        self.kwargs['key'] = serializer.validated_data['key']
-        confirmation = self.get_object()
+        view = ConfirmEmailView()
+        view.kwargs = {'key': serializer.validated_data['key']}
+        confirmation = view.get_object()
         confirmation.confirm(self.request)
         return Response({'message': _('ok')}, status=status.HTTP_200_OK)
 
