@@ -10,8 +10,8 @@ if 'allauth.socialaccount' in settings.INSTALLED_APPS:
 
 
 class TwitterLoginSerializer(serializers.Serializer):
-    access_token = serializers.CharField(required=True)
-    token_secret = serializers.CharField(required=True)
+    access_token = serializers.CharField()
+    token_secret = serializers.CharField()
 
     def _get_request(self):
         request = self.context.get('request')
