@@ -10,6 +10,21 @@ from allauth.account import app_settings as account_app_settings
 from .test_base import BaseAPITestCase
 
 
+class CustomUser(object):
+    """
+    User without `emailaddress_set`.
+    Should not be able to login via API.
+    """
+
+    is_active = True
+
+
+class CustomUserAuthenticationBackend(object):
+
+    def authenticate(self, *args, **kwargs):
+        return CustomUser()
+
+
 @override_settings(ROOT_URLCONF="tests.urls")
 class APITestCase1(TestCase, BaseAPITestCase):
     """
@@ -467,6 +482,61 @@ class APITestCase1(TestCase, BaseAPITestCase):
         # try to login again
         self._login()
         self._logout()
+
+    @override_settings(
+        ACCOUNT_EMAIL_VERIFICATION='mandatory',
+        ACCOUNT_EMAIL_REQUIRED=True,
+        ACCOUNT_EMAIL_CONFIRMATION_HMAC=False
+    )
+    def test_registration_with_email_verification_but_missing_email_address(self):
+        """
+        Possible if user was created without using the register API, e.g. in admin backend.
+        """
+
+        UserModel = get_user_model()
+        user = UserModel(username=self.USERNAME)
+        user.set_password(self.PASS)
+        user.save()
+
+        payload = {
+            "username": self.USERNAME,
+            "password": self.PASS,
+        }
+
+        response = self.post(
+            self.login_url,
+            data=payload,
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+        # Check against localized message to be sure that the user could not login because of an unverified email
+        self.assertEqual(response.data['non_field_errors'], ['E-mail is not verified.'])
+
+    @override_settings(
+        ACCOUNT_EMAIL_VERIFICATION='mandatory',
+        ACCOUNT_EMAIL_REQUIRED=True,
+        ACCOUNT_EMAIL_CONFIRMATION_HMAC=False,
+        AUTHENTICATION_BACKENDS=['rest_auth.tests.test_api.CustomUserAuthenticationBackend', 'django.contrib.auth.backends.ModelBackend']
+    )
+    def test_registration_with_email_verification_and_custom_authentication_backend(self):
+        """
+        Authenticated user must not strictly be of type AUTH_USER_MODEL.
+        Thus, it is possible that there is also not an email address associated to the user.
+        """
+
+        payload = {
+            "username": self.USERNAME,
+            "password": self.PASS,
+        }
+
+        response = self.post(
+            self.login_url,
+            data=payload,
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+        # Check against localized message to be sure that the user could not login because of an unverified email
+        self.assertEqual(response.data['non_field_errors'], ['E-mail is not verified.'])
 
     @override_settings(ACCOUNT_LOGOUT_ON_GET=True)
     def test_logout_on_get(self):

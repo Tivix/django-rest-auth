@@ -2,6 +2,7 @@ from django.contrib.auth import get_user_model, authenticate
 from django.conf import settings
 from django.contrib.auth.forms import PasswordResetForm, SetPasswordForm
 from django.contrib.auth.tokens import default_token_generator
+from django.core.exceptions import ObjectDoesNotExist
 from django.utils.http import urlsafe_base64_decode as uid_decoder
 from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import force_text
@@ -101,10 +102,22 @@ class LoginSerializer(serializers.Serializer):
         # If required, is the email verified?
         if 'rest_auth.registration' in settings.INSTALLED_APPS:
             from allauth.account import app_settings
+
+            email_not_verified_msg = _('E-mail is not verified.')
+
             if app_settings.EMAIL_VERIFICATION == app_settings.EmailVerificationMethod.MANDATORY:
-                email_address = user.emailaddress_set.get(email=user.email)
+                # The authenticated user must not strictly be an instance of AUTH_USER_MODEL,
+                # depending on used authentication backends
+                if not hasattr(user, 'emailaddress_set'):
+                    raise serializers.ValidationError(email_not_verified_msg)
+
+                try:
+                    email_address = user.emailaddress_set.get(email=user.email)
+                except ObjectDoesNotExist:
+                    raise serializers.ValidationError(email_not_verified_msg)
+
                 if not email_address.verified:
-                    raise serializers.ValidationError(_('E-mail is not verified.'))
+                    raise serializers.ValidationError(email_not_verified_msg)
 
         attrs['user'] = user
         return attrs
