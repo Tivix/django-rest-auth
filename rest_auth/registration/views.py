@@ -32,7 +32,7 @@ class RegisterView(CreateAPIView):
     def get_response_data(self, user):
         if allauth_settings.EMAIL_VERIFICATION == \
                 allauth_settings.EmailVerificationMethod.MANDATORY:
-            return {}
+            return {"detail": _("Verification e-mail sent")}
 
         if getattr(settings, 'REST_USE_JWT', False):
             data = {
