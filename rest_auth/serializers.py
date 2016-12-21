@@ -121,7 +121,6 @@ class TokenSerializer(serializers.ModelSerializer):
 
 
 class UserDetailsSerializer(serializers.ModelSerializer):
-
     """
     User model w/o password
     """
@@ -148,18 +147,15 @@ class JWTSerializer(serializers.Serializer):
 
 
 class PasswordResetSerializer(serializers.Serializer):
-
     """
     Serializer for requesting a password reset e-mail.
     """
-
     email = serializers.EmailField()
 
     password_reset_form_class = PasswordResetForm
 
     def get_email_options(self):
-        """ Override this method to change default e-mail options
-        """
+        """Override this method to change default e-mail options"""
         return {}
 
     def validate_email(self, value):
@@ -187,7 +183,6 @@ class PasswordResetConfirmSerializer(serializers.Serializer):
     """
     Serializer for requesting a password reset e-mail.
     """
-
     new_password1 = serializers.CharField(max_length=128)
     new_password2 = serializers.CharField(max_length=128)
     uid = serializers.CharField()
@@ -225,7 +220,6 @@ class PasswordResetConfirmSerializer(serializers.Serializer):
 
 
 class PasswordChangeSerializer(serializers.Serializer):
-
     old_password = serializers.CharField(max_length=128)
     new_password1 = serializers.CharField(max_length=128)
     new_password2 = serializers.CharField(max_length=128)

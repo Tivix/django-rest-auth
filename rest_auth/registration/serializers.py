@@ -9,7 +9,7 @@ try:
     from allauth.account.adapter import get_adapter
     from allauth.account.utils import setup_user_email
 except ImportError:
-    raise ImportError('allauth needs to be added to INSTALLED_APPS.')
+    raise ImportError("allauth needs to be added to INSTALLED_APPS.")
 
 from rest_framework import serializers
 from requests.exceptions import HTTPError
@@ -31,12 +31,13 @@ class SocialLoginSerializer(serializers.Serializer):
 
     def get_social_login(self, adapter, app, token, response):
         """
-
-        :param adapter: allauth.socialaccount Adapter subclass. Usually OAuthAdapter or Auth2Adapter
+        :param adapter: allauth.socialaccount Adapter subclass.
+            Usually OAuthAdapter or Auth2Adapter
         :param app: `allauth.socialaccount.SocialApp` instance
         :param token: `allauth.socialaccount.SocialToken` instance
         :param response: Provider's response for OAuth1. Not used in the
-        :returns: A populated instance of the `allauth.socialaccount.SocialLoginView` instance
+        :returns: A populated instance of the
+            `allauth.socialaccount.SocialLoginView` instance
         """
         request = self._get_request()
         social_login = adapter.complete_login(request, app, token, response=response)
@@ -49,12 +50,12 @@ class SocialLoginSerializer(serializers.Serializer):
 
         if not view:
             raise serializers.ValidationError(
-                _('View is not defined, pass it as a context variable')
+                _("View is not defined, pass it as a context variable")
             )
 
         adapter_class = getattr(view, 'adapter_class', None)
         if not adapter_class:
-            raise serializers.ValidationError(_('Define adapter_class in view'))
+            raise serializers.ValidationError(_("Define adapter_class in view"))
 
         adapter = adapter_class(request)
         app = adapter.get_provider().get_app(request)
@@ -73,11 +74,11 @@ class SocialLoginSerializer(serializers.Serializer):
 
             if not self.callback_url:
                 raise serializers.ValidationError(
-                    _('Define callback_url in view')
+                    _("Define callback_url in view")
                 )
             if not self.client_class:
                 raise serializers.ValidationError(
-                    _('Define client_class in view')
+                    _("Define client_class in view")
                 )
 
             code = attrs.get('code')
@@ -97,7 +98,8 @@ class SocialLoginSerializer(serializers.Serializer):
             access_token = token['access_token']
 
         else:
-            raise serializers.ValidationError(_('Incorrect input. access_token or code is required.'))
+            raise serializers.ValidationError(
+                _("Incorrect input. access_token or code is required."))
 
         social_token = adapter.parse_token({'access_token': access_token})
         social_token.app = app

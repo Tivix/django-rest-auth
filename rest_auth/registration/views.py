@@ -32,7 +32,7 @@ class RegisterView(CreateAPIView):
     def get_response_data(self, user):
         if allauth_settings.EMAIL_VERIFICATION == \
                 allauth_settings.EmailVerificationMethod.MANDATORY:
-            return {"detail": _("Verification e-mail sent")}
+            return {"detail": _("Verification e-mail sent.")}
 
         if getattr(settings, 'REST_USE_JWT', False):
             data = {
@@ -49,7 +49,9 @@ class RegisterView(CreateAPIView):
         user = self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
 
-        return Response(self.get_response_data(user), status=status.HTTP_201_CREATED, headers=headers)
+        return Response(self.get_response_data(user),
+                        status=status.HTTP_201_CREATED,
+                        headers=headers)
 
     def perform_create(self, serializer):
         user = serializer.save(self.request)
@@ -65,7 +67,6 @@ class RegisterView(CreateAPIView):
 
 
 class VerifyEmailView(APIView, ConfirmEmailView):
-
     permission_classes = (AllowAny,)
     allowed_methods = ('POST', 'OPTIONS', 'HEAD')
 

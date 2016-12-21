@@ -21,15 +21,17 @@ class TwitterLoginSerializer(serializers.Serializer):
 
     def get_social_login(self, adapter, app, token, response):
         """
-
-        :param adapter: allauth.socialaccount Adapter subclass. Usually OAuthAdapter or Auth2Adapter
+        :param adapter: allauth.socialaccount Adapter subclass.
+            Usually OAuthAdapter or Auth2Adapter
         :param app: `allauth.socialaccount.SocialApp` instance
         :param token: `allauth.socialaccount.SocialToken` instance
         :param response: Provider's response for OAuth1. Not used in the
-        :returns: A populated instance of the `allauth.socialaccount.SocialLoginView` instance
+        :returns: A populated instance of the
+            `allauth.socialaccount.SocialLoginView` instance
         """
         request = self._get_request()
-        social_login = adapter.complete_login(request, app, token, response=response)
+        social_login = adapter.complete_login(request, app, token,
+                                              response=response)
         social_login.token = token
         return social_login
 
@@ -39,12 +41,12 @@ class TwitterLoginSerializer(serializers.Serializer):
 
         if not view:
             raise serializers.ValidationError(
-                'View is not defined, pass it as a context variable'
+                "View is not defined, pass it as a context variable"
             )
 
         adapter_class = getattr(view, 'adapter_class', None)
         if not adapter_class:
-            raise serializers.ValidationError('Define adapter_class in view')
+            raise serializers.ValidationError("Define adapter_class in view")
 
         adapter = adapter_class(request)
         app = adapter.get_provider().get_app(request)
