@@ -3,6 +3,7 @@ from django.contrib.auth import (
     logout as django_logout
 )
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.translation import ugettext_lazy as _
 
@@ -129,6 +130,14 @@ class UserDetailsView(RetrieveUpdateAPIView):
 
     def get_object(self):
         return self.request.user
+
+    def get_queryset(self):
+        """
+        Adding this method since it is sometimes called when using
+        django-rest-swagger
+        https://github.com/Tivix/django-rest-auth/issues/275
+        """
+        return get_user_model().objects.none()
 
 
 class PasswordResetView(GenericAPIView):
