@@ -10,7 +10,7 @@ Basic
     - email
     - password
 
-    Returns Token Object's key
+    Returns Token key
 
 - /rest-auth/logout/ (POST)
 

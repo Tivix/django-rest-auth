@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-02-02 14:11+0100\n"
+"POT-Creation-Date: 2016-12-22 11:37-0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,19 +18,19 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: registration/serializers.py:54
+#: registration/serializers.py:53
 msgid "View is not defined, pass it as a context variable"
 msgstr "\"View\" ist nicht definiert, übergib es als Contextvariable"
 
-#: registration/serializers.py:59
+#: registration/serializers.py:58
 msgid "Define adapter_class in view"
 msgstr "Definier \"adapter_class\" in view"
 
-#: registration/serializers.py:78
+#: registration/serializers.py:77
 msgid "Define callback_url in view"
 msgstr "Definier \"callback_url\" in view"
 
-#: registration/serializers.py:82
+#: registration/serializers.py:81
 msgid "Define client_class in view"
 msgstr "Definier \"client_class\" in view"
 
@@ -50,50 +50,49 @@ msgstr "Ein User mit dieser E-Mail Adresse ist schon registriert."
 msgid "The two password fields didn't match."
 msgstr "Die beiden Passwörter sind nicht identisch."
 
-#: registration/views.py:64
+#: registration/views.py:82
 msgid "ok"
 msgstr "Ok"
 
-#: serializers.py:29
+#: serializers.py:30
 msgid "Must include \"email\" and \"password\"."
 msgstr "Muss \"email\" und \"password\" enthalten."
 
-#: serializers.py:40
+#: serializers.py:41
 msgid "Must include \"username\" and \"password\"."
 msgstr "Muss \"username\" und \"password\" enthalten."
 
-#: serializers.py:53
+#: serializers.py:54
 msgid "Must include either \"username\" or \"email\" and \"password\"."
 msgstr "Muss entweder \"username\" oder \"email\" und password \"password\""
 
-#: serializers.py:94
+#: serializers.py:95
 msgid "User account is disabled."
 msgstr "Der Useraccount ist deaktiviert."
 
-#: serializers.py:97
+#: serializers.py:98
 msgid "Unable to log in with provided credentials."
 msgstr "Kann nicht mit den angegeben Zugangsdaten anmelden."
 
-#: serializers.py:106
+#: serializers.py:107
 msgid "E-mail is not verified."
 msgstr "E-Mail Adresse ist nicht verifiziert."
 
-#: serializers.py:152
-msgid "Error"
-msgstr "Fehler"
-
-#: views.py:71
+#: views.py:114
 msgid "Successfully logged out."
 msgstr "Erfolgreich ausgeloggt."
 
-#: views.py:111
+#: views.py:162
 msgid "Password reset e-mail has been sent."
 msgstr "Die E-Mail zum Zurücksetzen des Passwortes wurde verschickt."
 
-#: views.py:132
+#: views.py:184
 msgid "Password has been reset with the new password."
 msgstr "Das Passwort wurde mit dem neuen Passwort ersetzt."
 
-#: views.py:150
+#: views.py:202
 msgid "New password has been saved."
 msgstr "Das neue Passwort wurde gespeichert."
+
+#~ msgid "Error"
+#~ msgstr "Fehler"
