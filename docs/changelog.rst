@@ -1,6 +1,14 @@
 Changelog
 =========
 
+0.9.0
+-----
+- allowed using custom UserDetailsSerializer with JWTSerializer
+- fixed error with logout on GET
+- updated api endpoints and configuration docs
+- bugfixes
+- minor text fixes
+
 0.8.2
 -----
 - fixed allauth import error
