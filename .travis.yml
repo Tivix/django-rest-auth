@@ -3,16 +3,13 @@ python:
   - "2.7"
   - "3.5"
 env:
-  - DJANGO=1.8.13
-  - DJANGO=1.9.7
+  - DJANGO=1.8.17
+  - DJANGO=1.9.12
+  - DJANGO=1.10.4
 install:
   - pip install -q Django==$DJANGO
   - pip install coveralls
   - pip install -r rest_auth/tests/requirements.pip
-matrix:
-  exclude:
-    - python: "3.5"
-      env: DJANGO=1.8.13
 script:
   - coverage run --source=rest_auth setup.py test
 after_success:
