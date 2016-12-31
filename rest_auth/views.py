@@ -5,7 +5,9 @@ from django.contrib.auth import (
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ObjectDoesNotExist
+from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext_lazy as _
+from django.views.decorators.debug import sensitive_post_parameters
 
 from rest_framework import status
 from rest_framework.views import APIView
@@ -21,6 +23,12 @@ from .app_settings import (
 from .models import TokenModel
 from .utils import jwt_encode
 
+sensitive_post_parameters_m = method_decorator(
+    sensitive_post_parameters(
+        'password', 'old_password', 'new_password1', 'new_password2'
+    )
+)
+
 
 class LoginView(GenericAPIView):
     """
@@ -35,6 +43,10 @@ class LoginView(GenericAPIView):
     permission_classes = (AllowAny,)
     serializer_class = LoginSerializer
     token_model = TokenModel
+
+    @sensitive_post_parameters_m
+    def dispatch(self, *args, **kwargs):
+        return super(LoginView, self).dispatch(*args, **kwargs)
 
     def process_login(self):
         django_login(self.request, self.user)
@@ -176,6 +188,10 @@ class PasswordResetConfirmView(GenericAPIView):
     serializer_class = PasswordResetConfirmSerializer
     permission_classes = (AllowAny,)
 
+    @sensitive_post_parameters_m
+    def dispatch(self, *args, **kwargs):
+        return super(PasswordResetConfirmView, self).dispatch(*args, **kwargs)
+
     def post(self, request):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -194,6 +210,10 @@ class PasswordChangeView(GenericAPIView):
     """
     serializer_class = PasswordChangeSerializer
     permission_classes = (IsAuthenticated,)
+
+    @sensitive_post_parameters_m
+    def dispatch(self, *args, **kwargs):
+        return super(PasswordChangeView, self).dispatch(*args, **kwargs)
 
     def post(self, request):
         serializer = self.get_serializer(data=request.data)

@@ -1,5 +1,7 @@
-from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
+from django.utils.decorators import method_decorator
+from django.utils.translation import ugettext_lazy as _
+from django.views.decorators.debug import sensitive_post_parameters
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -15,19 +17,26 @@ from allauth.account import app_settings as allauth_settings
 from rest_auth.app_settings import (TokenSerializer,
                                     JWTSerializer,
                                     create_token)
+from rest_auth.models import TokenModel
 from rest_auth.registration.serializers import (SocialLoginSerializer,
                                                 VerifyEmailSerializer)
+from rest_auth.utils import jwt_encode
 from rest_auth.views import LoginView
-from rest_auth.models import TokenModel
 from .app_settings import RegisterSerializer
 
-from rest_auth.utils import jwt_encode
+sensitive_post_parameters_m = method_decorator(
+    sensitive_post_parameters('password1', 'password2')
+)
 
 
 class RegisterView(CreateAPIView):
     serializer_class = RegisterSerializer
     permission_classes = (AllowAny, )
     token_model = TokenModel
+
+    @sensitive_post_parameters_m
+    def dispatch(self, *args, **kwargs):
+        return super(RegisterView, self).dispatch(*args, **kwargs)
 
     def get_response_data(self, user):
         if allauth_settings.EMAIL_VERIFICATION == \
