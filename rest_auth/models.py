@@ -1,6 +1,9 @@
 from django.conf import settings
 
-from rest_framework.authtoken.models import Token as DefaultTokenModel
+if getattr(settings, 'REST_USE_KNOX', False):
+	from knox.models import AuthToken as DefaultTokenModel
+else:
+	from rest_framework.authtoken.models import Token as DefaultTokenModel
 
 from .utils import import_callable
 
