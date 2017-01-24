@@ -126,7 +126,7 @@ class KnoxTokenSerializer(serializers.ModelSerializer):
     """
 
     class Meta:
-        model = knox.models.AuthToken
+        model = TokenModel
         fields = ('token',)
 
 
