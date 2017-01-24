@@ -120,6 +120,16 @@ class TokenSerializer(serializers.ModelSerializer):
         fields = ('key',)
 
 
+class KnoxTokenSerializer(serializers.ModelSerializer):
+    """
+    Serializer for Knox AuthToken model.
+    """
+
+    class Meta:
+        model = knox.models.AuthToken
+        fields = ('token',)
+
+
 class UserDetailsSerializer(serializers.ModelSerializer):
     """
     User model w/o password
