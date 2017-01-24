@@ -124,10 +124,7 @@ class KnoxTokenSerializer(serializers.ModelSerializer):
     """
     Serializer for Knox AuthToken model.
     """
-
-    class Meta:
-        model = TokenModel
-        fields = ('token_key',)
+    token = serializers.CharField()
 
 
 class UserDetailsSerializer(serializers.ModelSerializer):
