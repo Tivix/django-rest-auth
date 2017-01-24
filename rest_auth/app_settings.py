@@ -1,8 +1,11 @@
 from django.conf import settings
 
+if getattr(settings, 'REST_USE_KNOX', False):
+    from rest_auth.serializers import KnoxTokenSerializer as DefaultTokenSerializer,
+else:
+    from rest_auth.serializers import TokenSerializer as DefaultTokenSerializer,
+
 from rest_auth.serializers import (
-    TokenSerializer as DefaultTokenSerializer,
-    KnoxTokenSerializer as DefaultKnoxTokenSerializer,
     JWTSerializer as DefaultJWTSerializer,
     UserDetailsSerializer as DefaultUserDetailsSerializer,
     LoginSerializer as DefaultLoginSerializer,
@@ -18,9 +21,6 @@ serializers = getattr(settings, 'REST_AUTH_SERIALIZERS', {})
 
 TokenSerializer = import_callable(
     serializers.get('TOKEN_SERIALIZER', DefaultTokenSerializer))
-
-KnoxTokenSerializer = import_callable(
-    serializers.get('KNOX_TOKEN_SERIALIZER', DefaultKnoxTokenSerializer))
 
 JWTSerializer = import_callable(
     serializers.get('JWT_SERIALIZER', DefaultJWTSerializer))
