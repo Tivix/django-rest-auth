@@ -120,7 +120,7 @@ class TokenSerializer(serializers.ModelSerializer):
         fields = ('key',)
 
 
-class KnoxTokenSerializer(serializers.ModelSerializer):
+class KnoxTokenSerializer(serializers.Serializer):
     """
     Serializer for Knox AuthToken model.
     """
