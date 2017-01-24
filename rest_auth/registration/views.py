@@ -16,6 +16,7 @@ from allauth.account import app_settings as allauth_settings
 
 from rest_auth.app_settings import (TokenSerializer,
                                     JWTSerializer,
+                                    KnoxTokenSerializer,
                                     create_token)
 from rest_auth.models import TokenModel
 from rest_auth.registration.serializers import (SocialLoginSerializer,
@@ -49,6 +50,12 @@ class RegisterView(CreateAPIView):
                 'token': self.token
             }
             return JWTSerializer(data).data
+        if getattr(settings, 'REST_AUTH_TOKEN_APP', False) is 'knox':
+            data = {
+                'token': self.token
+            }
+            return KnoxTokenSerializer(data).data
+        
         else:
             return TokenSerializer(self.token).data
 
