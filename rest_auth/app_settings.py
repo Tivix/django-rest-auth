@@ -1,6 +1,6 @@
 from django.conf import settings
 
-if getattr(settings, 'REST_USE_KNOX', False):
+if getattr(settings, 'REST_AUTH_TOKEN_APP', False) is 'knox':
     from rest_auth.serializers import KnoxTokenSerializer as DefaultTokenSerializer
 else:
     from rest_auth.serializers import TokenSerializer as DefaultTokenSerializer

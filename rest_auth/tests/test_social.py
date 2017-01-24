@@ -280,7 +280,7 @@ class TestSocialAuth(TestCase, BaseAPITestCase):
 
     @responses.activate
     @override_settings(
-        REST_USE_JWT=True
+        REST_AUTH_TOKEN_APP='jwt'
     )
     def test_jwt(self):
         resp_body = '{"id":"123123123123","first_name":"John","gender":"male","last_name":"Smith","link":"https:\\/\\/www.facebook.com\\/john.smith","locale":"en_US","name":"John Smith","timezone":2,"updated_time":"2014-08-13T10:14:38+0000","username":"john.smith","verified":true}'  # noqa

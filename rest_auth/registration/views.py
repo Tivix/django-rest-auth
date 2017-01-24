@@ -43,7 +43,7 @@ class RegisterView(CreateAPIView):
                 allauth_settings.EmailVerificationMethod.MANDATORY:
             return {"detail": _("Verification e-mail sent.")}
 
-        if getattr(settings, 'REST_USE_JWT', False):
+        if getattr(settings, 'REST_AUTH_TOKEN_APP', False) is 'jwt':
             data = {
                 'user': user,
                 'token': self.token
@@ -64,7 +64,7 @@ class RegisterView(CreateAPIView):
 
     def perform_create(self, serializer):
         user = serializer.save(self.request)
-        if getattr(settings, 'REST_USE_JWT', False):
+        if getattr(settings, 'REST_AUTH_TOKEN_APP', False) is 'jwt':
             self.token = jwt_encode(user)  
         else:
             self.token = create_token(self.token_model, user, serializer)
