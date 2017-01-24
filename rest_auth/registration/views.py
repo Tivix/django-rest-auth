@@ -51,7 +51,7 @@ class RegisterView(CreateAPIView):
             }
             return JWTSerializer(data).data
         else:
-            return TokenSerializer(user.auth_token).data
+            return TokenSerializer(self.token).data
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -66,9 +66,9 @@ class RegisterView(CreateAPIView):
     def perform_create(self, serializer):
         user = serializer.save(self.request)
         if getattr(settings, 'REST_USE_JWT', False):
-            self.token = jwt_encode(user)
+            self.token = jwt_encode(user)  
         else:
-            create_token(self.token_model, user, serializer)
+            self.token = create_token(self.token_model, user, serializer)
 
         complete_signup(self.request._request, user,
                         allauth_settings.EMAIL_VERIFICATION,
