@@ -161,16 +161,16 @@ class LogoutAllView(APIView):
 
     def get(self, request, *args, **kwargs):
         if getattr(settings, 'ACCOUNT_LOGOUT_ON_GET', False):
-            response = self.logout(request)
+            response = self.logout_all(request)
         else:
             response = self.http_method_not_allowed(request, *args, **kwargs)
 
         return self.finalize_response(request, response, *args, **kwargs)
 
     def post(self, request):
-        return self.logout(request)
+        return self.logout_all(request)
 
-    def logout(self, request):
+    def logout_all(self, request):
         try:
             request.user.auth_token_set.all().delete()
         except (AttributeError, ObjectDoesNotExist):
