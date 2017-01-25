@@ -16,9 +16,10 @@ from rest_framework.generics import GenericAPIView, RetrieveUpdateAPIView
 from rest_framework.permissions import IsAuthenticated, AllowAny
 
 from .app_settings import (
-    TokenSerializer, UserDetailsSerializer, LoginSerializer,
-    PasswordResetSerializer, PasswordResetConfirmSerializer,
-    PasswordChangeSerializer, JWTSerializer, create_token
+    TokenSerializer, KnoxTokenSerializer, UserDetailsSerializer,
+    LoginSerializer, PasswordResetSerializer,
+    PasswordResetConfirmSerializer, PasswordChangeSerializer,
+    JWTSerializer, create_token
 )
 from .models import TokenModel
 from .utils import jwt_encode
