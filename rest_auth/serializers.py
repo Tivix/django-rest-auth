@@ -114,7 +114,6 @@ class TokenSerializer(serializers.ModelSerializer):
     """
     Serializer for Token model.
     """
-
     class Meta:
         model = TokenModel
         fields = ('key',)
