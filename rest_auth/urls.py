@@ -20,6 +20,6 @@ urlpatterns = [
 ]
 
 if getattr(settings, 'REST_USE_KNOX', False):
-    urlpatterns.append(
+    urlpatterns.extend([
         url(r'^logoutall/$' LogoutAllView.as_view(), name='rest_logout_all'),
-    )
+    ])
