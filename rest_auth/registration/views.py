@@ -16,7 +16,7 @@ from allauth.account import app_settings as allauth_settings
 
 from rest_auth.app_settings import (TokenSerializer,
                                     JWTSerializer,
-                                    KnoxTokenSerializer,
+                                    KnoxSerializer,
                                     create_token)
 from rest_auth.models import TokenModel
 from rest_auth.registration.serializers import (SocialLoginSerializer,
