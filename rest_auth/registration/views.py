@@ -50,12 +50,11 @@ class RegisterView(CreateAPIView):
                 'token': self.token
             }
             return JWTSerializer(data).data
-        if getattr(settings, 'REST_AUTH_TOKEN_APP', False) is 'knox':
+        elif getattr(settings, 'REST_USE_KNOX', False):
             data = {
                 'token': self.token
             }
             return KnoxTokenSerializer(data).data
-        
         else:
             return TokenSerializer(self.token).data
 
