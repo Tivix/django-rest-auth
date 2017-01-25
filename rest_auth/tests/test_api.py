@@ -136,7 +136,7 @@ class APITestCase1(TestCase, BaseAPITestCase):
 
         self.post(self.login_url, data=payload, status_code=200)
 
-    @override_settings(REST_AUTH_TOKEN_APP='jwt')
+    @override_settings(REST_USE_JWT=True)
     def test_login_jwt(self):
         payload = {
             "username": self.USERNAME,
@@ -367,7 +367,7 @@ class APITestCase1(TestCase, BaseAPITestCase):
         self.assertEqual(user.last_name, self.response.json['last_name'])
         self.assertEqual(user.email, self.response.json['email'])
 
-    @override_settings(REST_AUTH_TOKEN_APP='jwt')
+    @override_settings(REST_USE_JWT=True)
     def test_user_details_using_jwt(self):
         user = get_user_model().objects.create_user(self.USERNAME, self.EMAIL, self.PASS)
         payload = {
@@ -398,7 +398,7 @@ class APITestCase1(TestCase, BaseAPITestCase):
         self._login()
         self._logout()
 
-    @override_settings(REST_AUTH_TOKEN_APP='jwt')
+    @override_settings(REST_USE_JWT=True)
     def test_registration_with_jwt(self):
         user_count = get_user_model().objects.all().count()
 

@@ -159,5 +159,5 @@ By default, ``django-rest-auth`` uses Django's Token-based authentication. If yo
 
 .. code-block:: python
 
-    REST_AUTH_TOKEN_APP = 'jwt'
+    REST_USE_JWT = True
 

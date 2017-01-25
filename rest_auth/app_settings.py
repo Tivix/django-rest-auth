@@ -1,6 +1,6 @@
 from django.conf import settings
 
-if getattr(settings, 'REST_AUTH_TOKEN_APP', False) is 'knox':
+if getattr(settings, 'REST_USE_KNOX', False):
     from .utils import create_knox_token as default_create_token
 else:
     from .utils import default_create_token

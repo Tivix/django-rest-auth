@@ -52,7 +52,7 @@ class LoginView(GenericAPIView):
         django_login(self.request, self.user)
 
     def get_response_serializer(self):
-        if getattr(settings, 'REST_AUTH_TOKEN_APP', False) is 'jwt':
+        if getattr(settings, 'REST_USE_JWT', False):
             response_serializer = JWTSerializer
         else:
             response_serializer = TokenSerializer
@@ -61,7 +61,7 @@ class LoginView(GenericAPIView):
     def login(self):
         self.user = self.serializer.validated_data['user']
 
-        if getattr(settings, 'REST_AUTH_TOKEN_APP', False) is 'jwt':
+        if getattr(settings, 'REST_USE_JWT', False):
             self.token = jwt_encode(self.user)
         else:
             self.token = create_token(self.token_model, self.user,
@@ -73,7 +73,7 @@ class LoginView(GenericAPIView):
     def get_response(self):
         serializer_class = self.get_response_serializer()
 
-        if getattr(settings, 'REST_AUTH_TOKEN_APP', False) is 'jwt':
+        if getattr(settings, 'REST_USE_JWT', False):
             data = {
                 'user': self.user,
                 'token': self.token
