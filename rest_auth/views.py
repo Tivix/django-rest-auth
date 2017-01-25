@@ -135,13 +135,13 @@ class LogoutView(APIView):
         return self.logout(request)
 
     def logout(self, request):
-        if getattr(settings, 'REST_USE_KNOX', False):
-            request._auth.delete()
-        else:
-            try:
+        try:
+            if getattr(settings, 'REST_USE_KNOX', False):
+                request._auth.delete()
+            else:
                 request.user.auth_token.delete()
-            except (AttributeError, ObjectDoesNotExist):
-                pass
+        except (AttributeError, ObjectDoesNotExist):
+            pass
 
         django_logout(request)
 
