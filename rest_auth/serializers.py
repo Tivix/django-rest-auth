@@ -132,7 +132,7 @@ class UserDetailsSerializer(serializers.ModelSerializer):
 # Required to allow using custom USER_DETAILS_SERIALIZER  in
 # JWTSerializer. Defining it here to avoid circular imports
 rest_auth_serializers = getattr(settings, 'REST_AUTH_SERIALIZERS', {})
-JWTUserDetailsSerializer = import_callable(
+CustomUserDetailsSerializer = import_callable(
     rest_auth_serializers.get('USER_DETAILS_SERIALIZER', UserDetailsSerializer)
 )
 
@@ -142,15 +142,15 @@ class JWTSerializer(serializers.Serializer):
     Serializer for JWT authentication.
     """
     token = serializers.CharField()
-    user = JWTUserDetailsSerializer()
+    user = CustomUserDetailsSerializer()
 
 
 class KnoxTokenSerializer(serializers.Serializer):
     """
-    Serializer for Knox AuthToken model.
+    Serializer for Knox authentication.
     """
     token = serializers.CharField()
-    user = JWTUserDetailsSerializer()
+    user = CustomUserDetailsSerializer()
 
 
 class PasswordResetSerializer(serializers.Serializer):
