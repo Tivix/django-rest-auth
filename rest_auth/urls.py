@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.conf.urls import url
 
 from rest_auth.views import (
