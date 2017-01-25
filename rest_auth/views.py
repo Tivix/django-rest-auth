@@ -156,7 +156,8 @@ class LogoutAllView(APIView):
 
     Accepts/Returns nothing.
     """
-    authentication_classes = (KnoxTokenAuthentication,)
+    if getattr(settings, 'REST_USE_KNOX', False):
+        authentication_classes = (KnoxTokenAuthentication,)
     permission_classes = (IsAuthenticated,)
 
     def get(self, request, *args, **kwargs):
