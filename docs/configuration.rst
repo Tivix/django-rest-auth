@@ -12,6 +12,8 @@ Configuration
 
         - JWT_SERIALIZER - (Using REST_USE_JWT=True) response for successful authentication in ``rest_auth.views.LoginView``, default value ``rest_auth.serializers.JWTSerializer``
 
+        - KNOX_SERIALIZER - (Using REST_USE_KNOX=True) response for successful authentication in ``rest_auth.views.LoginView`` and successful registration in ``rest_auth.registration.views.RegisterView`` (using ``django-allauth`` and ``ACCOUNT_EMAIL_VERIFICATION = 'optional' or 'none'``), default value ``rest_auth.serializers.KnoxSerializer``
+
         - USER_DETAILS_SERIALIZER - serializer class in ``rest_auth.views.UserDetailsView``, default value ``rest_auth.serializers.UserDetailsSerializer``
 
         - PASSWORD_RESET_SERIALIZER - serializer class in ``rest_auth.views.PasswordResetView``, default value ``rest_auth.serializers.PasswordResetSerializer``
@@ -48,6 +50,8 @@ Configuration
 
 - **REST_USE_JWT** - Enable JWT Authentication instead of Token/Session based. This is built on top of django-rest-framework-jwt http://getblimp.github.io/django-rest-framework-jwt/, which must also be installed. (default: False)
 
+- **REST_USE_KNOX** - Use Knox token authentication instead of the built-in Django-Rest-Framework token authentication. Knox makes some significant security improvements, and supports multiple tokens per user. https://github.com/James1345/django-rest-knox/ must be installed. Not compatible with ``REST_USE_JWT`` (default: False)
+
 - **OLD_PASSWORD_FIELD_ENABLED** - set it to True if you want to have old password verification on password change enpoint (default: False)
 
-- **LOGOUT_ON_PASSWORD_CHANGE** - set to False if you want to keep the current user logged in after a password change
+- **LOGOUT_ON_PASSWORD_CHANGE** - set to False if you want to keep the current user logged in after a password change (default: False)
