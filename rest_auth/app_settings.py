@@ -7,7 +7,7 @@ else:
 
 from rest_auth.serializers import (
     TokenSerializer as DefaultTokenSerializer,
-    KnoxTokenSerializer as DefaultKnoxTokenSerializer,
+    KnoxSerializer as DefaultKnoxSerializer,
     JWTSerializer as DefaultJWTSerializer,
     UserDetailsSerializer as DefaultUserDetailsSerializer,
     LoginSerializer as DefaultLoginSerializer,
@@ -27,8 +27,8 @@ TokenSerializer = import_callable(
 JWTSerializer = import_callable(
     serializers.get('JWT_SERIALIZER', DefaultJWTSerializer))
 
-KnoxTokenSerializer = import_callable(
-    serializers.get('KNOX_TOKEN_SERIALIZER', DefaultKnoxTokenSerializer))
+KnoxSerializer = import_callable(
+    serializers.get('KNOX_TOKEN_SERIALIZER', DefaultKnoxSerializer))
 
 UserDetailsSerializer = import_callable(
     serializers.get('USER_DETAILS_SERIALIZER', DefaultUserDetailsSerializer)

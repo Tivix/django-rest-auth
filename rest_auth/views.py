@@ -16,7 +16,7 @@ from rest_framework.generics import GenericAPIView, RetrieveUpdateAPIView
 from rest_framework.permissions import IsAuthenticated, AllowAny
 
 from .app_settings import (
-    TokenSerializer, KnoxTokenSerializer, UserDetailsSerializer,
+    TokenSerializer, KnoxSerializer, UserDetailsSerializer,
     LoginSerializer, PasswordResetSerializer,
     PasswordResetConfirmSerializer, PasswordChangeSerializer,
     JWTSerializer, create_token
@@ -62,7 +62,7 @@ class LoginView(GenericAPIView):
         if getattr(settings, 'REST_USE_JWT', False):
             response_serializer = JWTSerializer
         elif getattr(settings, 'REST_USE_KNOX', False):
-            response_serializer = KnoxTokenSerializer
+            response_serializer = KnoxSerializer
         else:
             response_serializer = TokenSerializer
         return response_serializer

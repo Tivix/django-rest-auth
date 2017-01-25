@@ -145,7 +145,7 @@ class JWTSerializer(serializers.Serializer):
     user = CustomUserDetailsSerializer()
 
 
-class KnoxTokenSerializer(serializers.Serializer):
+class KnoxSerializer(serializers.Serializer):
     """
     Serializer for Knox authentication.
     """
