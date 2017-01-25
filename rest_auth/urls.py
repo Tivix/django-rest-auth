@@ -1,8 +1,8 @@
 from django.conf.urls import url
 
 from rest_auth.views import (
-    LoginView, LogoutView, UserDetailsView, PasswordChangeView,
-    PasswordResetView, PasswordResetConfirmView
+    LoginView, LogoutView, LogoutAllView, UserDetailsView,
+    PasswordChangeView, PasswordResetView, PasswordResetConfirmView
 )
 
 urlpatterns = [
@@ -18,3 +18,8 @@ urlpatterns = [
     url(r'^password/change/$', PasswordChangeView.as_view(),
         name='rest_password_change'),
 ]
+
+if getattr(settings, 'REST_USE_KNOX', False):
+    urlpatterns.append(
+        url(r'^logoutall/$' LogoutAllView.as_view(), name='rest_logout_all'),
+    )

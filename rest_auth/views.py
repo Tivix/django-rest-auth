@@ -149,6 +149,39 @@ class LogoutView(APIView):
                         status=status.HTTP_200_OK)
 
 
+class LogoutAllView(APIView):
+    """
+    Calls Django logout method and deletes all the Knox tokens
+    assigned to the current User object.
+
+    Accepts/Returns nothing.
+    """
+    authentication_classes = (KnoxTokenAuthentication,)
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request, *args, **kwargs):
+        if getattr(settings, 'ACCOUNT_LOGOUT_ON_GET', False):
+            response = self.logout(request)
+        else:
+            response = self.http_method_not_allowed(request, *args, **kwargs)
+
+        return self.finalize_response(request, response, *args, **kwargs)
+
+    def post(self, request):
+        return self.logout(request)
+
+    def logout(self, request):
+        try:
+            request.user.auth_token_set.all().delete()
+        except (AttributeError, ObjectDoesNotExist):
+            pass
+
+        django_logout(request)
+
+        return Response({"detail": _("Successfully logged out.")},
+                        status=status.HTTP_200_OK)
+
+
 class UserDetailsView(RetrieveUpdateAPIView):
     """
     Reads and updates UserModel fields
