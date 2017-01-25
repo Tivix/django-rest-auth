@@ -119,13 +119,6 @@ class TokenSerializer(serializers.ModelSerializer):
         fields = ('key',)
 
 
-class KnoxTokenSerializer(serializers.Serializer):
-    """
-    Serializer for Knox AuthToken model.
-    """
-    token = serializers.CharField()
-
-
 class UserDetailsSerializer(serializers.ModelSerializer):
     """
     User model w/o password
@@ -147,6 +140,14 @@ JWTUserDetailsSerializer = import_callable(
 class JWTSerializer(serializers.Serializer):
     """
     Serializer for JWT authentication.
+    """
+    token = serializers.CharField()
+    user = JWTUserDetailsSerializer()
+
+
+class KnoxTokenSerializer(serializers.Serializer):
+    """
+    Serializer for Knox AuthToken model.
     """
     token = serializers.CharField()
     user = JWTUserDetailsSerializer()

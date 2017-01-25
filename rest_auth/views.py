@@ -91,6 +91,7 @@ class LoginView(GenericAPIView):
                                           context={'request': self.request})
         elif getattr(settings, 'REST_USE_KNOX', False):
             data = {
+                'user': self.user,
                 'token': self.token
             }
             serializer = serializer_class(instance=data,
