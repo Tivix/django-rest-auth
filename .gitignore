@@ -58,6 +58,5 @@ db.sqlite3
 
 # Virtual Environments
 .vagrant/
-bash/
 cookbooks/
 tmp/
