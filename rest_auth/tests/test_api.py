@@ -148,6 +148,24 @@ class APITestCase1(TestCase, BaseAPITestCase):
         self.assertEqual('token' in self.response.json.keys(), True)
         self.token = self.response.json['token']
 
+    @override_settings(REST_USE_KNOX=True, REST_FRAMEWORK = {
+        'DEFAULT_AUTHENTICATION_CLASSES': ('knox.auth.TokenAuthentication')},)
+    def test_login_knox(self):
+        payload = {
+            "username": self.USERNAME,
+            "password": self.PASS
+        }
+        get_user_model().objects.create_user(self.USERNAME, '', self.PASS)
+
+        self.post(self.login_url, data=payload, status_code=200)
+        self.assertEqual('token' in self.response.json.keys(), True)
+        self.token = self.response.json['token']
+        self.assertEqual('user' in self.response.json.keys(), True)
+        self.user = self.response.json['user']
+
+        self.post(self.login_url, data=payload, status_code=200)
+        self.assertNotEqual(self.token, self.response.json['token'])
+
     def test_login_by_email(self):
         # starting test without allauth app
         settings.INSTALLED_APPS.remove('allauth')
@@ -382,6 +400,21 @@ class APITestCase1(TestCase, BaseAPITestCase):
         user = get_user_model().objects.get(pk=user.pk)
         self.assertEqual(user.email, self.response.json['email'])
 
+    @override_settings(REST_USE_KNOX=True, REST_FRAMEWORK = {
+        'DEFAULT_AUTHENTICATION_CLASSES': ('knox.auth.TokenAuthentication')},)
+    def test_user_details_using_knox(self):
+        user = get_user_model().objects.create_user(self.USERNAME, self.EMAIL, self.PASS)
+        payload = {
+            "username": self.USERNAME,
+            "password": self.PASS
+        }
+        self.post(self.login_url, data=payload, status_code=200)
+        self.token = self.response.json['token']
+        self.get(self.user_url, status_code=200)
+        self.patch(self.user_url, data=self.BASIC_USER_DATA, status_code=200)
+        user = get_user_model().objects.get(pk=user.pk)
+        self.assertEqual(user.email, self.response.json['email'])
+
     def test_registration(self):
         user_count = get_user_model().objects.all().count()
 
@@ -406,6 +439,21 @@ class APITestCase1(TestCase, BaseAPITestCase):
 
         result = self.post(self.register_url, data=self.REGISTRATION_DATA, status_code=201)
         self.assertIn('token', result.data)
+        self.assertEqual(get_user_model().objects.all().count(), user_count + 1)
+
+        self._login()
+        self._logout()
+
+    @override_settings(REST_USE_KNOX=True, REST_FRAMEWORK = {
+        'DEFAULT_AUTHENTICATION_CLASSES': ('knox.auth.TokenAuthentication')},)
+    def test_registration_with_knox(self):
+        user_count = get_user_model().objects.all().count()
+
+        self.post(self.register_url, data={}, status_code=400)
+
+        result = self.post(self.register_url, data=self.REGISTRATION_DATA, status_code=201)
+        self.assertIn('token', result.data)
+        self.assertIn('user', result.data)
         self.assertEqual(get_user_model().objects.all().count(), user_count + 1)
 
         self._login()
