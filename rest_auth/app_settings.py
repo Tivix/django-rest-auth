@@ -1,10 +1,5 @@
 from django.conf import settings
 
-if getattr(settings, 'REST_USE_KNOX', False):
-    from .utils import create_knox_token as default_create_token
-else:
-    from .utils import default_create_token
-
 from rest_auth.serializers import (
     TokenSerializer as DefaultTokenSerializer,
     KnoxSerializer as DefaultKnoxSerializer,
@@ -14,7 +9,7 @@ from rest_auth.serializers import (
     PasswordResetSerializer as DefaultPasswordResetSerializer,
     PasswordResetConfirmSerializer as DefaultPasswordResetConfirmSerializer,
     PasswordChangeSerializer as DefaultPasswordChangeSerializer)
-from .utils import import_callable
+from .utils import import_callable, default_create_token
 
 create_token = import_callable(
     getattr(settings, 'REST_AUTH_TOKEN_CREATOR', default_create_token))

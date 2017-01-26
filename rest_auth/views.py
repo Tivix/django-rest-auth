@@ -22,7 +22,7 @@ from .app_settings import (
     JWTSerializer, create_token
 )
 from .models import TokenModel
-from .utils import jwt_encode
+from .utils import create_knox_token, jwt_encode
 
 if getattr(settings, 'REST_USE_KNOX', False):
     try:
@@ -72,6 +72,8 @@ class LoginView(GenericAPIView):
 
         if getattr(settings, 'REST_USE_JWT', False):
             self.token = jwt_encode(self.user)
+        elif getattr(settings, 'REST_USE_KNOX', False):
+            self.token = create_knox_token(self.user)
         else:
             self.token = create_token(self.token_model, self.user,
                                       self.serializer)

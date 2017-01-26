@@ -16,8 +16,12 @@ def default_create_token(token_model, user, serializer):
     return token
 
 
-def create_knox_token(token_model, user, serializer):
-    token = token_model.objects.create(user=user)
+def create_knox_token(user):
+    try:
+        from knox.models import AuthToken
+    except ImportError:
+        raise ImportError("django-rest-knox needs to be installed")
+    token = AuthToken.objects.create(user=user)
     return token
 
 

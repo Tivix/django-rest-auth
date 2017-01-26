@@ -21,7 +21,7 @@ from rest_auth.app_settings import (TokenSerializer,
 from rest_auth.models import TokenModel
 from rest_auth.registration.serializers import (SocialLoginSerializer,
                                                 VerifyEmailSerializer)
-from rest_auth.utils import jwt_encode
+from rest_auth.utils import create_knox_token, jwt_encode
 from rest_auth.views import LoginView
 from .app_settings import RegisterSerializer
 
@@ -73,6 +73,8 @@ class RegisterView(CreateAPIView):
         user = serializer.save(self.request)
         if getattr(settings, 'REST_USE_JWT', False):
             self.token = jwt_encode(user)  
+        elif getattr(settings, 'REST_USE_KNOX', False):
+            self.token = create_knox_token(user)
         else:
             self.token = create_token(self.token_model, user, serializer)
 
