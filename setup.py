@@ -38,6 +38,8 @@ setup(
     tests_require=[
         'responses>=0.5.0',
         'django-allauth>=0.25.0',
+        'djangorestframework-jwt>=1.9.0',
+        'django-rest-knox>=2.3.0'
     ],
     test_suite='runtests.runtests',
     include_package_data=True,
