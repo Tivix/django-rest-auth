@@ -52,10 +52,10 @@ class RegisterView(CreateAPIView):
             return JWTSerializer(data).data
         elif getattr(settings, 'REST_USE_KNOX', False):
             data = {
-                'token': user,
+                'user': user,
                 'token': self.token
             }
-            return KnoxTokenSerializer(data).data
+            return KnoxSerializer(data).data
         else:
             return TokenSerializer(self.token).data
 
