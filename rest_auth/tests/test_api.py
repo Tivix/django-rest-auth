@@ -1,15 +1,26 @@
 from django.core.urlresolvers import reverse
 from django.test import TestCase, override_settings
+
 from django.contrib.auth import get_user_model
 from django.core import mail
 from django.conf import settings
 from django.utils.encoding import force_text
+from django.utils.six.moves import reload_module
 
 from rest_framework import status
+from rest_framework.test import APIClient
+from rest_framework import views as drf_views
+
+from unittest.mock import patch
+
 from allauth.account import app_settings as account_app_settings
+from knox.models import AuthToken
+
 from .test_base import BaseAPITestCase
+from .settings import REST_FRAMEWORK_KNOX
 
 
+client = APIClient()
 @override_settings(ROOT_URLCONF="tests.urls")
 class APITestCase1(TestCase, BaseAPITestCase):
     """
@@ -541,3 +552,43 @@ class APITestCase1(TestCase, BaseAPITestCase):
 
         self.post(self.login_url, data=payload, status_code=status.HTTP_200_OK)
         self.get(self.logout_url, status_code=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    # @override_settings(REST_USE_KNOX=True, REST_FRAMEWORK = {
+    #     'DEFAULT_AUTHENTICATION_CLASSES': ('knox.auth.TokenAuthentication')},)
+    def test_logout_knox(self):
+        with override_settings(REST_USE_KNOX=True, REST_FRAMEWORK=REST_FRAMEWORK_KNOX):
+            reload_module(drf_views)
+            payload = {
+                "username": self.USERNAME,
+                "password": self.PASS
+            }
+
+            get_user_model().objects.create_user(self.USERNAME, '', self.PASS)
+
+            self.client = APIClient()
+
+            response = self.client.post(self.login_url, data=payload, status_code=status.HTTP_200_OK)
+            self.client.credentials(HTTP_AUTHORIZATION=('Token %s' % response.data['token']))
+            self.client.post(self.logout_url, status_code=status.HTTP_200_OK)
+            self.assertEqual(AuthToken.objects.count(), 0)
+        reload_module(drf_views)
+
+    @override_settings(REST_USE_KNOX=True, REST_FRAMEWORK = {
+        'DEFAULT_AUTHENTICATION_CLASSES': ('knox.auth.TokenAuthentication')},)
+    def test_logout_all_knox(self):
+        payload = {
+            "username": self.USERNAME,
+            "password": self.PASS
+        }
+
+        get_user_model().objects.create_user(self.USERNAME, '', self.PASS)
+
+        self.logout_all_url = reverse('rest_logout_all')
+
+        self.client = APIClient()
+
+        self.client.post(self.login_url, data=payload, status_code=status.HTTP_200_OK)
+        response = self.client.post(self.login_url, data=payload, status_code=status.HTTP_200_OK)
+        self.client.credentials(HTTP_AUTHORIZATION=('Token %s' % response.data['token']))
+        self.client.post(self.logout_all_url, status_code=status.HTTP_200_OK)
+        self.assertEqual(AuthToken.objects.count(), 0)

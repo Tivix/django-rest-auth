@@ -66,6 +66,15 @@ REST_FRAMEWORK = {
     )
 }
 
+REST_FRAMEWORK_KNOX = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'knox.auth.TokenAuthentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
+}
+
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
