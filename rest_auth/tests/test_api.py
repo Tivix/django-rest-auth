@@ -20,7 +20,6 @@ from .test_base import BaseAPITestCase
 from .settings import REST_FRAMEWORK_KNOX
 
 
-client = APIClient()
 @override_settings(ROOT_URLCONF="tests.urls")
 class APITestCase1(TestCase, BaseAPITestCase):
     """
