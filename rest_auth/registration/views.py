@@ -16,11 +16,12 @@ from allauth.account import app_settings as allauth_settings
 
 from rest_auth.app_settings import (TokenSerializer,
                                     JWTSerializer,
+                                    KnoxSerializer,
                                     create_token)
 from rest_auth.models import TokenModel
 from rest_auth.registration.serializers import (SocialLoginSerializer,
                                                 VerifyEmailSerializer)
-from rest_auth.utils import jwt_encode
+from rest_auth.utils import create_knox_token, jwt_encode
 from rest_auth.views import LoginView
 from .app_settings import RegisterSerializer
 
@@ -49,8 +50,14 @@ class RegisterView(CreateAPIView):
                 'token': self.token
             }
             return JWTSerializer(data).data
+        elif getattr(settings, 'REST_USE_KNOX', False):
+            data = {
+                'user': user,
+                'token': self.token
+            }
+            return KnoxSerializer(data).data
         else:
-            return TokenSerializer(user.auth_token).data
+            return TokenSerializer(self.token).data
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -65,9 +72,11 @@ class RegisterView(CreateAPIView):
     def perform_create(self, serializer):
         user = serializer.save(self.request)
         if getattr(settings, 'REST_USE_JWT', False):
-            self.token = jwt_encode(user)
+            self.token = jwt_encode(user)  
+        elif getattr(settings, 'REST_USE_KNOX', False):
+            self.token = create_knox_token(user)
         else:
-            create_token(self.token_model, user, serializer)
+            self.token = create_token(self.token_model, user, serializer)
 
         complete_signup(self.request._request, user,
                         allauth_settings.EMAIL_VERIFICATION,

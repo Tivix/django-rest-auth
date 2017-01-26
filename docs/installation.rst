@@ -153,7 +153,7 @@ JWT Support (optional)
 
 By default, ``django-rest-auth`` uses Django's Token-based authentication. If you want to use JWT authentication, you need to install the following:
 
-1. Install ``django-rest-framework-jwt`` http://getblimp.github.io/django-rest-framework-jwt/ . Right now this is the only supported JWT library. 
+1. Install ``django-rest-framework-jwt`` http://getblimp.github.io/django-rest-framework-jwt/ .
 
 2. Add the following to your settings 
 
@@ -161,3 +161,19 @@ By default, ``django-rest-auth`` uses Django's Token-based authentication. If yo
 
     REST_USE_JWT = True
 
+
+Knox (optional)
+---------------
+By default, ``django-rest-auth`` uses Django's Token-based authentication. ``django-rest-knox`` provides more secure token authentication with additional features, including multiple tokens per user.
+
+Knox and JWT cannot currently be used simultaneously.
+
+1. Install ``django-rest-knox`` https://james1345.github.io/django-rest-knox/installation/ .
+
+2. Configure ``django-rest-knox`` https://james1345.github.io/django-rest-knox/settings/ . ``REST_KNOX['USER_SERIALIZER']`` will not be used.
+
+3. Add the following to your settings 
+
+.. code-block:: python
+
+    REST_USE_KNOX = True

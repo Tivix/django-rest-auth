@@ -16,12 +16,19 @@ from rest_framework.generics import GenericAPIView, RetrieveUpdateAPIView
 from rest_framework.permissions import IsAuthenticated, AllowAny
 
 from .app_settings import (
-    TokenSerializer, UserDetailsSerializer, LoginSerializer,
-    PasswordResetSerializer, PasswordResetConfirmSerializer,
-    PasswordChangeSerializer, JWTSerializer, create_token
+    TokenSerializer, KnoxSerializer, UserDetailsSerializer,
+    LoginSerializer, PasswordResetSerializer,
+    PasswordResetConfirmSerializer, PasswordChangeSerializer,
+    JWTSerializer, create_token
 )
 from .models import TokenModel
-from .utils import jwt_encode
+from .utils import create_knox_token, jwt_encode
+
+if getattr(settings, 'REST_USE_KNOX', False):
+    try:
+        from knox.auth import TokenAuthentication as KnoxTokenAuthentication
+    except ImportError:
+        raise ImportError("Install django-rest-knox to use REST_USE_KNOX = True")
 
 sensitive_post_parameters_m = method_decorator(
     sensitive_post_parameters(
@@ -54,6 +61,8 @@ class LoginView(GenericAPIView):
     def get_response_serializer(self):
         if getattr(settings, 'REST_USE_JWT', False):
             response_serializer = JWTSerializer
+        elif getattr(settings, 'REST_USE_KNOX', False):
+            response_serializer = KnoxSerializer
         else:
             response_serializer = TokenSerializer
         return response_serializer
@@ -63,6 +72,8 @@ class LoginView(GenericAPIView):
 
         if getattr(settings, 'REST_USE_JWT', False):
             self.token = jwt_encode(self.user)
+        elif getattr(settings, 'REST_USE_KNOX', False):
+            self.token = create_knox_token(self.user)
         else:
             self.token = create_token(self.token_model, self.user,
                                       self.serializer)
@@ -74,6 +85,13 @@ class LoginView(GenericAPIView):
         serializer_class = self.get_response_serializer()
 
         if getattr(settings, 'REST_USE_JWT', False):
+            data = {
+                'user': self.user,
+                'token': self.token
+            }
+            serializer = serializer_class(instance=data,
+                                          context={'request': self.request})
+        elif getattr(settings, 'REST_USE_KNOX', False):
             data = {
                 'user': self.user,
                 'token': self.token
@@ -102,7 +120,11 @@ class LogoutView(APIView):
 
     Accepts/Returns nothing.
     """
-    permission_classes = (AllowAny,)
+    if getattr(settings, 'REST_USE_KNOX', False):
+        authentication_classes = (KnoxTokenAuthentication,)
+        permission_classes = (IsAuthenticated,)
+    else:
+        permission_classes = (AllowAny,)
 
     def get(self, request, *args, **kwargs):
         if getattr(settings, 'ACCOUNT_LOGOUT_ON_GET', False):
@@ -117,7 +139,44 @@ class LogoutView(APIView):
 
     def logout(self, request):
         try:
-            request.user.auth_token.delete()
+            if getattr(settings, 'REST_USE_KNOX', False):
+                request._auth.delete()
+            else:
+                request.user.auth_token.delete()
+        except (AttributeError, ObjectDoesNotExist):
+            pass
+
+        django_logout(request)
+
+        return Response({"detail": _("Successfully logged out.")},
+                        status=status.HTTP_200_OK)
+
+
+class LogoutAllView(APIView):
+    """
+    Calls Django logout method and deletes all the Knox tokens
+    assigned to the current User object.
+
+    Accepts/Returns nothing.
+    """
+    if getattr(settings, 'REST_USE_KNOX', False):
+        authentication_classes = (KnoxTokenAuthentication,)
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request, *args, **kwargs):
+        if getattr(settings, 'ACCOUNT_LOGOUT_ON_GET', False):
+            response = self.logout_all(request)
+        else:
+            response = self.http_method_not_allowed(request, *args, **kwargs)
+
+        return self.finalize_response(request, response, *args, **kwargs)
+
+    def post(self, request):
+        return self.logout_all(request)
+
+    def logout_all(self, request):
+        try:
+            request.user.auth_token_set.all().delete()
         except (AttributeError, ObjectDoesNotExist):
             pass
 

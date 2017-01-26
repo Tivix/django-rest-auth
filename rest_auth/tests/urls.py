@@ -8,6 +8,7 @@ from allauth.socialaccount.providers.twitter.views import TwitterOAuthAdapter
 from rest_framework.decorators import api_view
 
 from rest_auth.urls import urlpatterns
+from rest_auth.views import LogoutAllView
 from rest_auth.registration.views import SocialLoginView
 from rest_auth.social_serializers import TwitterLoginSerializer
 
@@ -49,5 +50,6 @@ urlpatterns += [
     url(r'^social-login/twitter/$', TwitterLogin.as_view(), name='tw_login'),
     url(r'^social-login/twitter-no-view/$', twitter_login_view, name='tw_login_no_view'),
     url(r'^social-login/twitter-no-adapter/$', TwitterLoginNoAdapter.as_view(), name='tw_login_no_adapter'),
-    url(r'^accounts/', include('allauth.socialaccount.urls'))
+    url(r'^accounts/', include('allauth.socialaccount.urls')),
+    url(r'^logoutall/$', LogoutAllView.as_view(), name='rest_logout_all'),
 ]

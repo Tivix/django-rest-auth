@@ -55,3 +55,8 @@ db.sqlite3
 
 # IntelliJ IDE files
 .idea
+
+# Virtual Environments
+.vagrant/
+cookbooks/
+tmp/

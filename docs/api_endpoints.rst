@@ -4,77 +4,139 @@ API endpoints
 Basic
 -----
 
-- /rest-auth/login/ (POST)
+Typically, auth data is sent in the body, with a header ``Content-Type: application/x-www-form-urlencoded``
 
-    - username
-    - email
-    - password
+/rest-auth/login/ (POST)
+************************
+**Request (standalone):**
 
-    Returns Token key
+- ``username`` or ``email`` (email will be used to lookup username)
+- ``password`` (required)
 
-- /rest-auth/logout/ (POST)
+**Request (using django-allauth):**
 
-    .. note:: ``ACCOUNT_LOGOUT_ON_GET = True`` to allow logout using GET - this is the exact same configuration from allauth. NOT recommended, see: http://django-allauth.readthedocs.io/en/latest/views.html#logout
+- ``username`` (required when ``ACCOUNT_AUTHENTICATION_METHOD = 'username'`` or ``'username_email'``)
+- ``email`` (required when ``ACCOUNT_AUTHENTICATION_METHOD = 'email'`` or ``'username_email'``)
+- ``password`` (required)
 
-- /rest-auth/password/reset/ (POST)
+**Response:**
 
-    - email
+- ``token``
+- ``user`` (when using django-rest-framework-jwt or django-rest-knox)
 
-- /rest-auth/password/reset/confirm/ (POST)
+/rest-auth/logout/ (POST)
+*************************
+    
+**Request (standalone):**
 
-    - uid
-    - token
-    - new_password1
-    - new_password2
+- No values expected
 
-    .. note:: uid and token are sent in email after calling /rest-auth/password/reset/
+**Request (using django-rest-knox):**
 
-- /rest-auth/password/change/ (POST)
+- ``Authorization: Token TOKEN`` *(Header)*
 
-    - new_password1
-    - new_password2
-    - old_password
+**Response:**
 
-    .. note:: ``OLD_PASSWORD_FIELD_ENABLED = True`` to use old_password.
-    .. note:: ``LOGOUT_ON_PASSWORD_CHANGE = False`` to keep the user logged in after password change
+- No values
 
-- /rest-auth/user/ (GET, PUT, PATCH)
+.. note:: ``ACCOUNT_LOGOUT_ON_GET = True`` to allow logout using GET - this is the exact same configuration from allauth. NOT recommended, see: http://django-allauth.readthedocs.io/en/latest/views.html#logout
 
-    - username
-    - first_name
-    - last_name
+/rest-auth/logoutall/ (POST)
+****************************
 
-    Returns pk, username, email, first_name, last_name
+This endpoint deletes all Knox tokens, and will only be loaded when `REST_USE_KNOX = True`.   
+
+| **Request (using django-rest-knox):**
+
+- `Authorization`: `Token TOKEN` (Header)
+
+**Response:**
+
+- No values
+
+.. note:: ``ACCOUNT_LOGOUT_ON_GET = True`` to allow logout using GET - this is the exact same configuration from allauth. NOT recommended, see: http://django-allauth.readthedocs.io/en/latest/views.html#logout
+
+/rest-auth/password/reset/ (POST)
+*********************************
+
+- email
+
+/rest-auth/password/reset/confirm/ (POST)
+*****************************************
+
+- uid
+- token
+- new_password1
+- new_password2
+
+.. note:: uid and token are sent in email after calling /rest-auth/password/reset/
+
+/rest-auth/password/change/ (POST)
+**********************************
+- new_password1
+- new_password2
+- old_password
+
+.. note:: ``OLD_PASSWORD_FIELD_ENABLED = True`` to use old_password.
+.. note:: ``LOGOUT_ON_PASSWORD_CHANGE = False`` to keep the user logged in after password change
+
+/rest-auth/user/ (GET, PUT, PATCH)
+**********************************
+- username
+- first_name
+- last_name
+
+Returns pk, username, email, first_name, last_name
 
 
 Registration
 ------------
 
-- /rest-auth/registration/ (POST)
+/rest-auth/registration/ (POST)
+*******************************
 
-    - username
-    - password1
-    - password2
-    - email
+**Request (using django-allauth):**
 
-- /rest-auth/registration/verify-email/ (POST)
+- ``username`` (required when ``ACCOUNT_AUTHENTICATION_METHOD = 'username'`` or ``'username_email'``, or when ``ACCOUNT_USERNAME_REQUIRED = True``)
+- ``email`` (required when ``ACCOUNT_AUTHENTICATION_METHOD = 'email'`` or ``'username_email'``, or when ``ACCOUNT_EMAIL_REQUIRED = True``)
+- ``password1`` (required)
+- ``password2`` (required)
 
-    - key
+**Response (using django-allauth):**
 
+- No values
+
+**Response (using django-allauth and django-rest-knox)**
+
+- ``token``
+- ``user``
+
+/rest-auth/registration/verify-email/ (POST)
+********************************************
+
+**Request (using django-allauth):**
+
+- ``key``
+
+**Response (using django-allauth):**
+
+- No values
 
 Social Media Authentication
 ---------------------------
 
-Basing on example from installation section :doc:`Installation </installation>`
+Based on the example from the installation section :doc:`Installation </installation>`
 
-- /rest-auth/facebook/ (POST)
+/rest-auth/facebook/ (POST)
+***************************
 
-    - access_token
-    - code
+- ``access_token``
+- ``code``
 
     .. note:: ``access_token`` OR ``code`` can be used as standalone arguments, see https://github.com/Tivix/django-rest-auth/blob/master/rest_auth/registration/views.py
 
-- /rest-auth/twitter/ (POST)
+/rest-auth/twitter/ (POST)
+**************************
 
-    - access_token
-    - token_secret
+- ``access_token``
+- ``token_secret``

@@ -16,6 +16,15 @@ def default_create_token(token_model, user, serializer):
     return token
 
 
+def create_knox_token(user):
+    try:
+        from knox.models import AuthToken
+    except ImportError:
+        raise ImportError("django-rest-knox needs to be installed")
+    token = AuthToken.objects.create(user=user)
+    return token
+
+
 def jwt_encode(user):
     try:
         from rest_framework_jwt.settings import api_settings
