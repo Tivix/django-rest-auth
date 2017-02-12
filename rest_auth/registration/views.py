@@ -22,7 +22,7 @@ from rest_auth.registration.serializers import (SocialLoginSerializer,
                                                 VerifyEmailSerializer)
 from rest_auth.utils import jwt_encode
 from rest_auth.views import LoginView
-from .app_settings import RegisterSerializer
+from .app_settings import RegisterSerializer, register_permission_classes
 
 sensitive_post_parameters_m = method_decorator(
     sensitive_post_parameters('password1', 'password2')
@@ -31,7 +31,7 @@ sensitive_post_parameters_m = method_decorator(
 
 class RegisterView(CreateAPIView):
     serializer_class = RegisterSerializer
-    permission_classes = (AllowAny, )
+    permission_classes = register_permission_classes()
     token_model = TokenModel
 
     @sensitive_post_parameters_m
