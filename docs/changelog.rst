@@ -1,6 +1,12 @@
 Changelog
 =========
 
+0.9.1
+-----
+- fixed import error when extending rest_auth serializers
+- added sensitive fields decorator
+- added Spanish translations
+
 0.9.0
 -----
 - allowed using custom UserDetailsSerializer with JWTSerializer

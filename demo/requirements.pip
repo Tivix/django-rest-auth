@@ -1,5 +1,5 @@
 django>=1.8.0
-django-rest-auth==0.9.0
+django-rest-auth==0.9.1
 djangorestframework==3.5.1
 django-allauth>=0.24.1
 six==1.9.0
