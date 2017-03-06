@@ -263,7 +263,7 @@ class TestSocialAuth(TestCase, BaseAPITestCase):
         email_confirmation = new_user.emailaddress_set.get(email=self.EMAIL)\
             .emailconfirmation_set.order_by('-created')[0]
         self.post(
-            self.veirfy_email_url,
+            self.verify_email_url,
             data={"key": email_confirmation.key},
             status_code=status.HTTP_200_OK
         )
