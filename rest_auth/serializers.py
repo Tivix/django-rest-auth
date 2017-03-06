@@ -130,20 +130,24 @@ class UserDetailsSerializer(serializers.ModelSerializer):
         read_only_fields = ('email', )
 
 
-# Required to allow using custom USER_DETAILS_SERIALIZER  in
-# JWTSerializer. Defining it here to avoid circular imports
-rest_auth_serializers = getattr(settings, 'REST_AUTH_SERIALIZERS', {})
-JWTUserDetailsSerializer = import_callable(
-    rest_auth_serializers.get('USER_DETAILS_SERIALIZER', UserDetailsSerializer)
-)
-
-
 class JWTSerializer(serializers.Serializer):
     """
     Serializer for JWT authentication.
     """
     token = serializers.CharField()
-    user = JWTUserDetailsSerializer()
+    user = serializers.SerializerMethodField()
+
+    def get_user(self, obj):
+        """
+        Required to allow using custom USER_DETAILS_SERIALIZER in
+        JWTSerializer. Defining it here to avoid circular imports
+        """
+        rest_auth_serializers = getattr(settings, 'REST_AUTH_SERIALIZERS', {})
+        JWTUserDetailsSerializer = import_callable(
+            rest_auth_serializers.get('USER_DETAILS_SERIALIZER', UserDetailsSerializer)
+        )
+        user_data = JWTUserDetailsSerializer(obj['user']).data
+        return user_data
 
 
 class PasswordResetSerializer(serializers.Serializer):
