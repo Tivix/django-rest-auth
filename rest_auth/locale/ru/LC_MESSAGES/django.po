@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-12-22 11:37-0800\n"
+"POT-Creation-Date: 2017-03-05 21:56-0800\n"
 "PO-Revision-Date: 2016-08-01 07:48+0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -52,11 +52,11 @@ msgstr "Пользователь с таким e-mail адресом уже за
 msgid "The two password fields didn't match."
 msgstr "Пароли не совпадают."
 
-#: registration/views.py:35
+#: registration/views.py:44
 msgid "Verification e-mail sent."
 msgstr "Письмо с подтверждением выслано."
 
-#: registration/views.py:82
+#: registration/views.py:91
 msgid "ok"
 msgstr "ок"
 
@@ -84,18 +84,18 @@ msgstr "Невозможно войти в систему с указанным�
 msgid "E-mail is not verified."
 msgstr "E-mail не подтверждён."
 
-#: views.py:114
+#: views.py:126
 msgid "Successfully logged out."
 msgstr "Успешно вышли."
 
-#: views.py:162
+#: views.py:174
 msgid "Password reset e-mail has been sent."
 msgstr "Письмо с инструкциями по восстановлению пароля выслано."
 
-#: views.py:184
+#: views.py:200
 msgid "Password has been reset with the new password."
 msgstr "Пароль изменён на новый."
 
-#: views.py:202
+#: views.py:222
 msgid "New password has been saved."
 msgstr "Новый пароль сохранён."

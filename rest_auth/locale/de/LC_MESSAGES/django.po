@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-12-22 11:37-0800\n"
+"POT-Creation-Date: 2017-03-05 21:56-0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -50,7 +50,7 @@ msgstr "Ein User mit dieser E-Mail Adresse ist schon registriert."
 msgid "The two password fields didn't match."
 msgstr "Die beiden Passwörter sind nicht identisch."
 
-#: registration/views.py:82
+#: registration/views.py:91
 msgid "ok"
 msgstr "Ok"
 
@@ -78,19 +78,19 @@ msgstr "Kann nicht mit den angegeben Zugangsdaten anmelden."
 msgid "E-mail is not verified."
 msgstr "E-Mail Adresse ist nicht verifiziert."
 
-#: views.py:114
+#: views.py:126
 msgid "Successfully logged out."
 msgstr "Erfolgreich ausgeloggt."
 
-#: views.py:162
+#: views.py:174
 msgid "Password reset e-mail has been sent."
 msgstr "Die E-Mail zum Zurücksetzen des Passwortes wurde verschickt."
 
-#: views.py:184
+#: views.py:200
 msgid "Password has been reset with the new password."
 msgstr "Das Passwort wurde mit dem neuen Passwort ersetzt."
 
-#: views.py:202
+#: views.py:222
 msgid "New password has been saved."
 msgstr "Das neue Passwort wurde gespeichert."
 
