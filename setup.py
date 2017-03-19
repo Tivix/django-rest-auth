@@ -38,12 +38,10 @@ setup(
     },
     tests_require=[
         'responses>=0.5.0',
-        'django-allauth>=0.25.0',
         'djangorestframework-jwt>=1.9.0',
     ],
     test_suite='runtests.runtests',
     include_package_data=True,
-    # cmdclass={},
     classifiers=[
         'Framework :: Django',
         'Intended Audience :: Developers',
