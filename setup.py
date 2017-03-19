@@ -31,6 +31,7 @@ setup(
         'Django>=1.8.0',
         'djangorestframework>=3.1.0',
         'six>=1.9.0',
+        'django-allauth>=0.25.0',
     ],
     extras_require={
         'with_social': ['django-allauth>=0.25.0'],
