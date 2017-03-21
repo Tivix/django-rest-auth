@@ -31,13 +31,13 @@ setup(
         'Django>=1.8.0',
         'djangorestframework>=3.1.0',
         'six>=1.9.0',
-        'django-allauth>=0.25.0',
     ],
     extras_require={
         'with_social': ['django-allauth>=0.25.0'],
     },
     tests_require=[
         'responses>=0.5.0',
+        'django-allauth>=0.25.0',
         'djangorestframework-jwt>=1.9.0',
     ],
     test_suite='runtests.runtests',
