@@ -54,8 +54,10 @@ class LoginView(GenericAPIView):
     def get_response_serializer(self):
         if getattr(settings, 'REST_USE_JWT', False):
             response_serializer = JWTSerializer
-        else:
+        elif getattr(settings, 'REST_USE_TOKEN', True):
             response_serializer = TokenSerializer
+        else:
+            response_serializer = UserDetailsSerializer
         return response_serializer
 
     def login(self):
@@ -63,7 +65,7 @@ class LoginView(GenericAPIView):
 
         if getattr(settings, 'REST_USE_JWT', False):
             self.token = jwt_encode(self.user)
-        else:
+        elif getattr(settings, 'REST_USE_TOKEN', True):
             self.token = create_token(self.token_model, self.user,
                                       self.serializer)
 
@@ -80,8 +82,11 @@ class LoginView(GenericAPIView):
             }
             serializer = serializer_class(instance=data,
                                           context={'request': self.request})
-        else:
+        elif getattr(settings, 'REST_USE_TOKEN', True):
             serializer = serializer_class(instance=self.token,
+                                          context={'request': self.request})
+        else:
+            serializer = serializer_class(instance=self.user,
                                           context={'request': self.request})
 
         return Response(serializer.data, status=status.HTTP_200_OK)

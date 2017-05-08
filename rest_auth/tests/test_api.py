@@ -196,6 +196,22 @@ class APITestCase1(TestCase, BaseAPITestCase):
         # bring back allauth
         settings.INSTALLED_APPS.append('allauth')
 
+    @override_settings(REST_USE_TOKEN=False)
+    def test_login_api_return_user_information(self):
+            get_user_model().objects.create_user(
+                username=self.USERNAME, password=self.PASS,
+            )
+
+            payload = {
+                'username': self.USERNAME,
+                'password': self.PASS
+            }
+            response = self.client.post(self.login_url, payload)
+            self.assertEqual(response.status_code, 200)
+
+            self.assertEqual(response.json()['username'], self.USERNAME)
+            self.assertEqual(response.json()['last_name'], "")
+
     def test_password_change(self):
         login_payload = {
             "username": self.USERNAME,
