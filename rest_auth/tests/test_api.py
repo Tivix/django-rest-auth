@@ -206,11 +206,10 @@ class APITestCase1(TestCase, BaseAPITestCase):
                 'username': self.USERNAME,
                 'password': self.PASS
             }
-            response = self.client.post(self.login_url, payload)
-            self.assertEqual(response.status_code, 200)
+            self.post(self.login_url, data=payload, status_code=200)
 
-            self.assertEqual(response.json()['username'], self.USERNAME)
-            self.assertEqual(response.json()['last_name'], "")
+            self.assertEqual(self.response.json['username'], self.USERNAME)
+            self.assertEqual(self.response.json['last_name'], "")
 
     def test_password_change(self):
         login_payload = {
