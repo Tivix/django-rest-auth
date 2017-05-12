@@ -14,7 +14,8 @@ from allauth.account.views import ConfirmEmailView
 from allauth.account.utils import complete_signup
 from allauth.account import app_settings as allauth_settings
 
-from rest_auth.app_settings import (TokenSerializer,
+from rest_auth.app_settings import (UserDetailsSerializer,
+                                    TokenSerializer,
                                     JWTSerializer,
                                     create_token)
 from rest_auth.models import TokenModel
@@ -49,8 +50,9 @@ class RegisterView(CreateAPIView):
                 'token': self.token
             }
             return JWTSerializer(data).data
-        else:
+        elif getattr(settings, 'REST_USE_TOKEN', True):
             return TokenSerializer(user.auth_token).data
+        return UserDetailsSerializer(user).data
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -66,12 +68,13 @@ class RegisterView(CreateAPIView):
         user = serializer.save(self.request)
         if getattr(settings, 'REST_USE_JWT', False):
             self.token = jwt_encode(user)
-        else:
+        elif getattr(settings, 'REST_USE_TOKEN', True):
             create_token(self.token_model, user, serializer)
 
         complete_signup(self.request._request, user,
                         allauth_settings.EMAIL_VERIFICATION,
                         None)
+
         return user
 
 

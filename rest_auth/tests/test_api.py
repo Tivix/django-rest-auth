@@ -426,6 +426,18 @@ class APITestCase1(TestCase, BaseAPITestCase):
         self._login()
         self._logout()
 
+    @override_settings(REST_USE_TOKEN=False)
+    def test_registration_without_token(self):
+        user_count = get_user_model().objects.all().count()
+
+        self.post(self.register_url, data=self.REGISTRATION_DATA_WITH_EMAIL, status_code=201)
+        self.assertEqual(self.response.json['username'], self.USERNAME)
+        self.assertEqual(self.response.json['email'], self.EMAIL)
+
+        self.assertEqual(get_user_model().objects.all().count(), user_count + 1)
+        self._login()
+        self._logout()
+
     def test_registration_with_invalid_password(self):
         data = self.REGISTRATION_DATA.copy()
         data['password2'] = 'foobar'
