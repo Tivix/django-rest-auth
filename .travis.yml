@@ -3,9 +3,9 @@ python:
   - "2.7"
   - "3.5"
 env:
-  - DJANGO=1.8.17
-  - DJANGO=1.9.12
-  - DJANGO=1.10.4
+  - DJANGO=1.8.18
+  - DJANGO=1.10.7
+  - DJANGO=1.11.1
 install:
   - pip install -q Django==$DJANGO
   - pip install coveralls
