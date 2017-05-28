@@ -20,9 +20,30 @@ Installation
     )
 
 
-.. note:: This project depends on ``django-rest-framework`` library, so install it if you haven't done yet. Make sure also you have installed ``rest_framework`` and ``rest_framework.authtoken`` apps
+.. note:: This project depends on ``django-rest-framework`` library, so install it if you haven't done yet. Make sure also you have ``rest_framework`` and ``rest_framework.authtoken`` added in INSTALLED_APPS
 
-3. Add rest_auth urls:
+3. Remove ``SessionAuthentication`` auth to ``TokenAuthentication``:
+Since this will be a API call form an external service, each API request is passed with a token (or key) to identify users. So we should use ``TokenAuthentication`` instead.
+
+.. code-block:: python
+
+    REST_FRAMEWORK = {
+        'DEFAULT_AUTHENTICATION_CLASSES': (
+            'rest_framework.authentication.SessionAuthentication', # Remove this!
+        )
+    }
+    
+replace with ``rest_framework.authentication.TokenAuthentication``
+
+.. code-block:: python
+
+    REST_FRAMEWORK = {
+        'DEFAULT_AUTHENTICATION_CLASSES': (
+            'rest_framework.authentication.TokenAuthentication',  # Add this instead
+        )
+    }
+
+4. Add rest_auth urls:
 
 .. code-block:: python
 
