@@ -12,6 +12,7 @@ from .test_base import BaseAPITestCase
 
 @override_settings(ROOT_URLCONF="tests.urls")
 class APITestCase1(TestCase, BaseAPITestCase):
+
     """
     Case #1:
     - user profile: defined
@@ -97,7 +98,8 @@ class APITestCase1(TestCase, BaseAPITestCase):
         self.post(self.password_change_url, status_code=403)
 
         # create user
-        user = get_user_model().objects.create_user(self.USERNAME, '', self.PASS)
+        user = get_user_model().objects.create_user(
+            self.USERNAME, '', self.PASS)
 
         self.post(self.login_url, data=payload, status_code=200)
         self.assertEqual('key' in self.response.json.keys(), True)
@@ -162,7 +164,8 @@ class APITestCase1(TestCase, BaseAPITestCase):
         self.post(self.password_change_url, status_code=403)
 
         # create user
-        user = get_user_model().objects.create_user(self.USERNAME, self.EMAIL, self.PASS)
+        user = get_user_model().objects.create_user(
+            self.USERNAME, self.EMAIL, self.PASS)
 
         # test auth by email
         self.post(self.login_url, data=payload, status_code=200)
@@ -276,7 +279,8 @@ class APITestCase1(TestCase, BaseAPITestCase):
         self.post(self.login_url, data=login_payload, status_code=200)
 
     def test_password_reset(self):
-        user = get_user_model().objects.create_user(self.USERNAME, self.EMAIL, self.PASS)
+        user = get_user_model().objects.create_user(
+            self.USERNAME, self.EMAIL, self.PASS)
 
         # call password reset
         mail_count = len(mail.outbox)
@@ -331,7 +335,8 @@ class APITestCase1(TestCase, BaseAPITestCase):
         self.post(self.login_url, data=payload, status_code=200)
 
     def test_password_reset_with_email_in_different_case(self):
-        get_user_model().objects.create_user(self.USERNAME, self.EMAIL.lower(), self.PASS)
+        get_user_model().objects.create_user(
+            self.USERNAME, self.EMAIL.lower(), self.PASS)
 
         # call password reset in upper case
         mail_count = len(mail.outbox)
@@ -343,7 +348,8 @@ class APITestCase1(TestCase, BaseAPITestCase):
         """
         Invalid email should not raise error, as this would leak users
         """
-        get_user_model().objects.create_user(self.USERNAME, self.EMAIL, self.PASS)
+        get_user_model().objects.create_user(
+            self.USERNAME, self.EMAIL, self.PASS)
 
         # call password reset
         mail_count = len(mail.outbox)
@@ -352,7 +358,8 @@ class APITestCase1(TestCase, BaseAPITestCase):
         self.assertEqual(len(mail.outbox), mail_count)
 
     def test_user_details(self):
-        user = get_user_model().objects.create_user(self.USERNAME, self.EMAIL, self.PASS)
+        user = get_user_model().objects.create_user(
+            self.USERNAME, self.EMAIL, self.PASS)
         payload = {
             "username": self.USERNAME,
             "password": self.PASS
@@ -388,9 +395,11 @@ class APITestCase1(TestCase, BaseAPITestCase):
         # test empty payload
         self.post(self.register_url, data={}, status_code=400)
 
-        result = self.post(self.register_url, data=self.REGISTRATION_DATA, status_code=201)
+        result = self.post(
+            self.register_url, data=self.REGISTRATION_DATA, status_code=201)
         self.assertIn('key', result.data)
-        self.assertEqual(get_user_model().objects.all().count(), user_count + 1)
+        self.assertEqual(
+            get_user_model().objects.all().count(), user_count + 1)
 
         new_user = get_user_model().objects.latest('id')
         self.assertEqual(new_user.username, self.REGISTRATION_DATA['username'])
@@ -439,7 +448,8 @@ class APITestCase1(TestCase, BaseAPITestCase):
             status_code=status.HTTP_201_CREATED
         )
         self.assertNotIn('key', result.data)
-        self.assertEqual(get_user_model().objects.all().count(), user_count + 1)
+        self.assertEqual(
+            get_user_model().objects.all().count(), user_count + 1)
         self.assertEqual(len(mail.outbox), mail_count + 1)
         new_user = get_user_model().objects.latest('id')
         self.assertEqual(new_user.username, self.REGISTRATION_DATA['username'])

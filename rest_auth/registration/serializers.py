@@ -18,7 +18,6 @@ from requests.exceptions import HTTPError
 if 'allauth.socialaccount' in settings.INSTALLED_APPS:
     from allauth.socialaccount.helpers import complete_social_login
 
-
 class SocialLoginSerializer(serializers.Serializer):
     access_token = serializers.CharField(required=False, allow_blank=True)
     code = serializers.CharField(required=False, allow_blank=True)
@@ -40,7 +39,8 @@ class SocialLoginSerializer(serializers.Serializer):
             `allauth.socialaccount.SocialLoginView` instance
         """
         request = self._get_request()
-        social_login = adapter.complete_login(request, app, token, response=response)
+        social_login = adapter.complete_login(
+            request, app, token, response=response)
         social_login.token = token
         return social_login
 

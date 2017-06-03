@@ -98,12 +98,14 @@ class TestSocialAuth(TestCase, BaseAPITestCase):
 
         self.post(self.fb_login_url, data=payload, status_code=200)
         self.assertIn('key', self.response.json.keys())
-        self.assertEqual(get_user_model().objects.all().count(), users_count + 1)
+        self.assertEqual(
+            get_user_model().objects.all().count(), users_count + 1)
 
         # make sure that second request will not create a new user
         self.post(self.fb_login_url, data=payload, status_code=200)
         self.assertIn('key', self.response.json.keys())
-        self.assertEqual(get_user_model().objects.all().count(), users_count + 1)
+        self.assertEqual(
+            get_user_model().objects.all().count(), users_count + 1)
 
     def _twitter_social_auth(self):
         # fake response for twitter call

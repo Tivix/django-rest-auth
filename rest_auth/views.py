@@ -71,6 +71,7 @@ class LoginView(GenericAPIView):
             self.process_login()
 
     def get_response(self):
+
         serializer_class = self.get_response_serializer()
 
         if getattr(settings, 'REST_USE_JWT', False):
