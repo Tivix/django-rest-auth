@@ -6,9 +6,9 @@
 Welcome to django-rest-auth's documentation!
 ============================================
 
-.. warning:: Updating django-rest-auth from version **0.3.3** is highly recommended because of a security issue in PasswordResetConfirmation validation method.
+.. warning:: Updating django-rest-auth from version **0.9.0** is highly recommended because of a security issue in PasswordResetConfirmation validation method.
 
-.. note:: django-rest-auth from v0.3.3 supports django-rest-framework v3.0
+.. note:: django-rest-auth from v0.9.0 supports django-rest-framework v3.5.1
 
 
 |build-status| |coverage-status| |requirements-status| |docs|
