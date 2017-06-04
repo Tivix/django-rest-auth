@@ -31,7 +31,13 @@ Installation
         url(r'^rest-auth/', include('rest_auth.urls'))
     )
 
+4. Migrate your database
 
+.. code-block:: python
+
+    python manage.py migrate 
+    
+    
 You're good to go now!
 
 
