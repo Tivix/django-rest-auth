@@ -498,6 +498,7 @@ class APITestCase1(TestCase, BaseAPITestCase):
         user = get_user_model().objects.create_user(self.USERNAME, self.EMAIL, self.PASS)
 
         self._login()
+        self.token = self.response.json['key']
 
         self.get(self.user_authenticated_status_url, status_code=200)
         self.assertTrue(self.response.json['authenticated'])

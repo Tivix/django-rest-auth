@@ -14,6 +14,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.generics import GenericAPIView, RetrieveUpdateAPIView
 from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.authentication import SessionAuthentication, TokenAuthentication
 
 from .app_settings import (
     TokenSerializer, UserDetailsSerializer, LoginSerializer,
@@ -160,11 +161,11 @@ class UserAuthenticationStatusView(APIView):
 
     Returns True/False indicator for if user is authenticated.
     """
-    authentication_classes = ()
+    authentication_classes = (TokenAuthentication,)
     permission_classes = ()
 
     def get(self, request, *args, **kwargs):
-        if hasattr(request, "user") and request.user.is_authenticated:
+        if hasattr(self.request, "user") and self.request.user.is_authenticated:
             return Response(
                 {"authenticated": True}, status=status.HTTP_200_OK
             )
@@ -172,6 +173,7 @@ class UserAuthenticationStatusView(APIView):
         return Response(
             {"authenticated": False}, status=status.HTTP_401_UNAUTHORIZED
         )
+
 
 class PasswordResetView(GenericAPIView):
     """
