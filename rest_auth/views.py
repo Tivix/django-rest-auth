@@ -153,6 +153,26 @@ class UserDetailsView(RetrieveUpdateAPIView):
         return get_user_model().objects.none()
 
 
+class UserAuthenticationStatusView(APIView):
+    """
+    Checks is_authenticated attribute for User attached to request.
+    Accepts GET method.
+
+    Returns True/False indicator for if user is authenticated.
+    """
+    authentication_classes = ()
+    permission_classes = ()
+
+    def get(self, request, *args, **kwargs):
+        if hasattr(request, "user") and request.user.is_authenticated:
+            return Response(
+                {"authenticated": True}, status=status.HTTP_200_OK
+            )
+
+        return Response(
+            {"authenticated": False}, status=status.HTTP_401_UNAUTHORIZED
+        )
+
 class PasswordResetView(GenericAPIView):
     """
     Calls Django Auth PasswordResetForm save method.
