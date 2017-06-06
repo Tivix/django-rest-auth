@@ -97,6 +97,7 @@ class BaseAPITestCase(object):
         self.register_url = reverse('rest_register')
         self.password_reset_url = reverse('rest_password_reset')
         self.user_url = reverse('rest_user_details')
+        self.user_authenticated_status_url = reverse('rest_auth_status')
         self.verify_email_url = reverse('rest_verify_email')
         self.fb_login_url = reverse('fb_login')
         self.tw_login_url = reverse('tw_login')
