@@ -159,7 +159,7 @@ JWT Support (optional)
 
 By default, ``django-rest-auth`` uses Django's Token-based authentication. If you want to use JWT authentication, you need to install the following:
 
-1. Install ``django-rest-framework-jwt`` http://getblimp.github.io/django-rest-framework-jwt/ . Right now this is the only supported JWT library. 
+1. Install ``djangorestframework-jwt`` http://getblimp.github.io/django-rest-framework-jwt/ . Right now this is the only supported JWT library. 
 
 2. Add the following to your settings 
 
