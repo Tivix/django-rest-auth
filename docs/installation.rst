@@ -157,13 +157,15 @@ If you are using Twitter for your social authentication, it is a bit different s
 JWT Support (optional)
 ----------------------
 
-By default, ``django-rest-auth`` uses Django's Token-based authentication. If you want to use JWT authentication, you need to install the following:
+By default ``django-rest-auth`` uses Django's Token-based authentication. If you want to use JWT authentication, follow these steps:
 
-1. Install ``django-rest-framework-jwt`` http://getblimp.github.io/django-rest-framework-jwt/ . Right now this is the only supported JWT library. 
+1. Install `django-rest-framework-jwt <http://getblimp.github.io/django-rest-framework-jwt/>`_
+    - ``django-rest-framework-jwt`` is currently the only supported JWT library.
+2. The ``JWT_PAYLOAD_HANDLER`` and ``JWT_ENCODE_HANDLER`` settings are imported from the ``django-rest-framework-jwt`` settings object.
+    - Refer to `the library's documentation <http://getblimp.github.io/django-rest-framework-jwt/#additional-settings>`_ for information on using different encoders.
 
-2. Add the following to your settings 
+3. Add the following configuration value to your settings file to enable JWT authentication.
 
 .. code-block:: python
 
     REST_USE_JWT = True
-
