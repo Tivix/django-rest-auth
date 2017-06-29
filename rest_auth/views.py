@@ -119,7 +119,8 @@ class LogoutView(APIView):
         try:
             request.user.auth_token.delete()
         except (AttributeError, ObjectDoesNotExist):
-            pass
+            return Response({"detail": _("Cannot log out Anonymous User")},
+                            status=status.HTTP_400_BAD_REQUEST)
 
         django_logout(request)
 
