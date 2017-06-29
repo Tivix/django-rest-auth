@@ -493,3 +493,11 @@ class APITestCase1(TestCase, BaseAPITestCase):
 
         self.post(self.login_url, data=payload, status_code=status.HTTP_200_OK)
         self.get(self.logout_url, status_code=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    @override_settings(ACCOUNT_LOGOUT_ON_GET=True)
+    def test_logout_anonymous_user(self):
+        payload = {
+
+        }
+        self.post(self.logout_url, data=payload, staus_code=status.HTTP_400_BAD_REQUEST)
+        self.get(self.logout_url, status_code=status.HTTP_400_BAD_REQUEST)
