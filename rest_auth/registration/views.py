@@ -36,7 +36,14 @@ class RegisterView(CreateAPIView):
 
     @sensitive_post_parameters_m
     def dispatch(self, *args, **kwargs):
-        return super(RegisterView, self).dispatch(*args, **kwargs)
+        # Check if registration is open
+        if get_adapter(self.request).is_open_for_signup(self.request):
+            return super(RegisterView, self).dispatch(*args, **kwargs)
+        else:
+            return Response(
+                data={'message': 'Registration is not open.'},
+                status=status.HTTP_403_FORBIDDEN,
+            )
 
     def get_response_data(self, user):
         if allauth_settings.EMAIL_VERIFICATION == \
