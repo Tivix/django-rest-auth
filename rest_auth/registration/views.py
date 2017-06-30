@@ -25,7 +25,7 @@ from rest_auth.views import LoginView
 from .app_settings import RegisterSerializer, register_permission_classes
 
 sensitive_post_parameters_m = method_decorator(
-    sensitive_post_parameters('password1', 'password2')
+    sensitive_post_parameters('password', 'old_password', 'new_password1', 'new_password2', 'password1', 'password2')
 )
 
 
@@ -123,6 +123,17 @@ class SocialLoginView(LoginView):
     """
 
     serializer_class = SocialLoginSerializer
+
+    @sensitive_post_parameters_m
+    def dispatch(self, *args, **kwargs):
+        # Check if registration is open
+        if get_adapter(self.request).is_open_for_signup(self.request):
+            return super(SocialLoginView, self).dispatch(*args, **kwargs)
+        else:
+            return Response(
+                data={'message': 'Registration is not open.'},
+                status=status.HTTP_403_FORBIDDEN,
+            )
 
     def process_login(self):
         get_adapter(self.request).login(self.request, self.user)
