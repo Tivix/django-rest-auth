@@ -84,7 +84,17 @@ class LoginView(GenericAPIView):
             serializer = serializer_class(instance=self.token,
                                           context={'request': self.request})
 
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        response = Response(serializer.data, status=status.HTTP_200_OK)
+        if getattr(settings, 'REST_USE_JWT', False):
+            from rest_framework_jwt.settings import api_settings as jwt_settings
+            if jwt_settings.JWT_AUTH_COOKIE:
+                from datetime import datetime
+                expiration = (datetime.utcnow() + jwt_settings.JWT_EXPIRATION_DELTA)
+                response.set_cookie(jwt_settings.JWT_AUTH_COOKIE,
+                                    self.token,
+                                    expires=expiration,
+                                    httponly=True)
+        return response
 
     def post(self, request, *args, **kwargs):
         self.request = request
