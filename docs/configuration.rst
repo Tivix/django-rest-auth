@@ -36,7 +36,7 @@ Configuration
     You can define your custom serializers for registration endpoint.
     Possible key values:
 
-        - REGISTER_SERIALIZER - serializer class in ``rest_auth.register.views.RegisterView``, default value ``rest_auth.registration.serializers.RegisterSerializer``
+        - REGISTER_SERIALIZER - serializer class in ``rest_auth.registration.views.RegisterView``, default value ``rest_auth.registration.serializers.RegisterSerializer``
     
         .. note:: The custom REGISTER_SERIALIZER must define a ``def save(self, request)`` method that returns a user model instance
 
