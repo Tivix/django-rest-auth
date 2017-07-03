@@ -36,14 +36,7 @@ class RegisterView(CreateAPIView):
 
     @sensitive_post_parameters_m
     def dispatch(self, *args, **kwargs):
-        # Check if registration is open
-        if get_adapter(self.request).is_open_for_signup(self.request):
-            return super(RegisterView, self).dispatch(*args, **kwargs)
-        else:
-            return Response(
-                data={'message': 'Registration is not open.'},
-                status=status.HTTP_403_FORBIDDEN,
-            )
+        return super(RegisterView, self).dispatch(*args, **kwargs)
 
     def get_response_data(self, user):
         if allauth_settings.EMAIL_VERIFICATION == \
@@ -60,14 +53,21 @@ class RegisterView(CreateAPIView):
             return TokenSerializer(user.auth_token).data
 
     def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        user = self.perform_create(serializer)
-        headers = self.get_success_headers(serializer.data)
+        # Check if registration is open
+        if get_adapter(self.request).is_open_for_signup(self.request):
+            serializer = self.get_serializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            user = self.perform_create(serializer)
+            headers = self.get_success_headers(serializer.data)
 
-        return Response(self.get_response_data(user),
-                        status=status.HTTP_201_CREATED,
-                        headers=headers)
+            return Response(self.get_response_data(user),
+                            status=status.HTTP_201_CREATED,
+                            headers=headers)
+        else:
+            return Response(
+                data={'message': 'Registration is not open.'},
+                status=status.HTTP_403_FORBIDDEN,
+            )
 
     def perform_create(self, serializer):
         user = serializer.save(self.request)
@@ -117,23 +117,12 @@ class SocialLoginView(LoginView):
 
     class FacebookLogin(SocialLoginView):
         adapter_class = FacebookOAuth2Adapter
-         client_class = OAuth2Client
-         callback_url = 'localhost:8000'
+        client_class = OAuth2Client
+        callback_url = 'localhost:8000'
     -------------
     """
 
     serializer_class = SocialLoginSerializer
-
-    @sensitive_post_parameters_m
-    def dispatch(self, *args, **kwargs):
-        # Check if registration is open
-        if get_adapter(self.request).is_open_for_signup(self.request):
-            return super(SocialLoginView, self).dispatch(*args, **kwargs)
-        else:
-            return Response(
-                data={'message': 'Registration is not open.'},
-                status=status.HTTP_403_FORBIDDEN,
-            )
 
     def process_login(self):
         get_adapter(self.request).login(self.request, self.user)
