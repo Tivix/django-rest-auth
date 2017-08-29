@@ -21,14 +21,28 @@ class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField(required=False, allow_blank=True)
     password = serializers.CharField(style={'input_type': 'password'})
 
+    default_error_messages = {
+        'email_and_password_required':
+            _('Must include "email" and "password".'),
+        'username_and_password_required':
+            _('Must include "username" and "password".'),
+        'either_username_or_email_and_password_required':
+            _('Must include either "username" or "email" and "password".'),
+        'user_account_disabled':
+            _('User account is disabled.'),
+        'cannot_log_in':
+            _('Unable to log in with provided credentials.'),
+        'email_not_verified':
+            _('E-mail is not verified.'),
+    }
+
     def _validate_email(self, email, password):
         user = None
 
         if email and password:
             user = authenticate(email=email, password=password)
         else:
-            msg = _('Must include "email" and "password".')
-            raise exceptions.ValidationError(msg)
+            self.fail('email_and_password_required')
 
         return user
 
@@ -38,8 +52,7 @@ class LoginSerializer(serializers.Serializer):
         if username and password:
             user = authenticate(username=username, password=password)
         else:
-            msg = _('Must include "username" and "password".')
-            raise exceptions.ValidationError(msg)
+            self.fail('username_and_password_required')
 
         return user
 
@@ -51,8 +64,7 @@ class LoginSerializer(serializers.Serializer):
         elif username and password:
             user = authenticate(username=username, password=password)
         else:
-            msg = _('Must include either "username" or "email" and "password".')
-            raise exceptions.ValidationError(msg)
+            self.fail('either_username_or_email_and_password_required')
 
         return user
 
@@ -92,11 +104,9 @@ class LoginSerializer(serializers.Serializer):
         # Did we get back an active user?
         if user:
             if not user.is_active:
-                msg = _('User account is disabled.')
-                raise exceptions.ValidationError(msg)
+                self.fail('user_account_disabled')
         else:
-            msg = _('Unable to log in with provided credentials.')
-            raise exceptions.ValidationError(msg)
+            self.fail('cannot_log_in')
 
         # If required, is the email verified?
         if 'rest_auth.registration' in settings.INSTALLED_APPS:
@@ -104,7 +114,7 @@ class LoginSerializer(serializers.Serializer):
             if app_settings.EMAIL_VERIFICATION == app_settings.EmailVerificationMethod.MANDATORY:
                 email_address = user.emailaddress_set.get(email=user.email)
                 if not email_address.verified:
-                    raise serializers.ValidationError(_('E-mail is not verified.'))
+                    self.fail('email_not_verified')
 
         attrs['user'] = user
         return attrs
@@ -230,6 +240,10 @@ class PasswordChangeSerializer(serializers.Serializer):
 
     set_password_form_class = SetPasswordForm
 
+    default_error_messages = {
+        'invalid_password': _('Invalid password.'),
+    }
+
     def __init__(self, *args, **kwargs):
         self.old_password_field_enabled = getattr(
             settings, 'OLD_PASSWORD_FIELD_ENABLED', False
@@ -253,7 +267,8 @@ class PasswordChangeSerializer(serializers.Serializer):
         )
 
         if all(invalid_password_conditions):
-            raise serializers.ValidationError('Invalid password')
+            self.fail('invalid_password')
+
         return value
 
     def validate(self, attrs):

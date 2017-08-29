@@ -23,6 +23,21 @@ class SocialLoginSerializer(serializers.Serializer):
     access_token = serializers.CharField(required=False, allow_blank=True)
     code = serializers.CharField(required=False, allow_blank=True)
 
+    default_error_messages = {
+        'view_not_defined':
+            _('View is not defined, pass it as a context variable'),
+        'adapter_class_missing':
+            _('Define adapter_class in view'),
+        'callback_url_missing':
+            _('Define callback_url in view'),
+        'client_class_missing':
+            _('Define client_class in view'),
+        'incorrect_input':
+            _('Incorrect input. access_token or code is required.'),
+        'incorrect_value':
+            _('Incorrect value')
+    }
+
     def _get_request(self):
         request = self.context.get('request')
         if not isinstance(request, HttpRequest):
@@ -49,13 +64,11 @@ class SocialLoginSerializer(serializers.Serializer):
         request = self._get_request()
 
         if not view:
-            raise serializers.ValidationError(
-                _("View is not defined, pass it as a context variable")
-            )
+            self.fail('view_not_defined')
 
         adapter_class = getattr(view, 'adapter_class', None)
         if not adapter_class:
-            raise serializers.ValidationError(_("Define adapter_class in view"))
+            self.fail('adapter_class_missing')
 
         adapter = adapter_class(request)
         app = adapter.get_provider().get_app(request)
@@ -73,13 +86,12 @@ class SocialLoginSerializer(serializers.Serializer):
             self.client_class = getattr(view, 'client_class', None)
 
             if not self.callback_url:
+                self.fail('callback_url_missing')
                 raise serializers.ValidationError(
                     _("Define callback_url in view")
                 )
             if not self.client_class:
-                raise serializers.ValidationError(
-                    _("Define client_class in view")
-                )
+                self.fail('client_class_missing')
 
             code = attrs.get('code')
 
@@ -98,8 +110,7 @@ class SocialLoginSerializer(serializers.Serializer):
             access_token = token['access_token']
 
         else:
-            raise serializers.ValidationError(
-                _("Incorrect input. access_token or code is required."))
+            self.fail('incorrect_input')
 
         social_token = adapter.parse_token({'access_token': access_token})
         social_token.app = app
@@ -108,7 +119,7 @@ class SocialLoginSerializer(serializers.Serializer):
             login = self.get_social_login(adapter, app, social_token, access_token)
             complete_social_login(request, login)
         except HTTPError:
-            raise serializers.ValidationError(_('Incorrect value'))
+            self.fail('incorrect_value')
 
         if not login.is_existing:
             login.lookup()
@@ -128,6 +139,13 @@ class RegisterSerializer(serializers.Serializer):
     password1 = serializers.CharField(write_only=True)
     password2 = serializers.CharField(write_only=True)
 
+    default_error_messages = {
+        'user_already_registered':
+            _('A user is already registered with this e-mail address.'),
+        'password_didnt_match':
+            _('The two password fields didn\'t match.')
+    }
+
     def validate_username(self, username):
         username = get_adapter().clean_username(username)
         return username
@@ -136,8 +154,7 @@ class RegisterSerializer(serializers.Serializer):
         email = get_adapter().clean_email(email)
         if allauth_settings.UNIQUE_EMAIL:
             if email and email_address_exists(email):
-                raise serializers.ValidationError(
-                    _("A user is already registered with this e-mail address."))
+                self.fail('user_already_registered')
         return email
 
     def validate_password1(self, password):
@@ -145,7 +162,7 @@ class RegisterSerializer(serializers.Serializer):
 
     def validate(self, data):
         if data['password1'] != data['password2']:
-            raise serializers.ValidationError(_("The two password fields didn't match."))
+            self.fail('password_didnt_match')
         return data
 
     def custom_signup(self, request, user):
