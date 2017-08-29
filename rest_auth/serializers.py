@@ -6,7 +6,7 @@ from django.utils.http import urlsafe_base64_decode as uid_decoder
 from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import force_text
 
-from rest_framework import serializers, exceptions
+from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
 from .models import TokenModel
