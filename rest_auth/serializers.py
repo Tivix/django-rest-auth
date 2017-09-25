@@ -71,7 +71,7 @@ class LoginSerializer(serializers.Serializer):
                 user = self._validate_email(email, password)
 
             # Authentication through username
-            if app_settings.AUTHENTICATION_METHOD == app_settings.AuthenticationMethod.USERNAME:
+            elif app_settings.AUTHENTICATION_METHOD == app_settings.AuthenticationMethod.USERNAME:
                 user = self._validate_username(username, password)
 
             # Authentication through either username or email
