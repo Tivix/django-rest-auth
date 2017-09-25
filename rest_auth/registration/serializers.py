@@ -128,7 +128,7 @@ class RegisterSerializer(serializers.Serializer):
     password1 = serializers.CharField(write_only=True)
     password2 = serializers.CharField(write_only=True)
     first_name = serializers.CharField(required=settings.ACCOUNT_FIRST_NAME_REQUIRED, max_length=30)
-	last_name = serializers.CharField(required=settings.ACCOUNT_LAST_NAME_REQUIRED, max_length=30)
+    last_name = serializers.CharField(required=settings.ACCOUNT_LAST_NAME_REQUIRED, max_length=30)
 
     def validate_username(self, username):
         username = get_adapter().clean_username(username)
