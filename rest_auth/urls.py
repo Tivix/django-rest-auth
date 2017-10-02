@@ -2,7 +2,7 @@ from django.conf.urls import url
 
 from rest_auth.views import (
     LoginView, LogoutView, UserDetailsView, PasswordChangeView,
-    PasswordResetView, PasswordResetConfirmView
+    PasswordResetView, PasswordResetConfirmView, UserAuthenticationStatusView
 )
 
 urlpatterns = [
@@ -15,6 +15,8 @@ urlpatterns = [
     # URLs that require a user to be logged in with a valid session / token.
     url(r'^logout/$', LogoutView.as_view(), name='rest_logout'),
     url(r'^user/$', UserDetailsView.as_view(), name='rest_user_details'),
+    url(r'^user/status/$', UserAuthenticationStatusView.as_view(), 
+        name='rest_auth_status'),
     url(r'^password/change/$', PasswordChangeView.as_view(),
         name='rest_password_change'),
 ]

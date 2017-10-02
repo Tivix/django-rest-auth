@@ -493,3 +493,17 @@ class APITestCase1(TestCase, BaseAPITestCase):
 
         self.post(self.login_url, data=payload, status_code=status.HTTP_200_OK)
         self.get(self.logout_url, status_code=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def test_user_authentication_status(self):
+        user = get_user_model().objects.create_user(self.USERNAME, self.EMAIL, self.PASS)
+
+        self._login()
+        self.token = self.response.json['key']
+
+        self.get(self.user_authenticated_status_url, status_code=200)
+        self.assertTrue(self.response.json['authenticated'])
+
+        self._logout()
+
+        self.get(self.user_authenticated_status_url, status_code=401)
+        self.assertFalse(self.response.json['authenticated'])
