@@ -1,6 +1,12 @@
 Changelog
 =========
 
+0.9.2
+-----
+- added permission classes configuration for registration
+- added more info to JWT docs
+- added Polish translations
+
 0.9.1
 -----
 - fixed import error when extending rest_auth serializers
