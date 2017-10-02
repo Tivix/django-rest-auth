@@ -5,13 +5,18 @@ from django.core import mail
 from django.conf import settings
 from django.utils.encoding import force_text
 
-from rest_framework import status
 from allauth.account import app_settings as account_app_settings
-from .test_base import BaseAPITestCase
+from rest_framework import status
+from rest_framework.test import APIRequestFactory
+
+from rest_auth.registration.views import RegisterView
+from rest_auth.registration.app_settings import register_permission_classes
+
+from .mixins import TestsMixin, CustomPermissionClass
 
 
 @override_settings(ROOT_URLCONF="tests.urls")
-class APITestCase1(TestCase, BaseAPITestCase):
+class APIBasicTests(TestsMixin, TestCase):
     """
     Case #1:
     - user profile: defined
@@ -397,6 +402,20 @@ class APITestCase1(TestCase, BaseAPITestCase):
 
         self._login()
         self._logout()
+
+    @override_settings(REST_AUTH_REGISTER_PERMISSION_CLASSES=(CustomPermissionClass,))
+    def test_registration_with_custom_permission_class(self):
+
+        class CustomRegisterView(RegisterView):
+            permission_classes = register_permission_classes()
+            authentication_classes = ()
+
+        factory = APIRequestFactory()
+        request = factory.post('/customer/details', self.REGISTRATION_DATA, format='json')
+
+        response = CustomRegisterView.as_view()(request)
+        self.assertEqual(response.data['detail'], CustomPermissionClass.message)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     @override_settings(REST_USE_JWT=True)
     def test_registration_with_jwt(self):

@@ -11,11 +11,11 @@ import responses
 
 from rest_framework import status
 
-from .test_base import BaseAPITestCase
+from .mixins import TestsMixin
 
 
 @override_settings(ROOT_URLCONF="tests.urls")
-class TestSocialAuth(TestCase, BaseAPITestCase):
+class TestSocialAuth(TestsMixin, TestCase):
 
     USERNAME = 'person'
     PASS = 'person'
