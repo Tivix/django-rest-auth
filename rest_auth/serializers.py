@@ -146,7 +146,7 @@ class JWTSerializer(serializers.Serializer):
         JWTUserDetailsSerializer = import_callable(
             rest_auth_serializers.get('USER_DETAILS_SERIALIZER', UserDetailsSerializer)
         )
-        user_data = JWTUserDetailsSerializer(obj['user']).data
+        user_data = JWTUserDetailsSerializer(obj['user'], context=self.context).data
         return user_data
 
 
