@@ -398,6 +398,23 @@ class APITestCase1(TestCase, BaseAPITestCase):
         self._login()
         self._logout()
 
+    def test_registration_with_empty_email(self):
+        user_count = get_user_model().objects.all().count()
+
+        payload = self.REGISTRATION_DATA
+        payload['email'] = ''
+
+        result = self.post(self.register_url, data=payload, status_code=201)
+        self.assertIn('key', result.data)
+        self.assertEqual(get_user_model().objects.all().count(), user_count + 1)
+
+        new_user = get_user_model().objects.latest('id')
+        self.assertEqual(new_user.username, self.REGISTRATION_DATA['username'])
+        self.assertEqual(new_user.email, "")
+
+        self._login()
+        self._logout()
+
     @override_settings(REST_USE_JWT=True)
     def test_registration_with_jwt(self):
         user_count = get_user_model().objects.all().count()
