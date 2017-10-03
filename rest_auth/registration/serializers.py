@@ -127,6 +127,8 @@ class RegisterSerializer(serializers.Serializer):
     email = serializers.EmailField(required=allauth_settings.EMAIL_REQUIRED)
     password1 = serializers.CharField(write_only=True)
     password2 = serializers.CharField(write_only=True)
+    first_name = serializers.CharField(required=settings.ACCOUNT_FIRST_NAME_REQUIRED, max_length=30)
+    last_name = serializers.CharField(required=settings.ACCOUNT_LAST_NAME_REQUIRED, max_length=30)
 
     def validate_username(self, username):
         username = get_adapter().clean_username(username)
@@ -153,10 +155,12 @@ class RegisterSerializer(serializers.Serializer):
 
     def get_cleaned_data(self):
         return {
-            'username': self.validated_data.get('username', ''),
-            'password1': self.validated_data.get('password1', ''),
-            'email': self.validated_data.get('email', '')
-        }
+			'username': self.validated_data.get('username', ''),
+			'password1': self.validated_data.get('password1', ''),
+			'email': self.validated_data.get('email', ''),
+			'first_name': self.validated_data.get('first_name', ''),
+			'last_name': self.validated_data.get('last_name', ''),
+		}
 
     def save(self, request):
         adapter = get_adapter()
