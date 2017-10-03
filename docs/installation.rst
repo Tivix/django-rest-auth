@@ -26,10 +26,10 @@ Installation
 
 .. code-block:: python
 
-    urlpatterns = patterns('',
+    urlpatterns = [
         ...,
         url(r'^rest-auth/', include('rest_auth.urls'))
-    )
+    ]
 
 4. Migrate your database
 
@@ -66,11 +66,11 @@ Registration (optional)
 
 .. code-block:: python
 
-    urlpatterns = patterns('',
+    urlpatterns = [
         ...,
         url(r'^rest-auth/', include('rest_auth.urls')),
         url(r'^rest-auth/registration/', include('rest_auth.registration.urls'))
-    )
+    ]
 
 
 Social Authentication (optional)
@@ -120,10 +120,10 @@ Facebook
 
 .. code-block:: python
 
-    urlpatterns += patterns('',
+    urlpatterns += [
         ...,
         url(r'^rest-auth/facebook/$', FacebookLogin.as_view(), name='fb_login')
-    )
+    ]
 
 
 Twitter
@@ -147,10 +147,10 @@ If you are using Twitter for your social authentication, it is a bit different s
 
 .. code-block:: python
 
-    urlpatterns += patterns('',
+    urlpatterns += [
         ...,
         url(r'^rest-auth/twitter/$', TwitterLogin.as_view(), name='twitter_login')
-    )
+    ]
 .. note:: Starting from v0.21.0, django-allauth has dropped support for context processors. Check out http://django-allauth.readthedocs.org/en/latest/changelog.html#from-0-21-0 for more details.
 
 
