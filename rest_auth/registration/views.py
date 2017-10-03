@@ -25,7 +25,7 @@ from rest_auth.views import LoginView
 from .app_settings import RegisterSerializer, register_permission_classes
 
 sensitive_post_parameters_m = method_decorator(
-    sensitive_post_parameters('password1', 'password2')
+    sensitive_post_parameters('password', 'old_password', 'new_password1', 'new_password2', 'password1', 'password2')
 )
 
 
@@ -53,14 +53,21 @@ class RegisterView(CreateAPIView):
             return TokenSerializer(user.auth_token).data
 
     def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        user = self.perform_create(serializer)
-        headers = self.get_success_headers(serializer.data)
+        # Check if registration is open
+        if get_adapter(self.request).is_open_for_signup(self.request):
+            serializer = self.get_serializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            user = self.perform_create(serializer)
+            headers = self.get_success_headers(serializer.data)
 
-        return Response(self.get_response_data(user),
-                        status=status.HTTP_201_CREATED,
-                        headers=headers)
+            return Response(self.get_response_data(user),
+                            status=status.HTTP_201_CREATED,
+                            headers=headers)
+        else:
+            return Response(
+                data={'message': 'Registration is not open.'},
+                status=status.HTTP_403_FORBIDDEN,
+            )
 
     def perform_create(self, serializer):
         user = serializer.save(self.request)
@@ -110,8 +117,8 @@ class SocialLoginView(LoginView):
 
     class FacebookLogin(SocialLoginView):
         adapter_class = FacebookOAuth2Adapter
-         client_class = OAuth2Client
-         callback_url = 'localhost:8000'
+        client_class = OAuth2Client
+        callback_url = 'localhost:8000'
     -------------
     """
 
