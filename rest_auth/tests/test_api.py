@@ -482,6 +482,7 @@ class APIBasicTests(TestsMixin, TestCase):
             data={"key": email_confirmation.key},
             status_code=status.HTTP_200_OK
         )
+        self.assertEqual(len(mail.outbox), mail_count + 1)
 
         # try to login again
         self._login()
