@@ -275,8 +275,12 @@ class TestSocialAuth(TestsMixin, TestCase):
             'access_token': 'abc123'
         }
 
-        self.post(self.fb_login_url, data=payload, status_code=200)
-        self.assertIn('key', self.response.json.keys())
+        # You should not have access to an account created through register
+        # by loging in through FB with an account that has the same
+        # email address.
+        self.post(self.fb_login_url, data=payload, status_code=400)
+        # self.post(self.fb_login_url, data=payload, status_code=200)
+        # self.assertIn('key', self.response.json.keys())
 
     @responses.activate
     @override_settings(

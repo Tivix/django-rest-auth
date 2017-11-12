@@ -1,6 +1,7 @@
 from django.http import HttpRequest
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
+from django.contrib.auth import get_user_model
 
 try:
     from allauth.account import app_settings as allauth_settings
@@ -111,6 +112,20 @@ class SocialLoginSerializer(serializers.Serializer):
             raise serializers.ValidationError(_('Incorrect value'))
 
         if not login.is_existing:
+            # We have an account already signed up in a different flow
+            # with the same email address: raise an exception.
+            # This needs to be handled in the frontend. We can not just
+            # link up the accounts due to security constraints
+            if(allauth_settings.UNIQUE_EMAIL):
+                # Do we have an account already with this email address?
+                existing_account = get_user_model().objects.filter(
+                    email=login.user.email,
+                ).count()
+                if(existing_account != 0):
+                    # There is an account already
+                    raise serializers.ValidationError(
+                    _("A user is already registered with this e-mail address."))
+
             login.lookup()
             login.save(request, connect=True)
         attrs['user'] = login.account.user
