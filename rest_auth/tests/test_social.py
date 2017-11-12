@@ -225,7 +225,7 @@ class TestSocialAuth(TestsMixin, TestCase):
         REST_SESSION_LOGIN=False,
         ACCOUNT_EMAIL_CONFIRMATION_HMAC=False
     )
-    def test_edge_case(self):
+    def test_email_clash_with_existing_account(self):
         resp_body = {
             "id": "123123123123",
             "first_name": "John",
@@ -251,6 +251,8 @@ class TestSocialAuth(TestsMixin, TestCase):
 
         # test empty payload
         self.post(self.register_url, data={}, status_code=400)
+
+        # register user and send email confirmation
         self.post(
             self.register_url,
             data=self.REGISTRATION_DATA,
@@ -271,16 +273,11 @@ class TestSocialAuth(TestsMixin, TestCase):
         self._login()
         self._logout()
 
+        # fb log in with already existing email
         payload = {
             'access_token': 'abc123'
         }
-
-        # You should not have access to an account created through register
-        # by loging in through FB with an account that has the same
-        # email address.
         self.post(self.fb_login_url, data=payload, status_code=400)
-        # self.post(self.fb_login_url, data=payload, status_code=200)
-        # self.assertIn('key', self.response.json.keys())
 
     @responses.activate
     @override_settings(
