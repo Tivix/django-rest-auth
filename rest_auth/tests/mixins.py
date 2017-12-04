@@ -1,7 +1,6 @@
 import json
 
 from django.conf import settings
-from django.core.urlresolvers import reverse
 from django.test.client import Client, MULTIPART_CONTENT
 from django.utils.encoding import force_text
 
@@ -14,6 +13,11 @@ class CustomPermissionClass(permissions.BasePermission):
 
     def has_permission(self, request, view):
         return False
+
+try:
+    from django.urls import reverse
+except ImportError:
+    from django.core.urlresolvers import reverse
 
 
 class APIClient(Client):
