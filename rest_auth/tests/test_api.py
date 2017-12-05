@@ -1,4 +1,3 @@
-from django.core.urlresolvers import reverse
 from django.test import TestCase, override_settings
 from django.contrib.auth import get_user_model
 from django.core import mail
@@ -13,6 +12,11 @@ from rest_auth.registration.views import RegisterView
 from rest_auth.registration.app_settings import register_permission_classes
 
 from .mixins import TestsMixin, CustomPermissionClass
+
+try:
+    from django.urls import reverse
+except ImportError:
+    from django.core.urlresolvers import reverse
 
 
 @override_settings(ROOT_URLCONF="tests.urls")
