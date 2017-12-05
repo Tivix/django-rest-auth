@@ -7,17 +7,17 @@ from django.utils.encoding import force_text
 from rest_framework import status
 from rest_framework import permissions
 
+try:
+    from django.urls import reverse
+except ImportError:
+    from django.core.urlresolvers import reverse
+
 
 class CustomPermissionClass(permissions.BasePermission):
     message = 'You shall not pass!'
 
     def has_permission(self, request, view):
         return False
-
-try:
-    from django.urls import reverse
-except ImportError:
-    from django.core.urlresolvers import reverse
 
 
 class APIClient(Client):
@@ -30,7 +30,6 @@ class APIClient(Client):
 
 
 class TestsMixin(object):
-
     """
     base for API tests:
         * easy request calls, f.e.: self.post(url, data), self.get(url)
