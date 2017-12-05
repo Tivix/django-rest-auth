@@ -47,15 +47,17 @@ INSTALLED_APPS = (
     'rest_framework_swagger',
 )
 
-MIDDLEWARE_CLASSES = (
+MIDDLEWARE = (
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
+
+# For backwards compatibility for Django 1.8
+MIDDLEWARE_CLASSES = MIDDLEWARE
 
 ROOT_URLCONF = 'demo.urls'
 
