@@ -3,6 +3,7 @@ from django.conf.urls import url
 
 from .views import RegisterView, VerifyEmailView
 
+app_name = 'restauth_registration'
 urlpatterns = [
     url(r'^$', RegisterView.as_view(), name='rest_register'),
     url(r'^verify-email/$', VerifyEmailView.as_view(), name='rest_verify_email'),
