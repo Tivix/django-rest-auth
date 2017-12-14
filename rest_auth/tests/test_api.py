@@ -280,6 +280,41 @@ class APIBasicTests(TestsMixin, TestCase):
         login_payload['password'] = new_password_payload['new_password1']
         self.post(self.login_url, data=login_payload, status_code=200)
 
+    @override_settings(LOGOUT_ON_PASSWORD_CHANGE=True)
+    def test_password_change_with_logout(self):
+        login_payload = {
+            "username": self.USERNAME,
+            "password": self.PASS
+        }
+        get_user_model().objects.create_user(self.USERNAME, '', self.PASS)
+        self.post(self.login_url, data=login_payload, status_code=200)
+        self.token = self.response.json['key']
+
+        new_password_payload = {
+            "new_password1": "new_person",
+            "new_password2": "new_person"
+        }
+
+        self.post(
+            self.password_change_url,
+            data=new_password_payload,
+            status_code=200
+        )
+
+        # user's token should not be valid any more
+        self.post(
+            self.password_change_url,
+            data=new_password_payload,
+            status_code=status.HTTP_403_FORBIDDEN
+        )
+
+        # user should not be able to login using old password
+        self.post(self.login_url, data=login_payload, status_code=400)
+
+        # new password should work
+        login_payload['password'] = new_password_payload['new_password1']
+        self.post(self.login_url, data=login_payload, status_code=200)
+
     def test_password_reset(self):
         user = get_user_model().objects.create_user(self.USERNAME, self.EMAIL, self.PASS)
 
