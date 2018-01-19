@@ -111,13 +111,9 @@ Facebook
 .. code-block:: python
 
     from allauth.socialaccount.providers.facebook.views import FacebookOAuth2Adapter
-    from rest_auth.registration.views import SocialLoginView, SocialConnectView
+    from rest_auth.registration.views import SocialLoginView
 
     class FacebookLogin(SocialLoginView):
-        adapter_class = FacebookOAuth2Adapter
-
-    # Add a connect view if you want to allow connecting existing accounts
-    class FacebookConnect(SocialConnectView):
         adapter_class = FacebookOAuth2Adapter
 
 4. Create url for FacebookLogin view:
@@ -127,7 +123,6 @@ Facebook
     urlpatterns += [
         ...,
         url(r'^rest-auth/facebook/$', FacebookLogin.as_view(), name='fb_login')
-        url(r'^rest-auth/facebook/connect/$', FacebookConnect.as_view(), name='fb_connect')
     ]
 
 
@@ -142,17 +137,11 @@ If you are using Twitter for your social authentication, it is a bit different s
 
     from allauth.socialaccount.providers.twitter.views import TwitterOAuthAdapter
     from rest_auth.registration.views import SocialLoginView
-    from rest_auth.social_serializers import TwitterLoginSerializer, TwitterConnectSerializer
+    from rest_auth.social_serializers import TwitterLoginSerializer
 
     class TwitterLogin(SocialLoginView):
         serializer_class = TwitterLoginSerializer
         adapter_class = TwitterOAuthAdapter
-
-    # Add a connect view if you want to allow connecting existing accounts
-    class TwitterConnect(SocialConnectView):
-        serializer_class = TwitterConnectSerializer
-        adapter_class = TwitterOAuthAdapter
-
 
 4. Create url for TwitterLogin view:
 
@@ -168,7 +157,32 @@ If you are using Twitter for your social authentication, it is a bit different s
 Additional Social Connect Views
 ###############################
 
-If you are using social connect views, you can also use additional views to check all social accounts attached to the current authenticated user and disconnect selected social accounts.
+If you want to allow connecting existing accounts in addition to just login, you can use connect views:
+
+.. code-block:: python
+
+    from allauth.socialaccount.providers.facebook.views import FacebookOAuth2Adapter
+    from rest_auth.registration.views import SocialConnectView
+    from rest_auth.social_serializers import TwitterConnectSerializer
+
+    class FacebookConnect(SocialConnectView):
+        adapter_class = FacebookOAuth2Adapter
+
+    class TwitterConnect(SocialConnectView):
+        serializer_class = TwitterConnectSerializer
+        adapter_class = TwitterOAuthAdapter
+
+In urls.py:
+
+.. code-block:: python
+
+    urlpatterns += [
+        ...,
+        url(r'^rest-auth/facebook/connect/$', FacebookConnect.as_view(), name='fb_connect')
+        url(r'^rest-auth/twitter/connect/$', TwitterConnect.as_view(), name='twitter_connect')
+    ]
+
+You can also use additional views to check all social accounts attached to the current authenticated user and disconnect selected social accounts.
 
 .. code-block:: python
     

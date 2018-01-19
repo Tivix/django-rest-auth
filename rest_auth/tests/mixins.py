@@ -90,6 +90,9 @@ class TestsMixin(object):
         self.tw_login_url = reverse('tw_login')
         self.tw_login_no_view_url = reverse('tw_login_no_view')
         self.tw_login_no_adapter_url = reverse('tw_login_no_adapter')
+        self.fb_connect_url = reverse('fb_connect')
+        self.tw_connect_url = reverse('tw_connect')
+        self.social_account_list_url = reverse('social_account_list')
 
     def _login(self):
         payload = {

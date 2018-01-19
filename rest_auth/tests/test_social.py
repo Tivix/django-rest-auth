@@ -5,6 +5,11 @@ from django.contrib.auth import get_user_model
 from django.test.utils import override_settings
 from django.contrib.sites.models import Site
 
+try:
+    from django.urls import reverse
+except ImportError:
+    from django.core.urlresolvers import reverse
+
 from allauth.socialaccount.models import SocialApp
 from allauth.socialaccount.providers.facebook.provider import GRAPH_API_URL
 import responses
@@ -303,3 +308,147 @@ class TestSocialAuth(TestsMixin, TestCase):
         self.assertIn('user', self.response.json.keys())
 
         self.assertEqual(get_user_model().objects.all().count(), users_count + 1)
+
+
+@override_settings(ROOT_URLCONF="tests.urls")
+class TestSocialConnectAuth(TestsMixin, TestCase):
+
+    USERNAME = 'person'
+    PASS = 'person'
+    EMAIL = "person1@world.com"
+    REGISTRATION_DATA = {
+        "username": USERNAME,
+        "password1": PASS,
+        "password2": PASS,
+        "email": EMAIL
+    }
+    LOGIN_DATA = {
+        "username": USERNAME,
+        "password": PASS,
+    }
+
+    def setUp(self):
+        self.init()
+
+        facebook_social_app = SocialApp.objects.create(
+            provider='facebook',
+            name='Facebook',
+            client_id='123123123',
+            secret='321321321',
+        )
+
+        twitter_social_app = SocialApp.objects.create(
+            provider='twitter',
+            name='Twitter',
+            client_id='11223344',
+            secret='55667788',
+        )
+
+        site = Site.objects.get_current()
+        facebook_social_app.sites.add(site)
+        twitter_social_app.sites.add(site)
+        self.graph_api_url = GRAPH_API_URL + '/me'
+        self.twitter_url = 'https://api.twitter.com/1.1/account/verify_credentials.json'
+
+    @responses.activate
+    def test_social_connect_no_auth(self):
+        responses.add(
+            responses.GET,
+            self.graph_api_url,
+            body='',
+            status=200,
+            content_type='application/json'
+        )
+
+        payload = {
+            'access_token': 'abc123'
+        }
+        self.post(self.fb_connect_url, data=payload, status_code=403)
+        self.post(self.tw_connect_url, data=payload, status_code=403)
+
+    @responses.activate
+    def test_social_connect(self):
+        # register user
+        self.post(
+            self.register_url,
+            data=self.REGISTRATION_DATA,
+            status_code=201
+        )
+
+        # Test Facebook
+        resp_body = {
+            "id": "123123123123",
+            "first_name": "John",
+            "gender": "male",
+            "last_name": "Smith",
+            "link": "https://www.facebook.com/john.smith",
+            "locale": "en_US",
+            "name": "John Smith",
+            "timezone": 2,
+            "updated_time": "2014-08-13T10:14:38+0000",
+            "username": "john.smith",
+            "verified": True
+        }
+
+        responses.add(
+            responses.GET,
+            self.graph_api_url,
+            body=json.dumps(resp_body),
+            status=200,
+            content_type='application/json'
+        )
+
+        payload = {
+            'access_token': 'abc123'
+        }
+        self.post(self.fb_connect_url, data=payload, status_code=200)
+        self.assertIn('key', self.response.json.keys())
+
+        # Test Twitter
+        self.post(self.logout_url)
+        self.post(self.login_url, data=self.LOGIN_DATA)
+
+        resp_body = {
+            "id": "123123123123",
+        }
+
+        responses.add(
+            responses.GET,
+            self.twitter_url,
+            body=json.dumps(resp_body),
+            status=200,
+            content_type='application/json'
+        )
+
+        payload = {
+            'access_token': 'abc123',
+            'token_secret': '1111222233334444'
+        }
+
+        self.post(self.tw_connect_url, data=payload)
+
+        self.assertIn('key', self.response.json.keys())
+
+        # Check current social accounts
+        self.get(self.social_account_list_url)
+        self.assertEqual(len(self.response.json), 2)
+        self.assertEqual(self.response.json[0]['provider'], 'facebook')
+        self.assertEqual(self.response.json[1]['provider'], 'twitter')
+
+        facebook_social_account_id = self.response.json[0]['id']
+
+        # Try disconnecting accounts
+        self.incorrect_disconnect_url = reverse(
+            'social_account_disconnect', args=[999]
+        )
+        self.post(self.incorrect_disconnect_url, status_code=404)
+
+        self.disconnect_url = reverse(
+            'social_account_disconnect', args=[facebook_social_account_id]
+        )
+        self.post(self.disconnect_url, status_code=200)
+
+        # Check social accounts after disconnecting
+        self.get(self.social_account_list_url)
+        self.assertEqual(len(self.response.json), 1)
+        self.assertEqual(self.response.json[0]['provider'], 'twitter')
