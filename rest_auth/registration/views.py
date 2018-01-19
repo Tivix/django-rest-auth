@@ -7,21 +7,25 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import (AllowAny,
                                         IsAuthenticated)
-from rest_framework.decorators import detail_route
-from rest_framework.viewsets import GenericViewSet
-from rest_framework.generics import CreateAPIView
+from rest_framework.generics import CreateAPIView, ListAPIView, GenericAPIView
+from rest_framework.exceptions import NotFound
 from rest_framework import status
 
+from allauth.account.adapter import get_adapter
 from allauth.account.views import ConfirmEmailView
 from allauth.account.utils import complete_signup
 from allauth.account import app_settings as allauth_settings
+from allauth.socialaccount import signals
+from allauth.socialaccount.adapter import get_adapter as get_social_adapter
+from allauth.socialaccount.models import SocialAccount
 
 from rest_auth.app_settings import (TokenSerializer,
                                     JWTSerializer,
                                     create_token)
 from rest_auth.models import TokenModel
-from rest_auth.registration.serializers import (SocialLoginSerializer,
-                                                VerifyEmailSerializer,
+from rest_auth.registration.serializers import (VerifyEmailSerializer,
+                                                SocialLoginSerializer,
+                                                SocialAccountSerializer,
                                                 SocialConnectSerializer)
 from rest_auth.utils import jwt_encode
 from rest_auth.views import LoginView
@@ -94,98 +98,89 @@ class VerifyEmailView(APIView, ConfirmEmailView):
         return Response({'detail': _('ok')}, status=status.HTTP_200_OK)
 
 
-if 'allauth.socialaccount' in settings.INSTALLED_APPS:
-    from allauth.socialaccount import signals
-    from allauth.socialaccount.models import SocialAccount
-    from allauth.socialaccount.adapter import get_adapter
+class SocialLoginView(LoginView):
+    """
+    class used for social authentications
+    example usage for facebook with access_token
+    -------------
+    from allauth.socialaccount.providers.facebook.views import FacebookOAuth2Adapter
 
-    from rest_auth.registration.serializers import SocialAccountSerializer
+    class FacebookLogin(SocialLoginView):
+        adapter_class = FacebookOAuth2Adapter
+    -------------
 
+    example usage for facebook with code
 
-    class SocialLoginView(LoginView):
-        """
-        class used for social authentications
-        example usage for facebook with access_token
-        -------------
-        from allauth.socialaccount.providers.facebook.views import FacebookOAuth2Adapter
+    -------------
+    from allauth.socialaccount.providers.facebook.views import FacebookOAuth2Adapter
+    from allauth.socialaccount.providers.oauth2.client import OAuth2Client
 
-        class FacebookLogin(SocialLoginView):
-            adapter_class = FacebookOAuth2Adapter
-        -------------
+    class FacebookLogin(SocialLoginView):
+        adapter_class = FacebookOAuth2Adapter
+        client_class = OAuth2Client
+        callback_url = 'localhost:8000'
+    -------------
+    """
+    serializer_class = SocialLoginSerializer
 
-        example usage for facebook with code
-
-        -------------
-        from allauth.socialaccount.providers.facebook.views import FacebookOAuth2Adapter
-        from allauth.socialaccount.providers.oauth2.client import OAuth2Client
-
-        class FacebookLogin(SocialLoginView):
-            adapter_class = FacebookOAuth2Adapter
-            client_class = OAuth2Client
-            callback_url = 'localhost:8000'
-        -------------
-        """
-
-        serializer_class = SocialLoginSerializer
-
-        def process_login(self):
-            get_adapter(self.request).login(self.request, self.user)
+    def process_login(self):
+        get_adapter(self.request).login(self.request, self.user)
 
 
-    class SocialConnectView(SocialLoginView):
-        """
-        class used for social account linking
+class SocialConnectView(LoginView):
+    """
+    class used for social account linking
 
-        example usage for facebook with access_token
-        -------------
-        from allauth.socialaccount.providers.facebook.views import FacebookOAuth2Adapter
+    example usage for facebook with access_token
+    -------------
+    from allauth.socialaccount.providers.facebook.views import FacebookOAuth2Adapter
 
-        class FacebookConnect(SocialConnectView):
-            adapter_class = FacebookOAuth2Adapter
-        -------------
-        """
+    class FacebookConnect(SocialConnectView):
+        adapter_class = FacebookOAuth2Adapter
+    -------------
+    """
+    serializer_class = SocialConnectSerializer
+    permission_classes = (IsAuthenticated,)
 
-        serializer_class = SocialConnectSerializer
-        permission_classes = (IsAuthenticated,)
+    def process_login(self):
+        get_adapter(self.request).login(self.request, self.user)
 
 
-    class SocialAccountViewSet(GenericViewSet):
-        """
-        allauth SocialAccount REST API read and disconnect views for logged in users
+class SocialAccountListView(ListAPIView):
+    """
+    List SocialAccounts for the currently logged in user
+    """
+    serializer_class = SocialAccountSerializer
+    permission_classes = (IsAuthenticated,)
 
-        Refer to the django-allauth package implementation of the models and
-        account handling logic for more details, this viewset emulates the allauth web UI.
-        """
+    def get_queryset(self):
+        return SocialAccount.objects.filter(user=self.request.user)
 
-        serializer_class = SocialAccountSerializer
-        permission_classes = (IsAuthenticated,)
-        queryset = SocialAccount.objects.none()
 
-        def get_queryset(self):
-            return SocialAccount.objects.filter(user=self.request.user)
+class SocialAccountDisconnectView(GenericAPIView):
+    """
+    Disconnect SocialAccount from remote service for
+    the currently logged in user
+    """
+    serializer_class = SocialConnectSerializer
+    permission_classes = (IsAuthenticated,)
 
-        def list(self, request):
-            """
-            list SocialAccounts for the currently logged in user
-            """
+    def get_queryset(self):
+        return SocialAccount.objects.filter(user=self.request.user)
 
-            return Response(self.get_serializer(self.get_queryset(), many=True).data)
+    def post(self, request, *args, **kwargs):
+        accounts = self.get_queryset()
+        account = accounts.filter(pk=kwargs['pk']).first()
+        if not account:
+            raise NotFound
 
-        @detail_route(methods=['POST'])
-        def disconnect(self, request, pk):
-            """
-            disconnect SocialAccount from remote service for the currently logged in user
-            """
+        get_social_adapter(self.request).validate_disconnect(account, accounts)
 
-            accounts = self.get_queryset()
-            account = accounts.get(pk=pk)
-            get_adapter(self.request).validate_disconnect(account, accounts)
+        account.delete()
+        signals.social_account_removed.send(
+            sender=SocialAccount,
+            request=self.request,
+            socialaccount=account
+        )
 
-            account.delete()
-            signals.social_account_removed.send(
-                sender=SocialAccount,
-                request=self.request,
-                socialaccount=account
-            )
-
-            return Response(self.get_serializer(account).data)
+        return Response(self.get_serializer(account).data)
