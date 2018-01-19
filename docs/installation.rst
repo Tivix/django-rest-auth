@@ -161,9 +161,34 @@ If you are using Twitter for your social authentication, it is a bit different s
     urlpatterns += [
         ...,
         url(r'^rest-auth/twitter/$', TwitterLogin.as_view(), name='twitter_login')
-        url(r'^rest-auth/twitter/connect/$', TwitterConnect.as_view(), name='twitter_login')
+        url(r'^rest-auth/twitter/connect/$', TwitterConnect.as_view(), name='twitter_connect')
     ]
 .. note:: Starting from v0.21.0, django-allauth has dropped support for context processors. Check out http://django-allauth.readthedocs.org/en/latest/changelog.html#from-0-21-0 for more details.
+
+Additional Social Connect Views
+###############################
+
+If you are using social connect views, you can also use additional views to check all social accounts attached to the current authenticated user and disconnect selected social accounts.
+
+.. code-block:: python
+    
+    from rest_auth.registration.views import (
+        SocialAccountListView, SocialAccountDisconnectView
+    )
+
+    urlpatterns += [
+        ...,
+        url(
+            r'^socialaccounts/$',
+            SocialAccountListView.as_view(),
+            name='social_account_list'
+        ),
+        url(
+            r'^socialaccounts/(?P<pk>\d+)/disconnect/$',
+            SocialAccountDisconnectView.as_view(),
+            name='social_account_disconnect'
+        )
+    ]
 
 
 JWT Support (optional)
