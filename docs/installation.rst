@@ -111,9 +111,13 @@ Facebook
 .. code-block:: python
 
     from allauth.socialaccount.providers.facebook.views import FacebookOAuth2Adapter
-    from rest_auth.registration.views import SocialLoginView
+    from rest_auth.registration.views import SocialLoginView, SocialConnectView
 
     class FacebookLogin(SocialLoginView):
+        adapter_class = FacebookOAuth2Adapter
+
+    # Add a connect view if you want to allow connecting existing accounts
+    class FacebookConnect(SocialConnectView):
         adapter_class = FacebookOAuth2Adapter
 
 4. Create url for FacebookLogin view:
@@ -123,6 +127,7 @@ Facebook
     urlpatterns += [
         ...,
         url(r'^rest-auth/facebook/$', FacebookLogin.as_view(), name='fb_login')
+        url(r'^rest-auth/facebook/connect/$', FacebookConnect.as_view(), name='fb_connect')
     ]
 
 
@@ -136,12 +141,18 @@ If you are using Twitter for your social authentication, it is a bit different s
 .. code-block:: python
 
     from allauth.socialaccount.providers.twitter.views import TwitterOAuthAdapter
-    from rest_auth.views import LoginView
-    from rest_auth.social_serializers import TwitterLoginSerializer
+    from rest_auth.registration.views import SocialLoginView
+    from rest_auth.social_serializers import TwitterLoginSerializer, TwitterConnectSerializer
 
-    class TwitterLogin(LoginView):
+    class TwitterLogin(SocialLoginView):
         serializer_class = TwitterLoginSerializer
         adapter_class = TwitterOAuthAdapter
+
+    # Add a connect view if you want to allow connecting existing accounts
+    class TwitterConnect(SocialConnectView):
+        serializer_class = TwitterConnectSerializer
+        adapter_class = TwitterOAuthAdapter
+
 
 4. Create url for TwitterLogin view:
 
@@ -150,6 +161,7 @@ If you are using Twitter for your social authentication, it is a bit different s
     urlpatterns += [
         ...,
         url(r'^rest-auth/twitter/$', TwitterLogin.as_view(), name='twitter_login')
+        url(r'^rest-auth/twitter/connect/$', TwitterConnect.as_view(), name='twitter_login')
     ]
 .. note:: Starting from v0.21.0, django-allauth has dropped support for context processors. Check out http://django-allauth.readthedocs.org/en/latest/changelog.html#from-0-21-0 for more details.
 

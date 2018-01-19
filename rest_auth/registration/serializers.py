@@ -14,10 +14,6 @@ except ImportError:
 
 from rest_framework import serializers
 from requests.exceptions import HTTPError
-# Import is needed only if we are using social login, in which
-# case the allauth.socialaccount will be declared
-if 'allauth.socialaccount' in settings.INSTALLED_APPS:
-    from allauth.socialaccount.helpers import complete_social_login
 
 
 class SocialLoginSerializer(serializers.Serializer):
@@ -186,3 +182,44 @@ class RegisterSerializer(serializers.Serializer):
 
 class VerifyEmailSerializer(serializers.Serializer):
     key = serializers.CharField()
+
+
+# Import is needed only if we are using social login, in which
+# case the allauth.socialaccount will be declared
+if 'allauth.socialaccount' in settings.INSTALLED_APPS:
+    from allauth.socialaccount.helpers import complete_social_login
+    from allauth.socialaccount.models import SocialAccount
+    from allauth.socialaccount.providers.base import AuthProcess
+
+    class SocialAccountSerializer(serializers.ModelSerializer):
+        """
+        serialize allauth SocialAccounts for use with a REST API
+        """
+        class Meta:
+            model = SocialAccount
+            fields = (
+                'id',
+                'provider',
+                'uid',
+                'last_login',
+                'date_joined',
+                'extra_data',
+            )
+
+
+    class SocialConnectMixin(object):
+        def get_social_login(self, *args, **kwargs):
+            """
+            set the social login process state to connect rather than login
+
+            Refer to the implementation of get_social_login in base class and to the
+            allauth.socialaccount.helpers module complete_social_login function.
+            """
+
+            social_login = super(SocialConnectMixin, self).get_social_login(*args, **kwargs)
+            social_login.state['process'] = AuthProcess.CONNECT
+            return social_login
+
+
+    class SocialConnectSerializer(SocialConnectMixin, SocialLoginSerializer):
+        pass
