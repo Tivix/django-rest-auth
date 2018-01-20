@@ -322,10 +322,6 @@ class TestSocialConnectAuth(TestsMixin, TestCase):
         "password2": PASS,
         "email": EMAIL
     }
-    LOGIN_DATA = {
-        "username": USERNAME,
-        "password": PASS,
-    }
 
     def setUp(self):
         self.init()
@@ -405,9 +401,6 @@ class TestSocialConnectAuth(TestsMixin, TestCase):
         self.assertIn('key', self.response.json.keys())
 
         # Test Twitter
-        self.post(self.logout_url)
-        self.post(self.login_url, data=self.LOGIN_DATA)
-
         resp_body = {
             "id": "123123123123",
         }
@@ -439,7 +432,7 @@ class TestSocialConnectAuth(TestsMixin, TestCase):
 
         # Try disconnecting accounts
         self.incorrect_disconnect_url = reverse(
-            'social_account_disconnect', args=[999]
+            'social_account_disconnect', args=[999999999]
         )
         self.post(self.incorrect_disconnect_url, status_code=404)
 

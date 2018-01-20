@@ -1,6 +1,13 @@
 Changelog
 =========
 
+0.9.3
+-----
+- added social connect views
+- added check for pre-existing accounts in social login
+- prevent double-validation in LoginSerializer
+- unit tests and demo project changes for Django 2.0
+
 0.9.2
 -----
 - added permission classes configuration for registration

@@ -150,14 +150,14 @@ If you are using Twitter for your social authentication, it is a bit different s
     urlpatterns += [
         ...,
         url(r'^rest-auth/twitter/$', TwitterLogin.as_view(), name='twitter_login')
-        url(r'^rest-auth/twitter/connect/$', TwitterConnect.as_view(), name='twitter_connect')
     ]
+
 .. note:: Starting from v0.21.0, django-allauth has dropped support for context processors. Check out http://django-allauth.readthedocs.org/en/latest/changelog.html#from-0-21-0 for more details.
 
 Additional Social Connect Views
 ###############################
 
-If you want to allow connecting existing accounts in addition to just login, you can use connect views:
+If you want to allow connecting existing accounts in addition to login, you can use connect views:
 
 .. code-block:: python
 
@@ -182,7 +182,7 @@ In urls.py:
         url(r'^rest-auth/twitter/connect/$', TwitterConnect.as_view(), name='twitter_connect')
     ]
 
-You can also use additional views to check all social accounts attached to the current authenticated user and disconnect selected social accounts.
+You can also use the following views to check all social accounts attached to the current authenticated user and disconnect selected social accounts:
 
 .. code-block:: python
     
