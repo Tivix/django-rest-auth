@@ -1,5 +1,4 @@
 from django.http import HttpRequest
-from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth import get_user_model
 
