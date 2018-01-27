@@ -91,7 +91,8 @@ class LoginSerializer(serializers.Serializer):
 
         # Did we get back an active user?
         if user:
-            if not user.is_active:
+            # Raises error only if user is deactivated and inactive user login is disabled
+            if not user.is_active and not getattr(settings, 'REST_INACTIVE_USER_LOGIN', False):
                 msg = _('User account is disabled.')
                 raise exceptions.ValidationError(msg)
         else:
