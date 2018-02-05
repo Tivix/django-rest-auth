@@ -17,7 +17,9 @@ UserModel = get_user_model()
 
 
 class LoginSerializer(serializers.Serializer):
-    username = serializers.CharField(required=False, allow_blank=True)
+    if settings.ACCOUNT_USER_MODEL_USERNAME_FIELD is not None:
+        username = serializers.CharField(required=False, allow_blank=True)
+
     email = serializers.EmailField(required=False, allow_blank=True)
     password = serializers.CharField(style={'input_type': 'password'})
 
@@ -34,7 +36,6 @@ class LoginSerializer(serializers.Serializer):
 
     def _validate_username(self, username, password):
         user = None
-
         if username and password:
             user = authenticate(username=username, password=password)
         else:
@@ -57,6 +58,7 @@ class LoginSerializer(serializers.Serializer):
         return user
 
     def validate(self, attrs):
+
         username = attrs.get('username')
         email = attrs.get('email')
         password = attrs.get('password')
@@ -114,7 +116,6 @@ class TokenSerializer(serializers.ModelSerializer):
     """
     Serializer for Token model.
     """
-
     class Meta:
         model = TokenModel
         fields = ('key',)
@@ -124,10 +125,16 @@ class UserDetailsSerializer(serializers.ModelSerializer):
     """
     User model w/o password
     """
-    class Meta:
-        model = UserModel
-        fields = ('pk', 'username', 'email', 'first_name', 'last_name')
-        read_only_fields = ('email', )
+    if settings.ACCOUNT_USER_MODEL_USERNAME_FIELD is None:
+        class Meta:
+            model = UserModel
+            fields = ('pk', 'email', 'first_name', 'last_name')
+            read_only_fields = ('email', )
+    else:
+        class Meta:
+            model = UserModel
+            fields = ('pk',  'username', 'email', 'first_name', 'last_name')
+            read_only_fields = ('email', )
 
 
 class JWTSerializer(serializers.Serializer):
