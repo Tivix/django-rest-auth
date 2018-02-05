@@ -36,6 +36,7 @@ class LoginSerializer(serializers.Serializer):
 
     def _validate_username(self, username, password):
         user = None
+
         if username and password:
             user = authenticate(username=username, password=password)
         else:
@@ -115,6 +116,7 @@ class TokenSerializer(serializers.ModelSerializer):
     """
     Serializer for Token model.
     """
+    
     class Meta:
         model = TokenModel
         fields = ('key',)
