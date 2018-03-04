@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.db import transaction
 from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext_lazy as _
 from django.views.decorators.debug import sensitive_post_parameters
@@ -29,7 +30,9 @@ from rest_auth.registration.serializers import (VerifyEmailSerializer,
                                                 SocialConnectSerializer)
 from rest_auth.utils import jwt_encode
 from rest_auth.views import LoginView
-from .app_settings import RegisterSerializer, register_permission_classes
+from .app_settings import (RegisterSerializer,
+                           register_permission_classes,
+                           roll_back_register_on_error)
 
 sensitive_post_parameters_m = method_decorator(
     sensitive_post_parameters('password1', 'password2')
@@ -80,6 +83,12 @@ class RegisterView(CreateAPIView):
                         allauth_settings.EMAIL_VERIFICATION,
                         None)
         return user
+
+
+if roll_back_register_on_error:
+    RegisterView.perform_create = transaction.atomic(
+        RegisterView.perform_create
+    )
 
 
 class VerifyEmailView(APIView, ConfirmEmailView):

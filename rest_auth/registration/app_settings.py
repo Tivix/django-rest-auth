@@ -17,3 +17,7 @@ def register_permission_classes():
     for klass in getattr(settings, 'REST_AUTH_REGISTER_PERMISSION_CLASSES', tuple()):
         permission_classes.append(import_callable(klass))
     return tuple(permission_classes)
+
+roll_back_register_on_error = getattr(settings,
+                                      'REST_AUTH_ROLL_BACK_REGISTER_ON_ERROR',
+                                      False)
