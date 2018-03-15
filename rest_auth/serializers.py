@@ -26,6 +26,12 @@ class LoginSerializer(serializers.Serializer):
 
         if email and password:
             user = authenticate(email=email, password=password)
+            try:
+                username = UserModel.objects.get(email__iexact=email).get_username()
+                user = authenticate(username=username, password=password)
+            except UserModel.DoesNotExist:
+                msg = _('Unable to log in with provided credentials.')
+                raise exceptions.ValidationError(msg)
         else:
             msg = _('Must include "email" and "password".')
             raise exceptions.ValidationError(msg)
@@ -48,6 +54,12 @@ class LoginSerializer(serializers.Serializer):
 
         if email and password:
             user = authenticate(email=email, password=password)
+            try:
+                username = UserModel.objects.get(email__iexact=email).get_username()
+                user = authenticate(username=username, password=password)
+            except UserModel.DoesNotExist:
+                msg = _('Unable to log in with provided credentials.')
+                raise exceptions.ValidationError(msg)
         elif username and password:
             user = authenticate(username=username, password=password)
         else:

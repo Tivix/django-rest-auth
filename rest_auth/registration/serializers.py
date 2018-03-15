@@ -1,4 +1,6 @@
+from django.conf import settings
 from django.http import HttpRequest
+
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth import get_user_model
 
@@ -17,7 +19,11 @@ except ImportError:
 from rest_framework import serializers
 from requests.exceptions import HTTPError
 
-
+if not hasattr(settings, 'ACCOUNT_FIRST_NAME_REQUIRED'):
+    settings.ACCOUNT_FIRST_NAME_REQUIRED = False
+if not hasattr(settings, 'ACCOUNT_LAST_NAME_REQUIRED'):
+    settings.ACCOUNT_LAST_NAME_REQUIRED = False
+    
 class SocialAccountSerializer(serializers.ModelSerializer):
     """
     serialize allauth SocialAccounts for use with a REST API
@@ -169,6 +175,8 @@ class RegisterSerializer(serializers.Serializer):
         min_length=allauth_settings.USERNAME_MIN_LENGTH,
         required=allauth_settings.USERNAME_REQUIRED
     )
+    first_name = serializers.CharField(required=settings.ACCOUNT_FIRST_NAME_REQUIRED, max_length=30)
+    last_name = serializers.CharField(required=settings.ACCOUNT_LAST_NAME_REQUIRED, max_length=30)
     email = serializers.EmailField(required=allauth_settings.EMAIL_REQUIRED)
     password1 = serializers.CharField(write_only=True)
     password2 = serializers.CharField(write_only=True)
@@ -198,6 +206,8 @@ class RegisterSerializer(serializers.Serializer):
 
     def get_cleaned_data(self):
         return {
+            'first_name': self.validated_data.get('first_name', ''),
+            'last_name': self.validated_data.get('last_name', ''),
             'username': self.validated_data.get('username', ''),
             'password1': self.validated_data.get('password1', ''),
             'email': self.validated_data.get('email', '')

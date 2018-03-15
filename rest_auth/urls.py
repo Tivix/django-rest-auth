@@ -5,6 +5,14 @@ from rest_auth.views import (
     PasswordResetView, PasswordResetConfirmView
 )
 
+from rest_framework import status
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+
+@api_view()
+def null_view(request):
+    return Response(status=status.HTTP_400_BAD_REQUEST)
+
 urlpatterns = [
     # URLs that do not require a session or valid token
     url(r'^password/reset/$', PasswordResetView.as_view(),
@@ -17,4 +25,5 @@ urlpatterns = [
     url(r'^user/$', UserDetailsView.as_view(), name='rest_user_details'),
     url(r'^password/change/$', PasswordChangeView.as_view(),
         name='rest_password_change'),
+    url(r'^new-password/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$', null_view ,name='password_reset_confirm'),
 ]
