@@ -154,7 +154,10 @@ class SocialAccountListView(ListAPIView):
     permission_classes = (IsAuthenticated,)
 
     def get_queryset(self):
-        return SocialAccount.objects.filter(user=self.request.user)
+        if self.request:
+            return SocialAccount.objects.filter(user=self.request.user)
+        else:
+            return SocialAccount.objects.none()
 
 
 class SocialAccountDisconnectView(GenericAPIView):
@@ -166,7 +169,10 @@ class SocialAccountDisconnectView(GenericAPIView):
     permission_classes = (IsAuthenticated,)
 
     def get_queryset(self):
-        return SocialAccount.objects.filter(user=self.request.user)
+        if self.request:
+            return SocialAccount.objects.filter(user=self.request.user)
+        else:
+            return SocialAccount.objects.none()
 
     def post(self, request, *args, **kwargs):
         accounts = self.get_queryset()
