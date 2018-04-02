@@ -14,6 +14,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.generics import GenericAPIView, RetrieveUpdateAPIView
 from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.authentication import TokenAuthentication, SessionAuthentication, BasicAuthentication
 
 from .app_settings import (
     TokenSerializer, UserDetailsSerializer, LoginSerializer,
@@ -141,6 +142,7 @@ class UserDetailsView(RetrieveUpdateAPIView):
     """
     serializer_class = UserDetailsSerializer
     permission_classes = (IsAuthenticated,)
+    authentication_classes = (BasicAuthentication, SessionAuthentication, TokenAuthentication)
 
     def get_object(self):
         return self.request.user
