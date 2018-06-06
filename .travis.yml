@@ -4,7 +4,6 @@ python:
   - "3.5"
   - "3.6"
 env:
-  - DJANGO=1.8.* DRF=3.6.*
   - DJANGO=1.11.* DRF=3.7.*
   - DJANGO=2.0.* DRF=3.7.*
 install:
