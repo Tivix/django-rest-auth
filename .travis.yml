@@ -22,4 +22,5 @@ matrix:
   exclude:
     - python: "2.7"
       env: DJANGO=2.0.* DRF=3.7.*
+    - python: "2.7"
       env: DJANGO=2.0.* DRF=3.8.*
