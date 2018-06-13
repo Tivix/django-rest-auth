@@ -21,11 +21,14 @@ class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField(required=False, allow_blank=True)
     password = serializers.CharField(style={'input_type': 'password'})
 
+    def authenticate(self, **kwargs):
+        return authenticate(self.context['request'], **kwargs)
+
     def _validate_email(self, email, password):
         user = None
 
         if email and password:
-            user = authenticate(email=email, password=password)
+            user = self.authenticate(email=email, password=password)
         else:
             msg = _('Must include "email" and "password".')
             raise exceptions.ValidationError(msg)
@@ -36,7 +39,7 @@ class LoginSerializer(serializers.Serializer):
         user = None
 
         if username and password:
-            user = authenticate(username=username, password=password)
+            user = self.authenticate(username=username, password=password)
         else:
             msg = _('Must include "username" and "password".')
             raise exceptions.ValidationError(msg)
@@ -47,9 +50,9 @@ class LoginSerializer(serializers.Serializer):
         user = None
 
         if email and password:
-            user = authenticate(email=email, password=password)
+            user = self.authenticate(email=email, password=password)
         elif username and password:
-            user = authenticate(username=username, password=password)
+            user = self.authenticate(username=username, password=password)
         else:
             msg = _('Must include either "username" or "email" and "password".')
             raise exceptions.ValidationError(msg)
