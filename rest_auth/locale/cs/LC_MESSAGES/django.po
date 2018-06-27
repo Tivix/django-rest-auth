@@ -1,4 +1,4 @@
-# Czech translations of django-rest-auth
+# Czech translations of Tivix/django-rest-auth
 #
 # This file is distributed under the same license as the Tivix/django-rest-auth package.
 #
