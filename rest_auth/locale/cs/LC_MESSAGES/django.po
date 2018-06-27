@@ -87,7 +87,7 @@ msgstr "E-mail není ověřený."
 
 #: .\views.py:127
 msgid "Successfully logged out."
-msgstr "Byli jste úspěšně odhlášení."
+msgstr "Byli jste úspěšně odhlášeni."
 
 #: .\views.py:175
 msgid "Password reset e-mail has been sent."
