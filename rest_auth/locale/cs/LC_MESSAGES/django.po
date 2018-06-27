@@ -1,10 +1,10 @@
 # Czech translations of django-rest-auth
 #
-# This file is distributed under the same license as the django-model-utils package.
+# This file is distributed under the same license as the Tivix/django-rest-auth package.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: django-rest-auth\n"
+"Project-Id-Version: Tivix/django-rest-auth\n"
 "Report-Msgid-Bugs-To: https://github.com/Tivix/django-rest-auth/issues\n"
 "POT-Creation-Date: 2018-06-27 23:05+0200\n"
 "PO-Revision-Date: 2018-06-27 23:15+0200\n"
