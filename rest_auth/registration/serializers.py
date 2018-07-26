@@ -83,8 +83,8 @@ class SocialLoginSerializer(serializers.Serializer):
 
         # Case 2: We received the authorization code
         elif attrs.get('code'):
-            self.callback_url = getattr(view, 'callback_url', None)
-            self.client_class = getattr(view, 'client_class', None)
+            self.callback_url = view.get_callback_url()
+            self.client_class = view.get_client_class()
 
             if not self.callback_url:
                 raise serializers.ValidationError(
