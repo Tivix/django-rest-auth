@@ -1,14 +1,8 @@
 #!/usr/bin/env python
 
-try:
-    from setuptools import setup, find_packages
-except ImportError:
-    from ez_setup import use_setuptools
-    use_setuptools()
-    from setuptools import setup, find_packages
-
-
 import os
+from setuptools import setup, find_packages
+
 
 here = os.path.dirname(os.path.abspath(__file__))
 f = open(os.path.join(here, 'README.rst'))
