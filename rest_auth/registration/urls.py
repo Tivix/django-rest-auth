@@ -7,7 +7,7 @@ urlpatterns = [
     url(r'^$', RegisterView.as_view(), name='rest_register'),
     url(r'^verify-email/$', VerifyEmailView.as_view(), name='rest_verify_email'),
 
-    # This url is used by django-allauth and empty TemplateView is
+    # These two urls are used by django-allauth and empty TemplateView were
     # defined just to allow reverse() call inside app, for example when email
     # with verification link is being sent, then it's required to render email
     # content.
@@ -18,6 +18,8 @@ urlpatterns = [
     # If you don't want to use API on that step, then just use ConfirmEmailView
     # view from:
     # django-allauth https://github.com/pennersr/django-allauth/blob/master/allauth/account/views.py
+    url(r'^account-email-verification-sent/$', TemplateView.as_view(),
+        name='account_email_verification_sent'),
     url(r'^account-confirm-email/(?P<key>[-:\w]+)/$', TemplateView.as_view(),
         name='account_confirm_email'),
 ]
