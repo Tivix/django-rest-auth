@@ -106,7 +106,7 @@ class LogoutView(APIView):
     permission_classes = (AllowAny,)
 
     def __init__(self):
-        if getattr(settings, 'ACCOUNT_LOGOUT_ON_GET', True):
+        if getattr(settings, 'ACCOUNT_LOGOUT_ON_GET', False):
             self.get = self._get
         super().__init__()
 
