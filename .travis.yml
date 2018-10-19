@@ -6,8 +6,11 @@ python:
 env:
   - DJANGO=1.11.* DRF=3.7.*
   - DJANGO=1.11.* DRF=3.8.*
+  - DJANGO=1.11.* DRF=3.9.*
   - DJANGO=2.0.* DRF=3.7.*
   - DJANGO=2.0.* DRF=3.8.*
+  - DJANGO=2.0.* DRF=3.9.*
+  - DJANGO=2.1.* DRF=3.9.*
 install:
   - pip install -q Django==$DJANGO djangorestframework==$DRF
   - pip install coveralls
@@ -24,3 +27,7 @@ matrix:
       env: DJANGO=2.0.* DRF=3.7.*
     - python: "2.7"
       env: DJANGO=2.0.* DRF=3.8.*
+    - python: "2.7"
+      env: DJANGO=2.0.* DRF=3.9.*
+    - python: "2.7"
+      env: DJANGO=2.1.* DRF=3.9.*
