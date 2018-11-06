@@ -159,7 +159,9 @@ class APIBasicTests(TestsMixin, TestCase):
         }
         get_user_model().objects.create_user(self.USERNAME, '', self.PASS)
 
+        user_logged_in.connect(self.on_login)
         self.post(self.login_url, data=payload, status_code=200)
+        self.assertTrue(self.signal_sent)
         self.assertEqual('token' in self.response.json.keys(), True)
         self.token = self.response.json['token']
 
@@ -180,7 +182,10 @@ class APIBasicTests(TestsMixin, TestCase):
         user = get_user_model().objects.create_user(self.USERNAME, self.EMAIL, self.PASS)
 
         # test auth by email
+
+        user_logged_in.connect(self.on_login)
         self.post(self.login_url, data=payload, status_code=200)
+        self.assertTrue(self.signal_sent)
         self.assertEqual('key' in self.response.json.keys(), True)
         self.token = self.response.json['key']
 
