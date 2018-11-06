@@ -1,7 +1,7 @@
 from django.contrib.auth import (
     login as django_login,
-    logout as django_logout
-)
+    logout as django_logout,
+    user_logged_in)
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ObjectDoesNotExist
@@ -69,6 +69,12 @@ class LoginView(GenericAPIView):
 
         if getattr(settings, 'REST_SESSION_LOGIN', True):
             self.process_login()
+        else:
+            '''
+            Send user logged in because it's only send on django_login but if REST_SESSION_LOGIN is disable it
+            is not going to be sent
+            '''
+            user_logged_in.send(sender=self.user.__class__, request=self.request, user=self.user)
 
     def get_response(self):
         serializer_class = self.get_response_serializer()

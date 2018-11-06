@@ -1,5 +1,5 @@
 from django.test import TestCase, override_settings
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model, user_logged_in
 from django.core import mail
 from django.conf import settings
 from django.utils.encoding import force_text
@@ -66,13 +66,15 @@ class APIBasicTests(TestsMixin, TestCase):
         result['token'] = default_token_generator.make_token(user)
         return result
 
+    def on_login(self, sender, **kwargs):
+        self.signal_sent = True
+
     @override_settings(ACCOUNT_AUTHENTICATION_METHOD=account_app_settings.AuthenticationMethod.EMAIL)
     def test_login_failed_email_validation(self):
         payload = {
             "email": '',
             "password": self.PASS
         }
-
         resp = self.post(self.login_url, data=payload, status_code=400)
         self.assertEqual(resp.json['non_field_errors'][0], u'Must include "email" and "password".')
 
@@ -105,11 +107,15 @@ class APIBasicTests(TestsMixin, TestCase):
 
         self.post(self.password_change_url, status_code=403)
 
+        # connect to user logged in
+        user_logged_in.connect(self.on_login)
+
         # create user
         user = get_user_model().objects.create_user(self.USERNAME, '', self.PASS)
 
         self.post(self.login_url, data=payload, status_code=200)
         self.assertEqual('key' in self.response.json.keys(), True)
+        self.assertTrue(self.signal_sent)
         self.token = self.response.json['key']
 
         self.post(self.password_change_url, status_code=400)
