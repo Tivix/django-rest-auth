@@ -75,7 +75,9 @@ class APIBasicTests(TestsMixin, TestCase):
             "email": '',
             "password": self.PASS
         }
+        user_logged_in.connect(self.on_login)
         resp = self.post(self.login_url, data=payload, status_code=400)
+        self.assertFalse(self.signal_sent)
         self.assertEqual(resp.json['non_field_errors'][0], u'Must include "email" and "password".')
 
     @override_settings(ACCOUNT_AUTHENTICATION_METHOD=account_app_settings.AuthenticationMethod.USERNAME)
@@ -85,7 +87,9 @@ class APIBasicTests(TestsMixin, TestCase):
             "password": self.PASS
         }
 
+        user_logged_in.connect(self.on_login)
         resp = self.post(self.login_url, data=payload, status_code=400)
+        self.assertFalse(self.signal_sent)
         self.assertEqual(resp.json['non_field_errors'][0], u'Must include "username" and "password".')
 
     @override_settings(ACCOUNT_AUTHENTICATION_METHOD=account_app_settings.AuthenticationMethod.USERNAME_EMAIL)
@@ -94,7 +98,9 @@ class APIBasicTests(TestsMixin, TestCase):
             "password": self.PASS
         }
 
+        user_logged_in.connect(self.on_login)
         resp = self.post(self.login_url, data=payload, status_code=400)
+        self.assertFalse(self.signal_sent)
         self.assertEqual(resp.json['non_field_errors'][0], u'Must include either "username" or "email" and "password".')
 
     def test_allauth_login_with_username(self):
@@ -103,12 +109,12 @@ class APIBasicTests(TestsMixin, TestCase):
             "password": self.PASS
         }
         # there is no users in db so it should throw error (400)
+        user_logged_in.connect(self.on_login)
         self.post(self.login_url, data=payload, status_code=400)
+        self.assertFalse(self.signal_sent)
 
         self.post(self.password_change_url, status_code=403)
-
-        # connect to user logged in
-        user_logged_in.connect(self.on_login)
+        self.assertFalse(self.signal_sent)
 
         # create user
         user = get_user_model().objects.create_user(self.USERNAME, '', self.PASS)
@@ -118,12 +124,15 @@ class APIBasicTests(TestsMixin, TestCase):
         self.assertTrue(self.signal_sent)
         self.token = self.response.json['key']
 
+        self.signal_sent = False
         self.post(self.password_change_url, status_code=400)
+        self.assertFalse(self.signal_sent)
 
         # test inactive user
         user.is_active = False
         user.save()
         self.post(self.login_url, data=payload, status_code=400)
+        self.assertFalse(self.signal_sent)
 
         # test wrong username/password
         payload = {
@@ -131,9 +140,11 @@ class APIBasicTests(TestsMixin, TestCase):
             "password": self.PASS
         }
         self.post(self.login_url, data=payload, status_code=400)
+        self.assertFalse(self.signal_sent)
 
         # test empty payload
         self.post(self.login_url, data={}, status_code=400)
+        self.assertFalse(self.signal_sent)
 
     @override_settings(ACCOUNT_AUTHENTICATION_METHOD=account_app_settings.AuthenticationMethod.EMAIL)
     def test_allauth_login_with_email(self):
