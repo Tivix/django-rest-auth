@@ -50,14 +50,16 @@ class RegisterView(CreateAPIView):
                 allauth_settings.EmailVerificationMethod.MANDATORY:
             return {"detail": _("Verification e-mail sent.")}
 
+        context = self.get_serializer_context()
+
         if getattr(settings, 'REST_USE_JWT', False):
             data = {
                 'user': user,
                 'token': self.token
             }
-            return JWTSerializer(data).data
+            return JWTSerializer(data, context=context).data
         else:
-            return TokenSerializer(user.auth_token).data
+            return TokenSerializer(user.auth_token, context=context).data
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
