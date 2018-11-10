@@ -245,6 +245,17 @@ class APIBasicTests(TestsMixin, TestCase):
         # send empty payload
         self.post(self.password_change_url, data={}, status_code=400)
 
+    @override_settings(AUTH_PASSWORD_VALIDATORS=[
+        {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'}
+    ])
+    def test_password_change_honors_password_validators(self):
+        login_payload = {"username": self.USERNAME, "password": self.PASS}
+        get_user_model().objects.create_user(self.USERNAME, '', self.PASS)
+        self.post(self.login_url, data=login_payload, status_code=200)
+        self.token = self.response.json['key']
+        new_password_payload = {"new_password1": 123, "new_password2": 123}
+        self.post(self.password_change_url, data=new_password_payload, status_code=400)
+
     @override_settings(OLD_PASSWORD_FIELD_ENABLED=True)
     def test_password_change_with_old_password(self):
         login_payload = {
@@ -360,6 +371,20 @@ class APIBasicTests(TestsMixin, TestCase):
         self.post(self.password_reset_url, data=payload, status_code=200)
         self.assertEqual(len(mail.outbox), mail_count)
 
+    @override_settings(AUTH_PASSWORD_VALIDATORS=[
+        {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'}
+    ])
+    def test_password_reset_honors_password_validators(self):
+        user = get_user_model().objects.create_user(self.USERNAME, self.EMAIL, self.PASS)
+        url_kwargs = self._generate_uid_and_token(user)
+        data = {
+            'new_password1': 123,
+            'new_password2': 123,
+            'uid': force_text(url_kwargs['uid']),
+            'token': url_kwargs['token']
+        }
+        self.post(reverse('rest_password_reset_confirm'), data=data, status_code=400)
+
     def test_user_details(self):
         user = get_user_model().objects.create_user(self.USERNAME, self.EMAIL, self.PASS)
         payload = {
@@ -406,6 +431,12 @@ class APIBasicTests(TestsMixin, TestCase):
 
         self._login()
         self._logout()
+
+    @override_settings(AUTH_PASSWORD_VALIDATORS=[
+        {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'}
+    ])
+    def test_registration_honors_password_validators(self):
+        self.post(self.register_url, data=self.REGISTRATION_DATA, status_code=400)
 
     @override_settings(REST_AUTH_REGISTER_PERMISSION_CLASSES=(CustomPermissionClass,))
     def test_registration_with_custom_permission_class(self):
