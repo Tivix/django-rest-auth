@@ -154,6 +154,34 @@ If you are using Twitter for your social authentication, it is a bit different s
 
 .. note:: Starting from v0.21.0, django-allauth has dropped support for context processors. Check out http://django-allauth.readthedocs.org/en/latest/changelog.html#from-0-21-0 for more details.
 
+
+GitHub
+######
+
+If you are using GitHub for your social authentication, it uses code and not AccessToken directly.
+
+3. Create new view as a subclass of ``rest_auth.views.SocialLoginView`` with ``GitHubOAuth2Adapter`` adapter, an ``OAuth2Client`` and a callback_url as attributes:
+
+.. code-block:: python
+
+    from allauth.socialaccount.providers.github.views import GitHubOAuth2Adapter
+    from allauth.socialaccount.providers.oauth2.client import OAuth2Client
+    from rest_auth.registration.views import SocialLoginView
+
+    class GithubLogin(SocialLoginView):
+        adapter_class = GitHubOAuth2Adapter
+        callback_url = CALLBACK_URL_YOU_SET_ON_GITHUB
+        client_class = OAuth2Client
+
+4. Create url for GitHubLogin view:
+
+.. code-block:: python
+
+    urlpatterns += [
+        ...,
+        url(r'^rest-auth/github/$', GitHubLogin.as_view(), name='github_login')
+    ]
+
 Additional Social Connect Views
 ###############################
 
@@ -162,6 +190,9 @@ If you want to allow connecting existing accounts in addition to login, you can 
 .. code-block:: python
 
     from allauth.socialaccount.providers.facebook.views import FacebookOAuth2Adapter
+    from allauth.socialaccount.providers.github.views import GitHubOAuth2Adapter
+    from allauth.socialaccount.providers.twitter.views import TwitterOAuthAdapter
+    from allauth.socialaccount.providers.oauth2.client import OAuth2Client
     from rest_auth.registration.views import SocialConnectView
     from rest_auth.social_serializers import TwitterConnectSerializer
 
@@ -172,6 +203,12 @@ If you want to allow connecting existing accounts in addition to login, you can 
         serializer_class = TwitterConnectSerializer
         adapter_class = TwitterOAuthAdapter
 
+    class GithubConnect(SocialConnectView):
+        adapter_class = GitHubOAuth2Adapter
+        callback_url = CALLBACK_URL_YOU_SET_ON_GITHUB
+        client_class = OAuth2Client
+
+
 In urls.py:
 
 .. code-block:: python
@@ -180,6 +217,7 @@ In urls.py:
         ...,
         url(r'^rest-auth/facebook/connect/$', FacebookConnect.as_view(), name='fb_connect')
         url(r'^rest-auth/twitter/connect/$', TwitterConnect.as_view(), name='twitter_connect')
+        url(r'^rest-auth/github/connect/$', GithubConnect.as_view(), name='github_connect')
     ]
 
 You can also use the following views to check all social accounts attached to the current authenticated user and disconnect selected social accounts:
