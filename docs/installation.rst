@@ -131,7 +131,7 @@ Twitter
 
 If you are using Twitter for your social authentication, it is a bit different since Twitter uses OAuth 1.0.
 
-3. Create new view as a subclass of ``rest_auth.views.LoginView`` with ``TwitterOAuthAdapter`` adapter and  ``TwitterLoginSerializer`` as an attribute:
+3. Create new view as a subclass of ``rest_auth.registration.views.SocialLoginView`` with ``TwitterOAuthAdapter`` adapter and  ``TwitterLoginSerializer`` as an attribute:
 
 .. code-block:: python
 
