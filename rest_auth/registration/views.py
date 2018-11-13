@@ -56,8 +56,11 @@ class RegisterView(CreateAPIView):
                 'token': self.token
             }
             return JWTSerializer(data).data
-        else:
+
+        if getattr(settings, 'REST_USE_TOKEN', True):
             return TokenSerializer(user.auth_token).data
+
+        return None
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -73,7 +76,7 @@ class RegisterView(CreateAPIView):
         user = serializer.save(self.request)
         if getattr(settings, 'REST_USE_JWT', False):
             self.token = jwt_encode(user)
-        else:
+        elif getattr(settings, 'REST_USE_TOKEN', True):
             create_token(self.token_model, user, serializer)
 
         complete_signup(self.request._request, user,

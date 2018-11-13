@@ -48,6 +48,8 @@ Configuration
 
 - **REST_USE_JWT** - Enable JWT Authentication instead of Token/Session based. This is built on top of django-rest-framework-jwt http://getblimp.github.io/django-rest-framework-jwt/, which must also be installed. (default: False)
 
+- **REST_USE_TOKEN** - set it to False if you do not want to use tokens. This is the recommended setting for cookie-based/custom authorization. With this option there is no need to define ``rest_framework.authtoken`` in ``INSTALLED_APPS``. (default: True)
+
 - **OLD_PASSWORD_FIELD_ENABLED** - set it to True if you want to have old password verification on password change enpoint (default: False)
 
 - **LOGOUT_ON_PASSWORD_CHANGE** - set to False if you want to keep the current user logged in after a password change

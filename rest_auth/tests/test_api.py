@@ -157,6 +157,16 @@ class APIBasicTests(TestsMixin, TestCase):
         self.assertEqual('token' in self.response.json.keys(), True)
         self.token = self.response.json['token']
 
+    @override_settings(REST_USE_TOKEN=False)
+    def test_login_returns_session_cookie(self):
+        payload = {
+            "username": self.USERNAME,
+            "password": self.PASS
+        }
+        get_user_model().objects.create_user(self.USERNAME, '', self.PASS)
+        self.post(self.login_url, data=payload, status_code=200)
+        self.assertIsNotNone(self.response.cookies.get('sessionid'))
+
     def test_login_by_email(self):
         # starting test without allauth app
         settings.INSTALLED_APPS.remove('allauth')
@@ -391,6 +401,23 @@ class APIBasicTests(TestsMixin, TestCase):
         user = get_user_model().objects.get(pk=user.pk)
         self.assertEqual(user.email, self.response.json['email'])
 
+    @override_settings(REST_USE_TOKEN=False)
+    def test_user_details_with_session_cookie(self):
+        user = get_user_model().objects.create_user(self.USERNAME, self.EMAIL, self.PASS)
+        payload = {
+            "username": self.USERNAME,
+            "password": self.PASS
+        }
+        result = self.post(self.login_url, data=payload, status_code=200)
+        self.assertIsNone(result.data)
+        self.get(self.user_url, status_code=200)
+
+        self.patch(self.user_url, data=self.BASIC_USER_DATA, status_code=200)
+        user = get_user_model().objects.get(pk=user.pk)
+        self.assertEqual(user.first_name, self.response.json['first_name'])
+        self.assertEqual(user.last_name, self.response.json['last_name'])
+        self.assertEqual(user.email, self.response.json['email'])
+
     def test_registration(self):
         user_count = get_user_model().objects.all().count()
 
@@ -429,6 +456,19 @@ class APIBasicTests(TestsMixin, TestCase):
 
         result = self.post(self.register_url, data=self.REGISTRATION_DATA, status_code=201)
         self.assertIn('token', result.data)
+        self.assertEqual(get_user_model().objects.all().count(), user_count + 1)
+
+        self._login()
+        self._logout()
+
+    @override_settings(REST_USE_TOKEN=False)
+    def test_registration_without_token(self):
+        user_count = get_user_model().objects.all().count()
+
+        self.post(self.register_url, data={}, status_code=400)
+
+        result = self.post(self.register_url, data=self.REGISTRATION_DATA, status_code=201)
+        self.assertIsNone(result.data)
         self.assertEqual(get_user_model().objects.all().count(), user_count + 1)
 
         self._login()

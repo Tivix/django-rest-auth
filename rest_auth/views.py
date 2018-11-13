@@ -51,19 +51,12 @@ class LoginView(GenericAPIView):
     def process_login(self):
         django_login(self.request, self.user)
 
-    def get_response_serializer(self):
-        if getattr(settings, 'REST_USE_JWT', False):
-            response_serializer = JWTSerializer
-        else:
-            response_serializer = TokenSerializer
-        return response_serializer
-
     def login(self):
         self.user = self.serializer.validated_data['user']
 
         if getattr(settings, 'REST_USE_JWT', False):
             self.token = jwt_encode(self.user)
-        else:
+        elif getattr(settings, 'REST_USE_TOKEN', True):
             self.token = create_token(self.token_model, self.user,
                                       self.serializer)
 
@@ -71,20 +64,24 @@ class LoginView(GenericAPIView):
             self.process_login()
 
     def get_response(self):
-        serializer_class = self.get_response_serializer()
-
         if getattr(settings, 'REST_USE_JWT', False):
-            data = {
-                'user': self.user,
-                'token': self.token
-            }
-            serializer = serializer_class(instance=data,
-                                          context={'request': self.request})
+            serializer = JWTSerializer(
+                instance={
+                    'user': self.user,
+                    'token': self.token,
+                },
+                context={'request': self.request},
+            )
+            data = serializer.data
+        elif getattr(settings, 'REST_USE_TOKEN', True):
+            serializer = TokenSerializer(
+                instance=self.token,
+                context={'request': self.request},
+            )
+            data = serializer.data
         else:
-            serializer = serializer_class(instance=self.token,
-                                          context={'request': self.request})
-
-        return Response(serializer.data, status=status.HTTP_200_OK)
+            data = None
+        return Response(data, status=status.HTTP_200_OK)
 
     def post(self, request, *args, **kwargs):
         self.request = request

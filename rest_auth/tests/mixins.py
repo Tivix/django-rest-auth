@@ -50,12 +50,14 @@ class TestsMixin(object):
         if hasattr(self, 'token'):
             if getattr(settings, 'REST_USE_JWT', False):
                 kwargs['HTTP_AUTHORIZATION'] = 'JWT %s' % self.token
-            else:
+            elif getattr(settings, 'REST_USE_TOKEN', True):
                 kwargs['HTTP_AUTHORIZATION'] = 'Token %s' % self.token
 
         self.response = request_func(*args, **kwargs)
-        is_json = bool(
-            [x for x in self.response._headers['content-type'] if 'json' in x])
+        is_json = bool([
+            x for x in self.response._headers.get('content-type', [])
+            if 'json' in x
+        ])
 
         self.response.json = {}
         if is_json and self.response.content:
