@@ -51,3 +51,13 @@ Configuration
 - **OLD_PASSWORD_FIELD_ENABLED** - set it to True if you want to have old password verification on password change enpoint (default: False)
 
 - **LOGOUT_ON_PASSWORD_CHANGE** - set to False if you want to keep the current user logged in after a password change
+
+- **REST_AUTH_REGISTER_PERMISSION_CLASSES** - set to add permissions to the registration view
+
+    Example configuration with dry-permissions (https://github.com/dbkaplan/dry-rest-permissions):
+
+    .. code-block:: python
+
+        REST_AUTH_REGISTER_PERMISSION_CLASSES = [
+            'dry_rest_permissions.generics.DRYPermissions'
+        ]
