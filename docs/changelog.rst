@@ -1,6 +1,14 @@
 Changelog
 =========
 
+0.9.4
+-----
+- Compatibility fixes (#437, #506)
+- JWT auth cookie fix (#345)
+- config & packaging fixes
+- updated docs
+- added new translations (Czech, Chinese, Turkish, Korean)
+
 0.9.3
 -----
 - added social connect views
