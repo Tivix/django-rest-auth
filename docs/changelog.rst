@@ -1,6 +1,10 @@
 Changelog
 =========
 
+0.9.5
+-----
+- fixed package distribution issue
+
 0.9.4
 -----
 - Compatibility fixes (#437, #506)
