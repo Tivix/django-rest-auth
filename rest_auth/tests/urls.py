@@ -3,8 +3,9 @@ from django.views.generic import TemplateView
 from . import django_urls
 
 from allauth.socialaccount.providers.facebook.views import FacebookOAuth2Adapter
+from allauth.socialaccount.providers.oauth2.client import OAuth2Client
 from allauth.socialaccount.providers.twitter.views import TwitterOAuthAdapter
-
+from rest_framework import serializers
 from rest_framework.decorators import api_view
 
 from rest_auth.urls import urlpatterns
@@ -12,6 +13,7 @@ from rest_auth.registration.views import (
     SocialLoginView, SocialConnectView, SocialAccountListView,
     SocialAccountDisconnectView
 )
+from rest_auth.registration.serializers import SocialLoginSerializer
 from rest_auth.social_serializers import (
     TwitterLoginSerializer, TwitterConnectSerializer
 )
@@ -19,6 +21,19 @@ from rest_auth.social_serializers import (
 
 class FacebookLogin(SocialLoginView):
     adapter_class = FacebookOAuth2Adapter
+
+
+class SocialLoginWithClientCallbackSerializer(SocialLoginSerializer):
+    # An example of a serializer allowing the client to supply their
+    # own `callback_url` value
+    callback_url = serializers.URLField(required=False)
+
+
+class FacebookAuthCodeLogin(SocialLoginView):
+    adapter_class = FacebookOAuth2Adapter
+    serializer_class = SocialLoginWithClientCallbackSerializer
+    callback_url = 'https://some.test.url.com'
+    client_class = OAuth2Client
 
 
 class TwitterLogin(SocialLoginView):
@@ -60,6 +75,7 @@ urlpatterns += [
     url(r'^account-confirm-email/(?P<key>[-:\w]+)/$', TemplateView.as_view(),
         name='account_confirm_email'),
     url(r'^social-login/facebook/$', FacebookLogin.as_view(), name='fb_login'),
+    url(r'^social-login/facebook-authcode/$', FacebookAuthCodeLogin.as_view(), name='fb_login_auth_code'),
     url(r'^social-login/twitter/$', TwitterLogin.as_view(), name='tw_login'),
     url(r'^social-login/twitter-no-view/$', twitter_login_view, name='tw_login_no_view'),
     url(r'^social-login/twitter-no-adapter/$', TwitterLoginNoAdapter.as_view(), name='tw_login_no_adapter'),
