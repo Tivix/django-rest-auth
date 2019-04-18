@@ -256,7 +256,8 @@ class PasswordChangeSerializer(serializers.Serializer):
         )
 
         if all(invalid_password_conditions):
-            raise serializers.ValidationError('Invalid password')
+            err_msg = _("Your old password was entered incorrectly. Please enter it again.")
+            raise serializers.ValidationError(err_msg)
         return value
 
     def validate(self, attrs):
