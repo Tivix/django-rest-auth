@@ -243,8 +243,8 @@ You can also use the following views to check all social accounts attached to th
     ]
 
 
-JWT Support (optional)
-----------------------
+JSON Web Token (JWT) Support (optional)
+---------------------------------------
 
 By default ``django-rest-auth`` uses Django's Token-based authentication. If you want to use JWT authentication, follow these steps:
 
