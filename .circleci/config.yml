@@ -1,0 +1,98 @@
+version: 2.1
+
+aliases:
+  - &environ
+    run:
+      name: setup virtual environment
+      # The below ensures the venv is activated for every subsequent step
+      command: |
+        virtualenv venv
+        echo "source /home/circleci/project/venv/bin/activate" >> $BASH_ENV
+
+  - &install
+    run:
+      name: install dependencies
+      command: |
+        pip install -U pip setuptools wheel tox tox-factor coveralls
+
+  - &test-steps
+    steps:
+      - checkout
+      - *environ
+      - *install
+      - run: tox
+      - run: coverage combine
+      - run: coverage report
+      - run: coveralls
+
+jobs:
+  lint:
+    steps:
+      - checkout
+      - *environ
+      - *install
+      - run: tox -e lint
+    docker:
+      - image: circleci/python:3.7
+
+  test-py37:
+    <<: *test-steps
+    docker:
+      - image: circleci/python:3.7
+    environment:
+      TOXFACTOR: py37
+
+  test-py36:
+    <<: *test-steps
+    docker:
+      - image: circleci/python:3.6
+    environment:
+      TOXFACTOR: py36
+
+  test-py35:
+    <<: *test-steps
+    docker:
+      - image: circleci/python:3.5
+    environment:
+      TOXFACTOR: py35
+
+  test-py27:
+    <<: *test-steps
+    docker:
+      - image: circleci/python:2.7
+    environment:
+      TOXFACTOR: py27
+
+
+workflows:
+  version: 2
+  commit: &test-workflow
+    jobs:
+      - lint
+
+      - test-py37:
+          requires:
+            - lint
+
+      - test-py36:
+          requires:
+            - lint
+
+      - test-py35:
+          requires:
+            - lint
+
+      - test-py27:
+          requires:
+            - lint
+
+  weekly:
+    <<: *test-workflow
+    triggers:
+      - schedule:
+          # 8/9 AM PST/PDT every Monday
+          cron: "0 16 * * 1"
+          filters:
+            branches:
+              only:
+                - master
