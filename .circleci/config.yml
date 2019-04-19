@@ -13,7 +13,7 @@ aliases:
     run:
       name: install dependencies
       command: |
-        pip install -U pip setuptools wheel tox tox-factor coveralls
+        pip install -U pip setuptools wheel tox tox-factor codecov
 
   - &test-steps
     steps:
@@ -23,7 +23,7 @@ aliases:
       - run: tox
       - run: coverage combine
       - run: coverage report
-      - run: coveralls
+      - run: codecov
 
 jobs:
   lint:
