@@ -1,5 +1,11 @@
 include AUTHORS
 include LICENSE
-include MANIFEST.in
-include README.md
+include README.rst
 graft rest_auth
+
+include tox.ini
+include manage.py
+recursive-include tests *.py
+recursive-include demo *
+recursive-include docs *
+prune docs/_build
