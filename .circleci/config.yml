@@ -20,7 +20,7 @@ aliases:
       - checkout
       - *environ
       - *install
-      - run: tox
+      - run: tox -- -v 2
       - run: coverage combine
       - run: coverage report
       - run: codecov
