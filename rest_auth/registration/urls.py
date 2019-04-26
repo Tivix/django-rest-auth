@@ -4,14 +4,13 @@ from django.conf.urls import url
 from .views import (
     RegisterView,
     VerifyEmailView,
-    ResendEmailVerification
+    ResendVerificationEmail
 )
 
 urlpatterns = [
     url(r'^$', RegisterView.as_view(), name='rest_register'),
-    url(r'^resend-verification-email/$', ResendEmailVerification.as_view(), name='rest_resend_verification_email'),
+    url(r'^resend-verification-email/$', ResendVerificationEmail.as_view(), name='rest_resend_verification_email'),
     url(r'^verify-email/$', VerifyEmailView.as_view(), name='rest_verify_email'),
-
     # This url is used by django-allauth and empty TemplateView is
     # defined just to allow reverse() call inside app, for example when email
     # with verification link is being sent, then it's required to render email

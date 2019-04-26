@@ -25,7 +25,7 @@ from rest_auth.app_settings import (TokenSerializer,
                                     create_token)
 from rest_auth.models import TokenModel
 from rest_auth.registration.serializers import (VerifyEmailSerializer,
-                                                ResendEmailVerificationSerializer,
+                                                ResendVerificationEmailSerializer,
                                                 SocialLoginSerializer,
                                                 SocialAccountSerializer,
                                                 SocialConnectSerializer)
@@ -100,8 +100,8 @@ class VerifyEmailView(APIView, ConfirmEmailView):
         return Response({'detail': _('ok')}, status=status.HTTP_200_OK)
 
 
-class ResendEmailVerification(GenericAPIView):
-    serializer_class = ResendEmailVerificationSerializer
+class ResendVerificationEmail(GenericAPIView):
+    serializer_class = ResendVerificationEmailSerializer
     permission_classes = (AllowAny,)
     allowed_methods = ('POST', 'OPTIONS', 'HEAD')
     
