@@ -100,7 +100,7 @@ class VerifyEmailView(APIView, ConfirmEmailView):
         return Response({'detail': _('ok')}, status=status.HTTP_200_OK)
 
 
-class ResendVerificationEmail(GenericAPIView):
+class ResendVerificationEmailView(GenericAPIView):
     serializer_class = ResendVerificationEmailSerializer
     permission_classes = (AllowAny,)
     allowed_methods = ('POST', 'OPTIONS', 'HEAD')
