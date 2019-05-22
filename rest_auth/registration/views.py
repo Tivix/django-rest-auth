@@ -104,7 +104,7 @@ class ResendVerificationEmailView(GenericAPIView):
     serializer_class = ResendVerificationEmailSerializer
     permission_classes = (AllowAny,)
     allowed_methods = ('POST', 'OPTIONS', 'HEAD')
-    
+
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -117,6 +117,7 @@ class ResendVerificationEmailView(GenericAPIView):
             pass
 
         return Response({'detail': _('Verification e-mail sent.')})
+
 
 class SocialLoginView(LoginView):
     """

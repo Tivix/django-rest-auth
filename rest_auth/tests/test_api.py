@@ -520,8 +520,8 @@ class APIBasicTests(TestsMixin, TestCase):
         self.get(self.logout_url, status_code=status.HTTP_405_METHOD_NOT_ALLOWED)
 
     @override_settings(ACCOUNT_EMAIL_VERIFICATION='mandatory')
-    def test_resend_account_verification_email(self):      
-        result = self.post(
+    def test_resend_account_verification_email(self):
+        self.post(
             self.register_url,
             data=self.REGISTRATION_DATA_WITH_EMAIL,
             status_code=status.HTTP_201_CREATED
@@ -544,7 +544,7 @@ class APIBasicTests(TestsMixin, TestCase):
     @override_settings(ACCOUNT_EMAIL_VERIFICATION='mandatory')
     def test_resend_not_registered_account_verification_email(self):
         self.assertEqual(EmailAddress.objects.count(), 0)
-        
+
         self.post(
             reverse('rest_resend_verification_email'),
             data={
@@ -557,7 +557,7 @@ class APIBasicTests(TestsMixin, TestCase):
 
     @override_settings(ACCOUNT_EMAIL_VERIFICATION='mandatory')
     def test_resend_already_verified_account_verification_email(self):
-        result = self.post(
+        self.post(
             self.register_url,
             data=self.REGISTRATION_DATA_WITH_EMAIL,
             status_code=status.HTTP_201_CREATED
