@@ -129,7 +129,7 @@ class SocialLoginSerializer(serializers.Serializer):
             # with the same email address: raise an exception.
             # This needs to be handled in the frontend. We can not just
             # link up the accounts due to security constraints
-            if allauth_settings.UNIQUE_EMAIL:
+            if login.user.email and allauth_settings.UNIQUE_EMAIL:
                 # Do we have an account already with this email address?
                 account_exists = get_user_model().objects.filter(
                     email=login.user.email,
