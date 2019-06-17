@@ -8,7 +8,7 @@ try:
                                get_username_max_length)
     from allauth.account.adapter import get_adapter
     from allauth.account.utils import setup_user_email
-    from allauth.socialaccount.adapter import get_adapter
+    from allauth.socialaccount.adapter import get_adapter as get_social_adapter
     from allauth.socialaccount.helpers import complete_social_login
     from allauth.socialaccount.models import SocialAccount
     from allauth.socialaccount.providers.base import AuthProcess
@@ -141,7 +141,7 @@ class SocialLoginSerializer(serializers.Serializer):
                     )
 
             # If signup is disabled, we cannot login a new user
-            if not get_adapter(request).is_open_for_signup(request, login):
+            if not get_social_adapter(request).is_open_for_signup(request, login):
                 raise serializers.ValidationError(
                         _("User is not registered but registration is closed.")
                     )
