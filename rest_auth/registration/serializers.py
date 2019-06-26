@@ -136,7 +136,7 @@ class SocialLoginSerializer(serializers.Serializer):
                 ).exists()
                 if account_exists:
                     raise serializers.ValidationError(
-                        _("User is already registered with this e-mail address.")
+                        _("A user is already registered with this e-mail address.")
                     )
 
             login.lookup()
