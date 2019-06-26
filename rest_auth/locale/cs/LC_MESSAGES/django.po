@@ -41,10 +41,6 @@ msgstr "Nesprávný vstup. access_token je povinný."
 msgid "Incorrect value"
 msgstr "Nesprávná hodnota"
 
-#: .\registration\serializers.py:139
-msgid "User is already registered with this e-mail address."
-msgstr "Uživatel s touto adresou je již registrován."
-
 #: .\registration\serializers.py:185
 msgid "A user is already registered with this e-mail address."
 msgstr "Uživatel s touto adresou je již registrován."
