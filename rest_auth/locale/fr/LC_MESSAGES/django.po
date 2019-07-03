@@ -48,7 +48,7 @@ msgstr "Un utilisateur existe déjà avec cette adresse email."
 
 #: registration/serializers.py:148
 msgid "The two password fields didn't match."
-msgstr "Les deux mots de passes ne sont pas les mêmes."
+msgstr "Les deux mots de passes ne correspondent pas."
 
 #: registration/views.py:82
 msgid "ok"
@@ -92,7 +92,7 @@ msgstr "Le mot de passe a été réinitialisé."
 
 #: views.py:202
 msgid "New password has been saved."
-msgstr "Le nouveau mot de passe est sauvé."
+msgstr "Le nouveau mot de passe a été sauvegardé."
 
 #~ msgid "Error"
 #~ msgstr "Fehler"
