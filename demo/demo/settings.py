@@ -31,7 +31,7 @@ INSTALLED_APPS = (
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
-    # 'django.contrib.messages',
+    'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sites',
 
@@ -39,12 +39,15 @@ INSTALLED_APPS = (
     'rest_framework.authtoken',
     'rest_auth',
 
+
     'allauth',
     'allauth.account',
     'rest_auth.registration',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.facebook',
     'rest_framework_swagger',
+
+    'axes',
 )
 
 MIDDLEWARE = (
@@ -54,10 +57,9 @@ MIDDLEWARE = (
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-)
 
-# For backwards compatibility for Django 1.8
-MIDDLEWARE_CLASSES = MIDDLEWARE
+    'axes.middleware.AxesMiddleware',
+)
 
 ROOT_URLCONF = 'demo.urls'
 
@@ -126,4 +128,28 @@ REST_FRAMEWORK = {
 SWAGGER_SETTINGS = {
     'LOGIN_URL': 'login',
     'LOGOUT_URL': 'logout',
+}
+
+AUTHENTICATION_BACKENDS = [
+
+    # AxesBackend should be the first backend in the AUTHENTICATION_BACKENDS list.
+    'axes.backends.AxesBackend',
+
+    # Required for rest-auth when using Axes to prevent 'Unable to log in with provided credentials.'
+    'allauth.account.auth_backends.AuthenticationBackend',
+
+    # Django ModelBackend is the default authentication backend.
+    'django.contrib.auth.backends.ModelBackend',
+]
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
+        'LOCATION': 'django_database_cache',
+    }
+}
+
+REST_AUTH_SERIALIZERS = {
+    'LOGIN_SERIALIZER': 'myapp.serializers.RestAuthLoginSerializer',
+    # 'TOKEN_SERIALIZER': 'path.to.custom.TokenSerializer',
 }
