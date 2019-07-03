@@ -1,6 +1,0 @@
-django>=1.9.0
-django-rest-auth==0.9.5
-djangorestframework>=3.7.0
-django-allauth>=0.24.1
-six==1.9.0
-django-rest-swagger==2.0.7
