@@ -5,12 +5,12 @@ from rest_framework import exceptions
 
 
 # noinspection PyAbstractClass
-class RestAuthLoginSerializer(LoginSerializer):
+class RestAuthAxesLoginSerializer(LoginSerializer):
 
     def validate(self, attrs):
         try:
-            attrs = super().validate(attrs)
-        except exceptions.ValidationError:
+            return super().validate(attrs)
+        except exceptions.ValidationError as e:
             if getattr(self.context['request'], 'axes_locked_out', None):
                 raise serializers.ValidationError(get_lockout_message())
-        return attrs
+            raise e

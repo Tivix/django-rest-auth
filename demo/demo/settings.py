@@ -150,6 +150,6 @@ CACHES = {
 }
 
 REST_AUTH_SERIALIZERS = {
-    'LOGIN_SERIALIZER': 'myapp.serializers.RestAuthLoginSerializer',
+    'LOGIN_SERIALIZER': 'myapp.serializers.RestAuthAxesLoginSerializer',
     # 'TOKEN_SERIALIZER': 'path.to.custom.TokenSerializer',
 }

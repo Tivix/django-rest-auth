@@ -1,0 +1,13 @@
+version: '3'
+
+services:
+  web:
+    build: .
+    image: gableroux/django-rest-auth-demo
+    command: python manage.py runserver 0.0.0.0:1234
+    environment:
+      PYTHONUNBUFFERED: 1
+    volumes:
+      - .:/code
+    ports:
+      - "1234:1234"
