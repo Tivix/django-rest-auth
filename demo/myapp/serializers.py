@@ -7,7 +7,7 @@ from rest_framework import exceptions
 # noinspection PyAbstractClass
 class RestAuthAxesLoginSerializer(LoginSerializer):
 
-    def validate(self, attrs):
+    def validate(self, attrs) -> dict:
         try:
             return super().validate(attrs)
         except exceptions.ValidationError as e:
