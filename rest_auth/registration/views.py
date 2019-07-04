@@ -55,9 +55,9 @@ class RegisterView(CreateAPIView):
                 'user': user,
                 'token': self.token
             }
-            return JWTSerializer(data).data
+            return JWTSerializer(data, context={'request': self.request}).data
         else:
-            return TokenSerializer(user.auth_token).data
+            return TokenSerializer(user.auth_token, context={'request': self.request}).data
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
