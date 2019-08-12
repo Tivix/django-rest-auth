@@ -179,7 +179,7 @@ If you are using GitHub for your social authentication, it uses code and not Acc
 
     urlpatterns += [
         ...,
-        url(r'^rest-auth/github/$', GitHubLogin.as_view(), name='github_login')
+        url(r'^rest-auth/github/$', GithubLogin.as_view(), name='github_login')
     ]
 
 Additional Social Connect Views
