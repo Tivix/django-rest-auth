@@ -115,7 +115,11 @@ class SocialLoginSerializer(serializers.Serializer):
             raise serializers.ValidationError(
                 _("Incorrect input. access_token or code is required."))
 
-        social_token = adapter.parse_token({'access_token': access_token})
+        # To allow allauth to store the refresh token as well as the access token, we
+        # make another minor adjustment, not yet in all-auth.
+        # https://github.com/Tivix/django-rest-auth/pull/486
+        # social_token = adapter.parse_token({'access_token': access_token})
+        social_token = adapter.parse_token(token)
         social_token.app = app
 
         try:
