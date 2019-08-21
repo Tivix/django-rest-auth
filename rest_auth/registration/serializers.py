@@ -142,6 +142,10 @@ class SocialLoginSerializer(serializers.Serializer):
             login.lookup()
             login.save(request, connect=True)
 
+        # we return the login data (and so User and SocialAccount instances) here
+        # such that custom login and connect views can render suitable responses
+        attrs['login'] = login
+        # we still return `user` here for backwards compatibility
         attrs['user'] = login.account.user
 
         return attrs
