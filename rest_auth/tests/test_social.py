@@ -36,7 +36,6 @@ facebook_resp_body = {
 }
 
 
-
 @override_settings(ROOT_URLCONF="tests.urls")
 class TestSocialAuth(TestsMixin, TestCase):
 
