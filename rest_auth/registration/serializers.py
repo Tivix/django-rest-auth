@@ -73,6 +73,7 @@ class SocialLoginSerializer(serializers.Serializer):
 
         adapter = adapter_class(request)
         app = adapter.get_provider().get_app(request)
+        token_attrs = {}
 
         # More info on code vs access_token
         # http://stackoverflow.com/questions/8666316/facebook-oauth-2-0-code-and-token
@@ -80,6 +81,7 @@ class SocialLoginSerializer(serializers.Serializer):
         # Case 1: We received the access_token
         if attrs.get('access_token'):
             access_token = attrs.get('access_token')
+            token_attrs['access_token'] = access_token
 
         # Case 2: We received the authorization code
         elif attrs.get('code'):
@@ -108,8 +110,8 @@ class SocialLoginSerializer(serializers.Serializer):
                 self.callback_url,
                 scope
             )
-            token = client.get_access_token(code)
-            access_token = token['access_token']
+            token_attrs = client.get_access_token(code)
+            access_token = token_attrs['access_token']
 
         else:
             raise serializers.ValidationError(
@@ -119,7 +121,7 @@ class SocialLoginSerializer(serializers.Serializer):
         # make another minor adjustment, not yet in all-auth.
         # https://github.com/Tivix/django-rest-auth/pull/486
         # social_token = adapter.parse_token({'access_token': access_token})
-        social_token = adapter.parse_token(token)
+        social_token = adapter.parse_token(token_attrs)
         social_token.app = app
 
         try:
