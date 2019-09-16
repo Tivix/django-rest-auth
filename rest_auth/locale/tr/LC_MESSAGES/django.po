@@ -7,15 +7,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-03-05 21:56-0800\n"
+"POT-Creation-Date: 2019-09-16 22:18+0300\n"
 "PO-Revision-Date: 2018-10-13 19:37+0300\n"
+"Last-Translator: \n"
+"Language-Team: \n"
 "Language: tr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"Last-Translator: \n"
-"Language-Team: \n"
 "X-Generator: Poedit 2.2\n"
 
 #: registration/serializers.py:67
@@ -42,13 +42,23 @@ msgstr "Geçersiz girdi. “access_token” veya “code” gerekli."
 msgid "Incorrect value"
 msgstr "Geçersiz değer"
 
+#: registration/serializers.py:139
+#, fuzzy
+#| msgid "A user is already registered with this e-mail address."
+msgid "User is already registered with this e-mail address."
+msgstr "Bu e-posta adresi ile bir kullanıcı zaten kayıt olmuştu."
+
 #: registration/serializers.py:185
 msgid "A user is already registered with this e-mail address."
 msgstr "Bu e-posta adresi ile bir kullanıcı zaten kayıt olmuştu."
 
 #: registration/serializers.py:193
 msgid "The two password fields didn't match."
-msgstr "İki şifre alanı eşleşmiyor."
+msgstr "İki parola alanı eşleşmiyor."
+
+#: registration/views.py:51
+msgid "Verification e-mail sent."
+msgstr "Doğrulama e-postası gönderildi."
 
 #: registration/views.py:98
 msgid "ok"
@@ -60,15 +70,15 @@ msgstr "\"email\" ve \"password\" içermelidir."
 
 #: serializers.py:44
 msgid "Must include \"username\" and \"password\"."
-msgstr "“username\" und \"password\" içermelidir."
+msgstr "“username\" ve \"password\" içermelidir."
 
 #: serializers.py:57
 msgid "Must include either \"username\" or \"email\" and \"password\"."
-msgstr "Ya ”username\" yada \"email\" ve \"password\" içermelidir."
+msgstr "”username\" ya da \"email\" ve \"password\" içermelidir."
 
 #: serializers.py:98
 msgid "User account is disabled."
-msgstr "Kullanıcı hesap pasiftir."
+msgstr "Kullanıcı hesabı devre dışı."
 
 #: serializers.py:101
 msgid "Unable to log in with provided credentials."
@@ -76,20 +86,24 @@ msgstr "Sağlanan kimlik bilgileri ile giriş yapılamıyor."
 
 #: serializers.py:110
 msgid "E-mail is not verified."
-msgstr "E-posta adresi doğrulanmadı."
+msgstr "E-posta adresi doğrulanamadı."
 
-#: views.py:127
+#: serializers.py:259
+msgid "Your old password was entered incorrectly. Please enter it again."
+msgstr "Eski parolanızı yalnış girdiniz. Lütfen tekrar deneyin."
+
+#: views.py:137
 msgid "Successfully logged out."
 msgstr "Başarılı bir şekilde çıkış yapıldı."
 
-#: views.py:175
+#: views.py:190
 msgid "Password reset e-mail has been sent."
-msgstr "Şifre sıfırlama e-postası gönderildi."
+msgstr "Parola sıfırlama e-postası gönderildi."
 
-#: views.py:201
+#: views.py:216
 msgid "Password has been reset with the new password."
-msgstr "Yeni şifre ile şifre sıfırlandı."
+msgstr "Parolanız, yeni bir parola ile değiştirildi."
 
-#: views.py:223
+#: views.py:238
 msgid "New password has been saved."
-msgstr "Yeni şifre kaydedildi."
+msgstr "Yeni parola kaydedildi."
