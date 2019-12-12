@@ -10,6 +10,8 @@ serializers = getattr(settings, 'REST_AUTH_REGISTER_SERIALIZERS', {})
 
 RegisterSerializer = import_callable(
     serializers.get('REGISTER_SERIALIZER', DefaultRegisterSerializer))
+SocialLoginSerializer = import_callable(
+    serializers.get('SOCIAL_LOGIN_SERIALIZER', DefaultRegisterSerializer))
 
 
 def register_permission_classes():
