@@ -24,12 +24,11 @@ from rest_auth.app_settings import (TokenSerializer,
                                     create_token)
 from rest_auth.models import TokenModel
 from rest_auth.registration.serializers import (VerifyEmailSerializer,
-                                                SocialLoginSerializer,
                                                 SocialAccountSerializer,
                                                 SocialConnectSerializer)
 from rest_auth.utils import jwt_encode
 from rest_auth.views import LoginView
-from .app_settings import RegisterSerializer, register_permission_classes
+from .app_settings import RegisterSerializer, SocialLoginSerializer, register_permission_classes
 
 sensitive_post_parameters_m = method_decorator(
     sensitive_post_parameters('password1', 'password2')
