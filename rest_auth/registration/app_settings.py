@@ -2,7 +2,8 @@ from django.conf import settings
 
 from rest_framework.permissions import AllowAny
 from rest_auth.registration.serializers import (
-    RegisterSerializer as DefaultRegisterSerializer)
+    RegisterSerializer as DefaultRegisterSerializer,
+    SocialLoginSerializer as DefaultSocialLoginSerializer)
 from ..utils import import_callable
 
 
@@ -11,7 +12,7 @@ serializers = getattr(settings, 'REST_AUTH_REGISTER_SERIALIZERS', {})
 RegisterSerializer = import_callable(
     serializers.get('REGISTER_SERIALIZER', DefaultRegisterSerializer))
 SocialLoginSerializer = import_callable(
-    serializers.get('SOCIAL_LOGIN_SERIALIZER', DefaultRegisterSerializer))
+    serializers.get('SOCIAL_LOGIN_SERIALIZER', DefaultSocialLoginSerializer))
 
 
 def register_permission_classes():
