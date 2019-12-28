@@ -56,6 +56,8 @@ Registration
     - password1
     - password2
     - email
+    
+    Returns Token key
 
 - /rest-auth/registration/verify-email/ (POST)
 
