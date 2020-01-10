@@ -40,6 +40,7 @@ class RegisterView(CreateAPIView):
     serializer_class = RegisterSerializer
     permission_classes = register_permission_classes()
     token_model = TokenModel
+    throttle_scope = 'rest_auth'
 
     @sensitive_post_parameters_m
     def dispatch(self, *args, **kwargs):
