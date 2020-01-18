@@ -103,31 +103,32 @@ class APIBasicTests(TestsMixin, TestCase):
         # there is no users in db so it should throw error (400)
         self.post(self.login_url, data=payload, status_code=400)
 
-        self.post(self.password_change_url, status_code=403)
+        self.post(self.password_change_url, status_code=401)
 
         # create user
         user = get_user_model().objects.create_user(self.USERNAME, '', self.PASS)
 
         self.post(self.login_url, data=payload, status_code=200)
-        self.assertEqual('key' in self.response.json.keys(), True)
-        self.token = self.response.json['key']
+        self.assertEqual('token' in self.response.json.keys(), True)
+        self.token = self.response.json['token']
 
         self.post(self.password_change_url, status_code=400)
 
         # test inactive user
         user.is_active = False
         user.save()
-        self.post(self.login_url, data=payload, status_code=400)
+        self.post(self.login_url, data=payload, status_code=401)
 
         # test wrong username/password
         payload = {
             "username": self.USERNAME + '?',
             "password": self.PASS
         }
-        self.post(self.login_url, data=payload, status_code=400)
+        self.post(self.login_url, data=payload, status_code=401)
 
         # test empty payload
-        self.post(self.login_url, data={}, status_code=400)
+        self.post(self.login_url, data={}, status_code=401)
+
 
     @override_settings(ACCOUNT_AUTHENTICATION_METHOD=account_app_settings.AuthenticationMethod.EMAIL)
     def test_allauth_login_with_email(self):
@@ -138,7 +139,7 @@ class APIBasicTests(TestsMixin, TestCase):
         # there is no users in db so it should throw error (400)
         self.post(self.login_url, data=payload, status_code=400)
 
-        self.post(self.password_change_url, status_code=403)
+        self.post(self.password_change_url, status_code=401)
 
         # create user
         get_user_model().objects.create_user(self.EMAIL, email=self.EMAIL, password=self.PASS)
@@ -168,15 +169,15 @@ class APIBasicTests(TestsMixin, TestCase):
         # there is no users in db so it should throw error (400)
         self.post(self.login_url, data=payload, status_code=400)
 
-        self.post(self.password_change_url, status_code=403)
+        self.post(self.password_change_url, status_code=401)
 
         # create user
         user = get_user_model().objects.create_user(self.USERNAME, self.EMAIL, self.PASS)
 
         # test auth by email
         self.post(self.login_url, data=payload, status_code=200)
-        self.assertEqual('key' in self.response.json.keys(), True)
-        self.token = self.response.json['key']
+        self.assertEqual('token' in self.response.json.keys(), True)
+        self.token = self.response.json['token']
 
         # test auth by email in different case
         payload = {
@@ -184,23 +185,23 @@ class APIBasicTests(TestsMixin, TestCase):
             "password": self.PASS
         }
         self.post(self.login_url, data=payload, status_code=200)
-        self.assertEqual('key' in self.response.json.keys(), True)
-        self.token = self.response.json['key']
+        self.assertEqual('token' in self.response.json.keys(), True)
+        self.token = self.response.json['token']
 
         # test inactive user
         user.is_active = False
         user.save()
-        self.post(self.login_url, data=payload, status_code=400)
+        self.post(self.login_url, data=payload, status_code=401)
 
         # test wrong email/password
         payload = {
             "email": 't' + self.EMAIL,
             "password": self.PASS
         }
-        self.post(self.login_url, data=payload, status_code=400)
+        self.post(self.login_url, data=payload, status_code=401)
 
         # test empty payload
-        self.post(self.login_url, data={}, status_code=400)
+        self.post(self.login_url, data={}, status_code=401)
 
         # bring back allauth
         settings.INSTALLED_APPS.append('allauth')
@@ -212,7 +213,7 @@ class APIBasicTests(TestsMixin, TestCase):
         }
         get_user_model().objects.create_user(self.USERNAME, '', self.PASS)
         self.post(self.login_url, data=login_payload, status_code=200)
-        self.token = self.response.json['key']
+        self.token = self.response.json['token']
 
         new_password_payload = {
             "new_password1": "new_person",
@@ -253,7 +254,7 @@ class APIBasicTests(TestsMixin, TestCase):
         }
         get_user_model().objects.create_user(self.USERNAME, '', self.PASS)
         self.post(self.login_url, data=login_payload, status_code=200)
-        self.token = self.response.json['key']
+        self.token = self.response.json['token']
 
         new_password_payload = {
             "old_password": "%s!" % self.PASS,  # wrong password
@@ -367,7 +368,7 @@ class APIBasicTests(TestsMixin, TestCase):
             "password": self.PASS
         }
         self.post(self.login_url, data=payload, status_code=200)
-        self.token = self.response.json['key']
+        self.token = self.response.json['token']
         self.get(self.user_url, status_code=200)
 
         self.patch(self.user_url, data=self.BASIC_USER_DATA, status_code=200)
@@ -378,6 +379,7 @@ class APIBasicTests(TestsMixin, TestCase):
 
     @override_settings(REST_USE_JWT=True)
     def test_user_details_using_jwt(self):
+        self.skipTest('Support only knox right now')
         user = get_user_model().objects.create_user(self.USERNAME, self.EMAIL, self.PASS)
         payload = {
             "username": self.USERNAME,
@@ -398,7 +400,7 @@ class APIBasicTests(TestsMixin, TestCase):
         self.post(self.register_url, data={}, status_code=400)
 
         result = self.post(self.register_url, data=self.REGISTRATION_DATA, status_code=201)
-        self.assertIn('key', result.data)
+        self.assertIn('token', result.data)
         self.assertEqual(get_user_model().objects.all().count(), user_count + 1)
 
         new_user = get_user_model().objects.latest('id')
@@ -461,7 +463,7 @@ class APIBasicTests(TestsMixin, TestCase):
             data=self.REGISTRATION_DATA_WITH_EMAIL,
             status_code=status.HTTP_201_CREATED
         )
-        self.assertNotIn('key', result.data)
+        self.assertNotIn('token', result.data)
         self.assertEqual(get_user_model().objects.all().count(), user_count + 1)
         self.assertEqual(len(mail.outbox), mail_count + 1)
         new_user = get_user_model().objects.latest('id')

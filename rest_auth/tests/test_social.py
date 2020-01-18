@@ -102,12 +102,12 @@ class TestSocialAuth(TestsMixin, TestCase):
         }
 
         self.post(self.fb_login_url, data=payload, status_code=200)
-        self.assertIn('key', self.response.json.keys())
+        self.assertIn('token', self.response.json.keys())
         self.assertEqual(get_user_model().objects.all().count(), users_count + 1)
 
         # make sure that second request will not create a new user
         self.post(self.fb_login_url, data=payload, status_code=200)
-        self.assertIn('key', self.response.json.keys())
+        self.assertIn('token', self.response.json.keys())
         self.assertEqual(get_user_model().objects.all().count(), users_count + 1)
 
     def _twitter_social_auth(self):
@@ -132,12 +132,12 @@ class TestSocialAuth(TestsMixin, TestCase):
 
         self.post(self.tw_login_url, data=payload)
 
-        self.assertIn('key', self.response.json.keys())
+        self.assertIn('token', self.response.json.keys())
         self.assertEqual(get_user_model().objects.all().count(), users_count + 1)
 
         # make sure that second request will not create a new user
         self.post(self.tw_login_url, data=payload, status_code=200)
-        self.assertIn('key', self.response.json.keys())
+        self.assertIn('token', self.response.json.keys())
         self.assertEqual(get_user_model().objects.all().count(), users_count + 1)
 
     @responses.activate
@@ -172,7 +172,7 @@ class TestSocialAuth(TestsMixin, TestCase):
         }
 
         self.post(self.tw_login_url, data=payload, status_code=400)
-        self.assertNotIn('key', self.response.json.keys())
+        self.assertNotIn('token', self.response.json.keys())
         self.assertEqual(get_user_model().objects.all().count(), users_count)
 
     @responses.activate
@@ -359,17 +359,18 @@ class TestSocialConnectAuth(TestsMixin, TestCase):
         payload = {
             'access_token': 'abc123'
         }
-        self.post(self.fb_connect_url, data=payload, status_code=403)
-        self.post(self.tw_connect_url, data=payload, status_code=403)
+        self.post(self.fb_connect_url, data=payload, status_code=401)
+        self.post(self.tw_connect_url, data=payload, status_code=401)
 
     @responses.activate
     def test_social_connect(self):
         # register user
-        self.post(
+        response = self.post(
             self.register_url,
             data=self.REGISTRATION_DATA,
             status_code=201
         )
+        self.token = response.json['token']
 
         # Test Facebook
         resp_body = {
@@ -398,7 +399,7 @@ class TestSocialConnectAuth(TestsMixin, TestCase):
             'access_token': 'abc123'
         }
         self.post(self.fb_connect_url, data=payload, status_code=200)
-        self.assertIn('key', self.response.json.keys())
+        self.assertIn('token', self.response.json.keys())
 
         # Test Twitter
         resp_body = {
@@ -420,7 +421,7 @@ class TestSocialConnectAuth(TestsMixin, TestCase):
 
         self.post(self.tw_connect_url, data=payload)
 
-        self.assertIn('key', self.response.json.keys())
+        self.assertIn('token', self.response.json.keys())
 
         # Check current social accounts
         self.get(self.social_account_list_url)

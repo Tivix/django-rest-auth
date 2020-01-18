@@ -274,3 +274,23 @@ class PasswordChangeSerializer(serializers.Serializer):
         if not self.logout_on_password_change:
             from django.contrib.auth import update_session_auth_hash
             update_session_auth_hash(self.request, self.user)
+
+
+
+
+
+
+
+
+
+
+class KnoxSerializer(serializers.Serializer):
+    """
+    Serializer for Knox authentication.
+    """
+    token = serializers.CharField()
+    user = UserDetailsSerializer()
+
+    def get_token(self, obj):
+        print(obj)
+        return obj["token"][1]

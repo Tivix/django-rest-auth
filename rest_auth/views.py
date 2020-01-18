@@ -15,6 +15,8 @@ from rest_framework.response import Response
 from rest_framework.generics import GenericAPIView, RetrieveUpdateAPIView
 from rest_framework.permissions import IsAuthenticated, AllowAny
 
+from rest_auth.serializers import KnoxSerializer
+from rest_auth.tests.utils import create_knox_token
 from .app_settings import (
     TokenSerializer, UserDetailsSerializer, LoginSerializer,
     PasswordResetSerializer, PasswordResetConfirmSerializer,
@@ -54,6 +56,8 @@ class LoginView(GenericAPIView):
     def get_response_serializer(self):
         if getattr(settings, 'REST_USE_JWT', False):
             response_serializer = JWTSerializer
+        elif getattr(settings, 'REST_USE_KNOX', False):
+            response_serializer = KnoxSerializer
         else:
             response_serializer = TokenSerializer
         return response_serializer
@@ -63,6 +67,8 @@ class LoginView(GenericAPIView):
 
         if getattr(settings, 'REST_USE_JWT', False):
             self.token = jwt_encode(self.user)
+        if getattr(settings, 'REST_USE_KNOX', False):
+            self.token = create_knox_token(None, self.user, None)
         else:
             self.token = create_token(self.token_model, self.user,
                                       self.serializer)
@@ -77,6 +83,13 @@ class LoginView(GenericAPIView):
             data = {
                 'user': self.user,
                 'token': self.token
+            }
+            serializer = serializer_class(instance=data,
+                                          context={'request': self.request})
+        elif getattr(settings, 'REST_USE_KNOX', False):
+            data = {
+                'user': self.user,
+                'token': self.token[1]
             }
             serializer = serializer_class(instance=data,
                                           context={'request': self.request})

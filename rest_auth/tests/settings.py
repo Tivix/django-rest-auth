@@ -62,10 +62,11 @@ TEMPLATES = [
     },
 ]
 
+REST_AUTH_TOKEN_MODEL = 'knox.models.AuthToken'
+REST_USE_KNOX = True
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework.authentication.SessionAuthentication',
-        'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
+        'knox.auth.TokenAuthentication',
     )
 }
 
@@ -78,6 +79,7 @@ INSTALLED_APPS = [
     'django.contrib.sites',
     'django.contrib.sitemaps',
     'django.contrib.staticfiles',
+    'django.contrib.messages',
 
     'allauth',
     'allauth.account',
@@ -86,6 +88,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.twitter',
 
     'rest_framework',
+    'knox',
     'rest_framework.authtoken',
 
     'rest_auth',
@@ -104,3 +107,8 @@ AUTHENTICATION_BACKENDS = (
     # `allauth` specific authentication methods, such as login by e-mail
     'allauth.account.auth_backends.AuthenticationBackend',
 )
+
+REST_AUTH_SERIALIZERS = {
+    'USER_DETAILS_SERIALIZER': 'rest_auth.serializers.UserDetailsSerializer',
+    'TOKEN_SERIALIZER': 'rest_auth.serializers.KnoxSerializer',
+}
