@@ -6,8 +6,7 @@ from django.utils.http import urlsafe_base64_decode as uid_decoder
 from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import force_text
 
-from rest_framework import serializers, exceptions
-from rest_framework.exceptions import ValidationError
+from rest_framework import serializers
 
 from .models import TokenModel
 from .utils import import_callable
@@ -31,7 +30,7 @@ class LoginSerializer(serializers.Serializer):
             user = self.authenticate(email=email, password=password)
         else:
             msg = _('Must include "email" and "password".')
-            raise exceptions.ValidationError(msg)
+            raise serializers.ValidationError(msg)
 
         return user
 
@@ -42,7 +41,7 @@ class LoginSerializer(serializers.Serializer):
             user = self.authenticate(username=username, password=password)
         else:
             msg = _('Must include "username" and "password".')
-            raise exceptions.ValidationError(msg)
+            raise serializers.ValidationError(msg)
 
         return user
 
@@ -55,7 +54,7 @@ class LoginSerializer(serializers.Serializer):
             user = self.authenticate(username=username, password=password)
         else:
             msg = _('Must include either "username" or "email" and "password".')
-            raise exceptions.ValidationError(msg)
+            raise serializers.ValidationError(msg)
 
         return user
 
@@ -96,10 +95,10 @@ class LoginSerializer(serializers.Serializer):
         if user:
             if not user.is_active:
                 msg = _('User account is disabled.')
-                raise exceptions.ValidationError(msg)
+                raise serializers.ValidationError(msg)
         else:
             msg = _('Unable to log in with provided credentials.')
-            raise exceptions.ValidationError(msg)
+            raise serializers.ValidationError(msg)
 
         # If required, is the email verified?
         if 'rest_auth.registration' in settings.INSTALLED_APPS:
@@ -208,7 +207,7 @@ class PasswordResetConfirmSerializer(serializers.Serializer):
             uid = force_text(uid_decoder(attrs['uid']))
             self.user = UserModel._default_manager.get(pk=uid)
         except (TypeError, ValueError, OverflowError, UserModel.DoesNotExist):
-            raise ValidationError({'uid': ['Invalid value']})
+            raise serializers.ValidationError({'uid': ['Invalid value']})
 
         self.custom_validation(attrs)
         # Construct SetPasswordForm instance
@@ -218,7 +217,7 @@ class PasswordResetConfirmSerializer(serializers.Serializer):
         if not self.set_password_form.is_valid():
             raise serializers.ValidationError(self.set_password_form.errors)
         if not default_token_generator.check_token(self.user, attrs['token']):
-            raise ValidationError({'token': ['Invalid value']})
+            raise serializers.ValidationError({'token': ['Invalid value']})
 
         return attrs
 
