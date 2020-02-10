@@ -129,10 +129,6 @@ class LogoutView(APIView):
         return self.logout(request)
 
     def logout(self, request):
-        try:
-            request.user.auth_token.delete()
-        except (AttributeError, ObjectDoesNotExist):
-            pass
         if getattr(settings, 'REST_SESSION_LOGIN', True):
             django_logout(request)
 
