@@ -28,7 +28,7 @@ Changelog
 
 0.9.1
 -----
-- fixed import error when extending rest_auth serializers
+- fixed import error when extending dj_rest_auth serializers
 - added sensitive fields decorator
 - added Spanish translations
 
@@ -109,7 +109,7 @@ Changelog
 -----
 
 - replaced ``django-registration`` with ``django-allauth``
-- moved registration logic to separated django application (``rest_auth.registration``)
+- moved registration logic to separated django application (``dj_rest_auth.registration``)
 - added serializers customization in django settings
 - added social media authentication view
 - changed request method from GET to POST in logout endpoint

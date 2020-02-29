@@ -18,8 +18,8 @@ Features
 Apps structure
 --------------
 
-* ``rest_auth`` has basic auth functionality like login, logout, password reset and password change
-* ``rest_auth.registration`` has logic related with registration and social media authentication
+* ``dj_rest_auth`` has basic auth functionality like login, logout, password reset and password change
+* ``dj_rest_auth.registration`` has logic related with registration and social media authentication
 
 
 Angular app

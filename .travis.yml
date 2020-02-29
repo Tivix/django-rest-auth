@@ -11,9 +11,9 @@ env:
 install:
   - pip install -q Django==$DJANGO djangorestframework==$DRF
   - pip install coveralls
-  - pip install -r rest_auth/tests/requirements.pip
+  - pip install -r dj_rest_auth/tests/requirements.pip
 script:
-  - coverage run --source=rest_auth setup.py test
+  - coverage run --source=dj_rest_auth setup.py test
 after_success:
   - coveralls
 before_script:

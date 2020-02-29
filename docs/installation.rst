@@ -7,7 +7,7 @@ Installation
 
     pip install django-rest-auth
 
-2. Add ``rest_auth`` app to INSTALLED_APPS in your django settings.py:
+2. Add ``dj_rest_auth`` app to INSTALLED_APPS in your django settings.py:
 
 .. code-block:: python
 
@@ -16,19 +16,19 @@ Installation
         'rest_framework',
         'rest_framework.authtoken',
         ...,
-        'rest_auth'
+        'dj_rest_auth'
     )
 
 
 .. note:: This project depends on ``django-rest-framework`` library, so install it if you haven't done yet. Make sure also you have installed ``rest_framework`` and ``rest_framework.authtoken`` apps
 
-3. Add rest_auth urls:
+3. Add dj_rest_auth urls:
 
 .. code-block:: python
 
     urlpatterns = [
         ...,
-        url(r'^rest-auth/', include('rest_auth.urls'))
+        url(r'^rest-auth/', include('dj_rest_auth.urls'))
     ]
 
 4. Migrate your database
@@ -46,7 +46,7 @@ Registration (optional)
 
 1. If you want to enable standard registration process you will need to install ``django-allauth`` by using ``pip install django-rest-auth[with_social]``.
 
-2. Add ``django.contrib.sites``, ``allauth``, ``allauth.account`` and ``rest_auth.registration`` apps to INSTALLED_APPS in your django settings.py:
+2. Add ``django.contrib.sites``, ``allauth``, ``allauth.account`` and ``dj_rest_auth.registration`` apps to INSTALLED_APPS in your django settings.py:
 
 3. Add ``SITE_ID = 1``  to your django settings.py
 
@@ -57,19 +57,19 @@ Registration (optional)
         'django.contrib.sites',
         'allauth',
         'allauth.account',
-        'rest_auth.registration',
+        'dj_rest_auth.registration',
     )
     
     SITE_ID = 1
 
-3. Add rest_auth.registration urls:
+3. Add dj_rest_auth.registration urls:
 
 .. code-block:: python
 
     urlpatterns = [
         ...,
-        url(r'^rest-auth/', include('rest_auth.urls')),
-        url(r'^rest-auth/registration/', include('rest_auth.registration.urls'))
+        url(r'^rest-auth/', include('dj_rest_auth.urls')),
+        url(r'^rest-auth/registration/', include('dj_rest_auth.registration.urls'))
     ]
 
 
@@ -88,12 +88,12 @@ Using ``django-allauth``, ``django-rest-auth`` provides helpful class for creati
         ...,
         'rest_framework',
         'rest_framework.authtoken',
-        'rest_auth'
+        'dj_rest_auth'
         ...,
         'django.contrib.sites',
         'allauth',
         'allauth.account',
-        'rest_auth.registration',
+        'dj_rest_auth.registration',
         ...,
         'allauth.socialaccount',
         'allauth.socialaccount.providers.facebook',
@@ -106,12 +106,12 @@ Using ``django-allauth``, ``django-rest-auth`` provides helpful class for creati
 Facebook
 ########
 
-3. Create new view as a subclass of ``rest_auth.registration.views.SocialLoginView`` with ``FacebookOAuth2Adapter`` adapter as an attribute:
+3. Create new view as a subclass of ``dj_rest_auth.registration.views.SocialLoginView`` with ``FacebookOAuth2Adapter`` adapter as an attribute:
 
 .. code-block:: python
 
     from allauth.socialaccount.providers.facebook.views import FacebookOAuth2Adapter
-    from rest_auth.registration.views import SocialLoginView
+    from dj_rest_auth.registration.views import SocialLoginView
 
     class FacebookLogin(SocialLoginView):
         adapter_class = FacebookOAuth2Adapter
@@ -131,13 +131,13 @@ Twitter
 
 If you are using Twitter for your social authentication, it is a bit different since Twitter uses OAuth 1.0.
 
-3. Create new view as a subclass of ``rest_auth.registration.views.SocialLoginView`` with ``TwitterOAuthAdapter`` adapter and  ``TwitterLoginSerializer`` as an attribute:
+3. Create new view as a subclass of ``dj_rest_auth.registration.views.SocialLoginView`` with ``TwitterOAuthAdapter`` adapter and  ``TwitterLoginSerializer`` as an attribute:
 
 .. code-block:: python
 
     from allauth.socialaccount.providers.twitter.views import TwitterOAuthAdapter
-    from rest_auth.registration.views import SocialLoginView
-    from rest_auth.social_serializers import TwitterLoginSerializer
+    from dj_rest_auth.registration.views import SocialLoginView
+    from dj_rest_auth.social_serializers import TwitterLoginSerializer
 
     class TwitterLogin(SocialLoginView):
         serializer_class = TwitterLoginSerializer
@@ -160,13 +160,13 @@ GitHub
 
 If you are using GitHub for your social authentication, it uses code and not AccessToken directly.
 
-3. Create new view as a subclass of ``rest_auth.views.SocialLoginView`` with ``GitHubOAuth2Adapter`` adapter, an ``OAuth2Client`` and a callback_url as attributes:
+3. Create new view as a subclass of ``dj_rest_auth.views.SocialLoginView`` with ``GitHubOAuth2Adapter`` adapter, an ``OAuth2Client`` and a callback_url as attributes:
 
 .. code-block:: python
 
     from allauth.socialaccount.providers.github.views import GitHubOAuth2Adapter
     from allauth.socialaccount.providers.oauth2.client import OAuth2Client
-    from rest_auth.registration.views import SocialLoginView
+    from dj_rest_auth.registration.views import SocialLoginView
 
     class GithubLogin(SocialLoginView):
         adapter_class = GitHubOAuth2Adapter
@@ -193,8 +193,8 @@ If you want to allow connecting existing accounts in addition to login, you can 
     from allauth.socialaccount.providers.github.views import GitHubOAuth2Adapter
     from allauth.socialaccount.providers.twitter.views import TwitterOAuthAdapter
     from allauth.socialaccount.providers.oauth2.client import OAuth2Client
-    from rest_auth.registration.views import SocialConnectView
-    from rest_auth.social_serializers import TwitterConnectSerializer
+    from dj_rest_auth.registration.views import SocialConnectView
+    from dj_rest_auth.social_serializers import TwitterConnectSerializer
 
     class FacebookConnect(SocialConnectView):
         adapter_class = FacebookOAuth2Adapter
@@ -224,7 +224,7 @@ You can also use the following views to check all social accounts attached to th
 
 .. code-block:: python
     
-    from rest_auth.registration.views import (
+    from dj_rest_auth.registration.views import (
         SocialAccountListView, SocialAccountDisconnectView
     )
 

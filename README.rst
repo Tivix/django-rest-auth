@@ -1,31 +1,31 @@
-Welcome to django-rest-auth
+Welcome to dj-rest-auth
 ===========================
 
-.. image:: https://travis-ci.org/Tivix/django-rest-auth.svg
-    :target: https://travis-ci.org/Tivix/django-rest-auth
+.. image:: https://travis-ci.org/iMerica/dj-rest-auth.svg
+    :target: https://travis-ci.org/iMerica/dj-rest-auth
 
 
-.. image:: https://coveralls.io/repos/Tivix/django-rest-auth/badge.svg
-    :target: https://coveralls.io/r/Tivix/django-rest-auth?branch=master
+.. image:: https://coveralls.io/repos/iMerica/dj-rest-auth/badge.svg
+    :target: https://coveralls.io/r/iMerica/dj-rest-auth?branch=master
 
 
-.. image:: https://readthedocs.org/projects/django-rest-auth/badge/?version=latest
-    :target: https://readthedocs.org/projects/django-rest-auth/?badge=latest
+.. image:: https://readthedocs.org/projects/dj-rest-auth/badge/?version=latest
+    :target: https://readthedocs.org/projects/dj-rest-auth/?badge=latest
 
 
-Django-rest-auth provides a set of REST API endpoints for Authentication and Registration
+Django-dj-rest-auth provides a set of REST API endpoints for Authentication and Registration
 
 
 Documentation
 -------------
-http://django-rest-auth.readthedocs.org/en/latest/
+http://dj-rest-auth.readthedocs.org/en/latest/
 
 
 Source code
 -----------
-https://github.com/Tivix/django-rest-auth
+https://github.com/iMerica/dj-rest-auth
 
 
 Stack Overflow
 -----------
-http://stackoverflow.com/questions/tagged/django-rest-auth
+http://stackoverflow.com/questions/tagged/dj-rest-auth
