@@ -4,11 +4,11 @@
 
 Drop-in API endpoints for authentication in Django Rest Framework.  
 
-### Requirements
+## Requirements
 - Django 2 or 3.
 - Python 3
 
-### Setup
+## Quick Setup
 
 Install package
 
@@ -30,6 +30,10 @@ Add URL patterns
     urlpatterns = [
         url(r'^dj-rest-auth/', include('dj_rest_auth.urls'))
     ]
+
+### Documentation
+
+View the full documentation here: https://dj-rest-auth.readthedocs.io/en/latest/index.html
 
 
 ### Acknowledgements

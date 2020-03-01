@@ -7,7 +7,7 @@ Welcome to dj-rest-auth's documentation!
 ============================================
 
 
-.. note:: dj-rest-auth from v0.3.3 supports django-rest-framework >= v3.0
+.. note:: dj-rest-auth supports django-rest-framework >= v3.0
 
 
 |build-status| |coverage-status| |requirements-status| |docs|
