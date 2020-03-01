@@ -21,7 +21,7 @@ Add `dj_rest_auth` app to INSTALLED_APPS in your django settings.py:
         'rest_framework',
         'rest_framework.authtoken',
         ...,
-        'rest_auth'
+        'dj_rest_auth'
     )
     
 Add URL patterns
