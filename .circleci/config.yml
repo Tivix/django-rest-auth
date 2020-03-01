@@ -9,7 +9,7 @@ jobs:
     environment:
       DJANGO_VERSION: 3.0
       DRF: 3.9
-    executor: python/default
+    executor: docker/docker
     steps:
       - checkout
       - run: echo "Django==$DJANGO_VERSION" > requirements.txt
