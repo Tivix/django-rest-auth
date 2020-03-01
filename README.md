@@ -2,7 +2,8 @@
 [![<iMerica>](https://circleci.com/gh/iMerica/dj-rest-auth.svg?style=svg)](https://app.circleci.com/github/iMerica/dj-rest-auth/pipelines)
 
 
-Drop-in API endpoints for authentication in Django Rest Framework.  
+Drop-in API endpoints for handling authentication securely in Django Rest Framework. Works especially well 
+with with SPAs (e.g React, Vue, Angular), and Mobile applications. 
 
 ## Requirements
 - Django 2 or 3.
