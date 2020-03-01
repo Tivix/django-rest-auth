@@ -53,7 +53,7 @@ class TwitterLoginNoAdapter(SocialLoginView):
 
 
 urlpatterns += [
-    url(r'^rest-registration/', include('rest_auth.registration.urls')),
+    url(r'^rest-registration/', include('dj_rest_auth.registration.urls')),
     url(r'^test-admin/', include(django_urls)),
     url(r'^account-email-verification-sent/$', TemplateView.as_view(),
         name='account_email_verification_sent'),
