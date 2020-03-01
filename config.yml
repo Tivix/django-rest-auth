@@ -1,0 +1,32 @@
+version: 2.1
+orbs:
+  python: circleci/python@0.2.1
+
+jobs:
+  build-latest: &template
+    environment:
+      DJANGO_VERSION: 3.0.*
+      DRF: 3.9.*
+    executor: python/default
+    steps:
+      - checkout
+      - python/load-cache
+      - run:
+          - echo -n $DJANGO_VERSION > requirements.txt
+          - echo -n $DRF >> requirements.txt
+          - pip install -r requirements.txt
+      - python/save-cache
+      - run:
+          command: ./manage.py test
+          name: Test
+  build-django-2:
+    <<: *template
+    environment:
+      DJANGO_VERSION: 2.0.*
+      DRF: 3.9.*
+
+workflows:
+  main:
+    jobs:
+      - build-latest
+      - build-django-2
