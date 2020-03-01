@@ -3,7 +3,7 @@ orbs:
   docker: circleci/docker@0.6.0
 
 jobs:
-  test-latest: &template
+  test-django-3: &template
     docker:
       - image: circleci/python:3.8.0
     environment:
@@ -23,15 +23,9 @@ jobs:
     environment:
       DJANGO_VERSION: 2.2.10
       DRF: 3.9
-  test-django-11:
-    <<: *template
-    environment:
-      DJANGO_VERSION: 1.11
-      DRF: 3.9
 
 workflows:
   main:
     jobs:
-      - test-latest
+      - test-django-3
       - test-django-2
-      - test-django-11
