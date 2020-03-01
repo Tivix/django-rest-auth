@@ -12,9 +12,10 @@ jobs:
       - checkout
       - run: echo "Django==$DJANGO_VERSION" > requirements.txt
       - run: echo "djangorestframework==$DRF" >> requirements.txt
+      - run: pip install coveralls
       - run: pip install -r requirements.txt
       - run:
-          command: ./runtest.py
+          command: coverage run --source=dj_rest_auth setup.py test
           name: Test
   build-django-2:
     <<: *template
