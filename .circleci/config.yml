@@ -11,10 +11,9 @@ jobs:
     steps:
       - checkout
       - python/load-cache
-      - run:
-          - echo -n $DJANGO_VERSION > requirements.txt
-          - echo -n $DRF >> requirements.txt
-          - pip install -r requirements.txt
+      - run: echo -n $DJANGO_VERSION > requirements.txt
+      - run: echo -n $DRF >> requirements.txt
+      - run: pip install -r requirements.txt
       - python/save-cache
       - run:
           command: ./manage.py test
