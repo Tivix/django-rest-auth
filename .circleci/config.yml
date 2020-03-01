@@ -8,7 +8,7 @@ jobs:
       - image: circleci/python:3.8.0
     environment:
       DJANGO_VERSION: 3.0
-      DRF: 3.9
+      DRF: 3.11
     executor: docker/docker
     steps:
       - checkout
