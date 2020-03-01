@@ -19,16 +19,16 @@ from allauth.socialaccount import signals
 from allauth.socialaccount.adapter import get_adapter as get_social_adapter
 from allauth.socialaccount.models import SocialAccount
 
-from rest_auth.app_settings import (TokenSerializer,
+from dj_rest_auth.app_settings import (TokenSerializer,
                                     JWTSerializer,
                                     create_token)
-from rest_auth.models import TokenModel
-from rest_auth.registration.serializers import (VerifyEmailSerializer,
+from dj_rest_auth.models import TokenModel
+from dj_rest_auth.registration.serializers import (VerifyEmailSerializer,
                                                 SocialLoginSerializer,
                                                 SocialAccountSerializer,
                                                 SocialConnectSerializer)
-from rest_auth.utils import jwt_encode
-from rest_auth.views import LoginView
+from dj_rest_auth.utils import jwt_encode
+from dj_rest_auth.views import LoginView
 from .app_settings import RegisterSerializer, register_permission_classes
 
 sensitive_post_parameters_m = method_decorator(

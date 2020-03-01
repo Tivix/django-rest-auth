@@ -8,8 +8,8 @@ from allauth.account import app_settings as account_app_settings
 from rest_framework import status
 from rest_framework.test import APIRequestFactory
 
-from rest_auth.registration.views import RegisterView
-from rest_auth.registration.app_settings import register_permission_classes
+from dj_rest_auth.registration.views import RegisterView
+from dj_rest_auth.registration.app_settings import register_permission_classes
 
 from .mixins import TestsMixin, CustomPermissionClass
 

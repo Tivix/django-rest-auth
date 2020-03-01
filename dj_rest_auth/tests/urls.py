@@ -7,12 +7,12 @@ from allauth.socialaccount.providers.twitter.views import TwitterOAuthAdapter
 
 from rest_framework.decorators import api_view
 
-from rest_auth.urls import urlpatterns
-from rest_auth.registration.views import (
+from dj_rest_auth.urls import urlpatterns
+from dj_rest_auth.registration.views import (
     SocialLoginView, SocialConnectView, SocialAccountListView,
     SocialAccountDisconnectView
 )
-from rest_auth.social_serializers import (
+from dj_rest_auth.social_serializers import (
     TwitterLoginSerializer, TwitterConnectSerializer
 )
 

@@ -1,6 +1,6 @@
 from django.conf.urls import url
 
-from rest_auth.views import (
+from dj_rest_auth.views import (
     LoginView, LogoutView, UserDetailsView, PasswordChangeView,
     PasswordResetView, PasswordResetConfirmView
 )
