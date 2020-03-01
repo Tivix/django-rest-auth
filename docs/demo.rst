@@ -8,7 +8,7 @@ Do these steps to make it running (ideally in virtualenv).
 .. code-block:: python
 
     cd /tmp
-    git clone https://github.com/iMerica/dj-rest-auth.git
+    git clone https://github.com/jazzband/dj-rest-auth.git
     cd dj-rest-auth/demo/
     pip install -r requirements.pip
     python manage.py migrate --settings=demo.settings --noinput

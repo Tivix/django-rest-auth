@@ -1,11 +1,11 @@
-# Czech translations of iMerica/dj-rest-auth
+# Czech translations of jazzband/dj-rest-auth
 #
-# This file is distributed under the same license as the iMerica/dj-rest-auth package.
+# This file is distributed under the same license as the jazzband/dj-rest-auth package.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: iMerica/dj-rest-auth\n"
-"Report-Msgid-Bugs-To: https://github.com/iMerica/dj-rest-auth/issues\n"
+"Project-Id-Version: jazzband/dj-rest-auth\n"
+"Report-Msgid-Bugs-To: https://github.com/jazzband/dj-rest-auth/issues\n"
 "POT-Creation-Date: 2018-06-27 23:05+0200\n"
 "PO-Revision-Date: 2018-06-27 23:22+0200\n"
 "Language: cs\n"

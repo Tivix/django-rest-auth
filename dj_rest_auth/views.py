@@ -161,7 +161,6 @@ class UserDetailsView(RetrieveUpdateAPIView):
         """
         Adding this method since it is sometimes called when using
         django-rest-swagger
-        https://github.com/iMerica/dj-rest-auth/issues/275
         """
         return get_user_model().objects.none()
 

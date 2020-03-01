@@ -72,7 +72,7 @@ Basing on example from installation section :doc:`Installation </installation>`
     - access_token
     - code
 
-    .. note:: ``access_token`` OR ``code`` can be used as standalone arguments, see https://github.com/iMerica/dj-rest-auth/blob/master/dj_rest_auth/registration/views.py
+    .. note:: ``access_token`` OR ``code`` can be used as standalone arguments, see https://github.com/jazzband/dj-rest-auth/blob/master/dj_rest_auth/registration/views.py
 
 - /dj-rest-auth/twitter/ (POST)
 

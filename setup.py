@@ -12,10 +12,10 @@ f.close()
 
 setup(
     name='dj-rest-auth',
-    version='0.1.3',
+    version='0.1.4',
     author='iMerica',
     author_email='imichael@pm.me',
-    url='http://github.com/iMerica/dj-rest-auth',
+    url='http://github.com/jazzband/dj-rest-auth',
     description='Authentication and Registration in Django Rest Framework',
     packages=find_packages(),
     long_description=long_description,
