@@ -4,6 +4,8 @@ orbs:
 
 jobs:
   build-latest: &template
+    docker:
+      - image: circleci/python:3.8.0
     environment:
       DJANGO_VERSION: 3.0
       DRF: 3.9
