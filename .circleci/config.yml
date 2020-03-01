@@ -3,7 +3,7 @@ orbs:
   docker: circleci/docker@0.6.0
 
 jobs:
-  build-latest: &template
+  test-latest: &template
     docker:
       - image: circleci/python:3.8.0
     environment:
@@ -20,12 +20,12 @@ jobs:
       - run:
           command: coverage run --source=dj_rest_auth setup.py test
           name: Test
-  build-django-2:
+  test-django-2:
     <<: *template
     environment:
       DJANGO_VERSION: 2.0
       DRF: 3.9
-  build-django-11:
+  test-django-11:
     <<: *template
     environment:
       DJANGO_VERSION: 1.11
@@ -34,6 +34,6 @@ jobs:
 workflows:
   main:
     jobs:
-      - build-latest
-      - build-django-2
-      - build-django-11
+      - test-latest
+      - test-django-2
+      - test-django-11
