@@ -12,7 +12,7 @@ f.close()
 
 setup(
     name='dj-rest-auth',
-    version='0.1.1',
+    version='0.1.2',
     author='iMerica',
     author_email='imichael@pm.me',
     url='http://github.com/iMerica/dj-rest-auth',
@@ -36,6 +36,7 @@ setup(
     ],
     test_suite='runtests.runtests',
     include_package_data=True,
+    python_requires='>=3.5',
     classifiers=[
         'Framework :: Django',
         'Intended Audience :: Developers',
