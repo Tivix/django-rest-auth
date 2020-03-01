@@ -36,3 +36,4 @@ workflows:
     jobs:
       - build-latest
       - build-django-2
+      - build-django-11
