@@ -10,7 +10,8 @@ Welcome to dj-rest-auth's documentation!
 .. note:: dj-rest-auth supports django-rest-framework >= v3.0
 
 
-|build-status| |coverage-status| |requirements-status| |docs|
+.. image:: https://circleci.com/gh/iMerica/dj-rest-auth.svg?style=svg
+    :target: https://circleci.com/gh/iMerica/dj-rest-auth
 
 Contents
 --------
@@ -25,27 +26,3 @@ Contents
    Demo project <demo>
    FAQ <faq>
    Changelog <changelog>
-
-
-.. |build-status| image:: https://travis-ci.org/iMerica/dj-rest-auth.svg?branch=master
-    :alt: build status
-    :scale: 100%
-    :target: https://travis-ci.org/iMerica/dj-rest-auth
-
-
-.. |coverage-status| image:: https://coveralls.io/repos/iMerica/dj-rest-auth/badge.png?branch=master
-    :alt: coverage status
-    :scale: 100%
-    :target: https://coveralls.io/r/iMerica/dj-rest-auth?branch=master
-
-
-.. |requirements-status| image:: https://requires.io/github/iMerica/dj-rest-auth/requirements.png?branch=master
-    :alt: requirements status
-    :scale: 100%
-    :target: https://requires.io/github/iMerica/dj-rest-auth/requirements/?branch=master
-
-
-.. |docs| image:: https://readthedocs.org/projects/dj-rest-auth/badge/?version=latest
-    :scale: 100%
-    :target: https://readthedocs.org/projects/dj-rest-auth/?badge=latest
-    :alt: Documentation Status
