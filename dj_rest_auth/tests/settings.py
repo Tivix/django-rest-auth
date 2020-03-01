@@ -1,8 +1,11 @@
 import os
 import sys
+import logging
 
 PROJECT_ROOT = os.path.abspath(os.path.split(os.path.split(__file__)[0])[0])
 
+
+logging.disable(logging.CRITICAL)
 ROOT_URLCONF = 'urls'
 STATIC_URL = '/static/'
 STATIC_ROOT = '%s/staticserve' % PROJECT_ROOT
@@ -70,7 +73,6 @@ REST_FRAMEWORK = {
 }
 
 INSTALLED_APPS = [
-    'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.humanize',
     'django.contrib.contenttypes',

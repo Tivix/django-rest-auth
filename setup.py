@@ -5,7 +5,7 @@ from setuptools import setup, find_packages
 
 
 here = os.path.dirname(os.path.abspath(__file__))
-f = open(os.path.join(here, 'README.rst'))
+f = open(os.path.join(here, 'README.md'))
 long_description = f.read().strip()
 f.close()
 
@@ -13,12 +13,13 @@ f.close()
 setup(
     name='dj-rest-auth',
     version='0.9.5',
-    author='Sumit Chachra',
-    author_email='chachra@tivix.com',
+    author='iMerica',
+    author_email='imichael@pm.me',
     url='http://github.com/iMerica/dj-rest-auth',
     description='Create a set of REST API endpoints for Authentication and Registration',
     packages=find_packages(),
     long_description=long_description,
+    long_description_content_type='text/markdown',
     keywords='django rest auth registration rest-framework django-registration api',
     zip_safe=False,
     install_requires=[

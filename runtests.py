@@ -3,8 +3,8 @@
 import os
 import sys
 
-os.environ['DJANGO_SETTINGS_MODULE'] = 'tests.settings'
-test_dir = os.path.join(os.path.dirname(__file__), 'rest_auth')
+os.environ['DJANGO_SETTINGS_MODULE'] = 'dj_rest_auth.tests.settings'
+test_dir = os.path.join(os.path.dirname(__file__), 'dj_rest_auth')
 sys.path.insert(0, test_dir)
 
 import django
