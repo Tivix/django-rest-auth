@@ -12,7 +12,7 @@ f.close()
 
 setup(
     name='dj-rest-auth',
-    version='0.9.5',
+    version='0.1.0',
     author='iMerica',
     author_email='imichael@pm.me',
     url='http://github.com/iMerica/dj-rest-auth',
@@ -23,7 +23,7 @@ setup(
     keywords='django rest auth registration rest-framework django-registration api',
     zip_safe=False,
     install_requires=[
-        'Django>=1.8.0',
+        'Django>=1.11',
         'djangorestframework>=3.1.3',
     ],
     extras_require={
