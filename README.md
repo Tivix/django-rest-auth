@@ -1,5 +1,5 @@
 # Dj-Rest-Auth
-[![<iMerica>](https://circleci.com/gh/iMerica/dj-rest-auth.svg?style=svg)](https://app.circleci.com/github/iMerica/dj-rest-auth/pipelines)
+[![<iMerica>](https://circleci.com/gh/jazzband/dj-rest-auth.svg?style=svg)](https://app.circleci.com/github/jazzband/dj-rest-auth/pipelines)
 
 
 Drop-in API endpoints for handling authentication securely in Django Rest Framework. Works especially well 

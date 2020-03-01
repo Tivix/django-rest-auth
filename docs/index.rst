@@ -10,8 +10,8 @@ Welcome to dj-rest-auth's documentation!
 .. note:: dj-rest-auth supports django-rest-framework >= v3.0
 
 
-.. image:: https://circleci.com/gh/iMerica/dj-rest-auth.svg?style=svg
-    :target: https://circleci.com/gh/iMerica/dj-rest-auth
+.. image:: https://circleci.com/gh/jazzband/dj-rest-auth.svg?style=svg
+    :target: https://circleci.com/gh/jazzband/dj-rest-auth
 
 Contents
 --------
