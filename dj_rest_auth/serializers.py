@@ -10,7 +10,6 @@ from rest_framework import serializers, exceptions
 from rest_framework.exceptions import ValidationError
 
 from .models import TokenModel
-from .utils import import_callable
 
 # Get the UserModel
 UserModel = get_user_model()
@@ -146,9 +145,7 @@ class JWTSerializer(serializers.Serializer):
         JWTSerializer. Defining it here to avoid circular imports
         """
         rest_auth_serializers = getattr(settings, 'REST_AUTH_SERIALIZERS', {})
-        JWTUserDetailsSerializer = import_callable(
-            rest_auth_serializers.get('USER_DETAILS_SERIALIZER', UserDetailsSerializer)
-        )
+        JWTUserDetailsSerializer = rest_auth_serializers.get('USER_DETAILS_SERIALIZER', UserDetailsSerializer)
         user_data = JWTUserDetailsSerializer(obj['user'], context=self.context).data
         return user_data
 

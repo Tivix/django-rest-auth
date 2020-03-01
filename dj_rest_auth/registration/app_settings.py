@@ -2,18 +2,17 @@ from django.conf import settings
 
 from rest_framework.permissions import AllowAny
 from rest_auth.registration.serializers import (
-    RegisterSerializer as DefaultRegisterSerializer)
-from ..utils import import_callable
+    RegisterSerializer as DefaultRegisterSerializer
+)
 
 
 serializers = getattr(settings, 'REST_AUTH_REGISTER_SERIALIZERS', {})
 
-RegisterSerializer = import_callable(
-    serializers.get('REGISTER_SERIALIZER', DefaultRegisterSerializer))
+RegisterSerializer = serializers.get('REGISTER_SERIALIZER', DefaultRegisterSerializer)
 
 
 def register_permission_classes():
     permission_classes = [AllowAny, ]
     for klass in getattr(settings, 'REST_AUTH_REGISTER_PERMISSION_CLASSES', tuple()):
-        permission_classes.append(import_callable(klass))
+        permission_classes.append(klass)
     return tuple(permission_classes)
