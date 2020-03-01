@@ -4,7 +4,7 @@ API endpoints
 Basic
 -----
 
-- /rest-auth/login/ (POST)
+- /dj-rest-auth/login/ (POST)
 
     - username
     - email
@@ -12,24 +12,24 @@ Basic
 
     Returns Token key
 
-- /rest-auth/logout/ (POST)
+- /dj-rest-auth/logout/ (POST)
 
     .. note:: ``ACCOUNT_LOGOUT_ON_GET = True`` to allow logout using GET - this is the exact same configuration from allauth. NOT recommended, see: http://django-allauth.readthedocs.io/en/latest/views.html#logout
 
-- /rest-auth/password/reset/ (POST)
+- /dj-rest-auth/password/reset/ (POST)
 
     - email
 
-- /rest-auth/password/reset/confirm/ (POST)
+- /dj-rest-auth/password/reset/confirm/ (POST)
 
     - uid
     - token
     - new_password1
     - new_password2
 
-    .. note:: uid and token are sent in email after calling /rest-auth/password/reset/
+    .. note:: uid and token are sent in email after calling /dj-rest-auth/password/reset/
 
-- /rest-auth/password/change/ (POST)
+- /dj-rest-auth/password/change/ (POST)
 
     - new_password1
     - new_password2
@@ -38,7 +38,7 @@ Basic
     .. note:: ``OLD_PASSWORD_FIELD_ENABLED = True`` to use old_password.
     .. note:: ``LOGOUT_ON_PASSWORD_CHANGE = False`` to keep the user logged in after password change
 
-- /rest-auth/user/ (GET, PUT, PATCH)
+- /dj-rest-auth/user/ (GET, PUT, PATCH)
 
     - username
     - first_name
@@ -50,14 +50,14 @@ Basic
 Registration
 ------------
 
-- /rest-auth/registration/ (POST)
+- /dj-rest-auth/registration/ (POST)
 
     - username
     - password1
     - password2
     - email
 
-- /rest-auth/registration/verify-email/ (POST)
+- /dj-rest-auth/registration/verify-email/ (POST)
 
     - key
 
@@ -67,14 +67,14 @@ Social Media Authentication
 
 Basing on example from installation section :doc:`Installation </installation>`
 
-- /rest-auth/facebook/ (POST)
+- /dj-rest-auth/facebook/ (POST)
 
     - access_token
     - code
 
-    .. note:: ``access_token`` OR ``code`` can be used as standalone arguments, see https://github.com/Tivix/django-rest-auth/blob/master/dj_rest_auth/registration/views.py
+    .. note:: ``access_token`` OR ``code`` can be used as standalone arguments, see https://github.com/iMerica/dj-rest-auth/blob/master/dj_rest_auth/registration/views.py
 
-- /rest-auth/twitter/ (POST)
+- /dj-rest-auth/twitter/ (POST)
 
     - access_token
     - token_secret

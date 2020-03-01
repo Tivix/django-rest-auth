@@ -85,17 +85,17 @@ qthelp:
 	@echo
 	@echo "Build finished; now you can run "qcollectiongenerator" with the" \
 	      ".qhcp project file in $(BUILDDIR)/qthelp, like this:"
-	@echo "# qcollectiongenerator $(BUILDDIR)/qthelp/django-rest-auth.qhcp"
+	@echo "# qcollectiongenerator $(BUILDDIR)/qthelp/dj-rest-auth.qhcp"
 	@echo "To view the help file:"
-	@echo "# assistant -collectionFile $(BUILDDIR)/qthelp/django-rest-auth.qhc"
+	@echo "# assistant -collectionFile $(BUILDDIR)/qthelp/dj-rest-auth.qhc"
 
 devhelp:
 	$(SPHINXBUILD) -b devhelp $(ALLSPHINXOPTS) $(BUILDDIR)/devhelp
 	@echo
 	@echo "Build finished."
 	@echo "To view the help file:"
-	@echo "# mkdir -p $$HOME/.local/share/devhelp/django-rest-auth"
-	@echo "# ln -s $(BUILDDIR)/devhelp $$HOME/.local/share/devhelp/django-rest-auth"
+	@echo "# mkdir -p $$HOME/.local/share/devhelp/dj-rest-auth"
+	@echo "# ln -s $(BUILDDIR)/devhelp $$HOME/.local/share/devhelp/dj-rest-auth"
 	@echo "# devhelp"
 
 epub:

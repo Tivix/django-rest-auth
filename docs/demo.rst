@@ -2,14 +2,14 @@ Demo project
 ============
 
 The idea of creating demo project was to show how you can potentially use
-django-rest-auth app with jQuery on frontend.
+dj-rest-auth app with jQuery on frontend.
 Do these steps to make it running (ideally in virtualenv).
 
 .. code-block:: python
 
     cd /tmp
-    git clone https://github.com/Tivix/django-rest-auth.git
-    cd django-rest-auth/demo/
+    git clone https://github.com/iMerica/dj-rest-auth.git
+    cd dj-rest-auth/demo/
     pip install -r requirements.pip
     python manage.py migrate --settings=demo.settings --noinput
     python manage.py runserver --settings=demo.settings

@@ -5,7 +5,7 @@ Installation
 
 .. code-block:: python
 
-    pip install django-rest-auth
+    pip install dj-rest-auth
 
 2. Add ``dj_rest_auth`` app to INSTALLED_APPS in your django settings.py:
 
@@ -44,7 +44,7 @@ You're good to go now!
 Registration (optional)
 -----------------------
 
-1. If you want to enable standard registration process you will need to install ``django-allauth`` by using ``pip install django-rest-auth[with_social]``.
+1. If you want to enable standard registration process you will need to install ``django-allauth`` by using ``pip install dj-rest-auth[with_social]``.
 
 2. Add ``django.contrib.sites``, ``allauth``, ``allauth.account`` and ``dj_rest_auth.registration`` apps to INSTALLED_APPS in your django settings.py:
 
@@ -76,7 +76,7 @@ Registration (optional)
 Social Authentication (optional)
 --------------------------------
 
-Using ``django-allauth``, ``django-rest-auth`` provides helpful class for creating social media authentication view. 
+Using ``django-allauth``, ``dj-rest-auth`` provides helpful class for creating social media authentication view. 
 
 .. note:: Points 1 and 2 are related to ``django-allauth`` configuration, so if you have already configured social authentication, then please go to step 3. See ``django-allauth`` documentation for more details.
 
@@ -246,7 +246,7 @@ You can also use the following views to check all social accounts attached to th
 JSON Web Token (JWT) Support (optional)
 ---------------------------------------
 
-By default ``django-rest-auth`` uses Django's Token-based authentication. If you want to use JWT authentication, follow these steps:
+By default ``dj-rest-auth`` uses Django's Token-based authentication. If you want to use JWT authentication, follow these steps:
 
 1. Install `djangorestframework-jwt <http://getblimp.github.io/django-rest-framework-jwt/>`_
     - ``djangorestframework-jwt`` is currently the only supported JWT library.
