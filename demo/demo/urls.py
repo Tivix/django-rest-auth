@@ -1,7 +1,6 @@
 from django.conf.urls import include, url
 from django.contrib import admin
-from django.views.generic import TemplateView, RedirectView
-
+from django.views.generic import RedirectView, TemplateView
 from rest_framework_swagger.views import get_swagger_view
 
 urlpatterns = [

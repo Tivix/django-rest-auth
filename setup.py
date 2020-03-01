@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 
 import os
-from setuptools import setup, find_packages
 
+from setuptools import find_packages, setup
 
 here = os.path.dirname(os.path.abspath(__file__))
 f = open(os.path.join(here, 'README.md'))
@@ -12,7 +12,7 @@ f.close()
 
 setup(
     name='dj-rest-auth',
-    version='0.1.2',
+    version='0.1.3',
     author='iMerica',
     author_email='imichael@pm.me',
     url='http://github.com/iMerica/dj-rest-auth',

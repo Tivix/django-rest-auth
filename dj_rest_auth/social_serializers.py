@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.http import HttpRequest
 from rest_framework import serializers
+
 # Import is needed only if we are using social login, in which
 # case the allauth.socialaccount will be declared
 if 'allauth.socialaccount' in settings.INSTALLED_APPS:

@@ -1,34 +1,30 @@
+from allauth.account import app_settings as allauth_settings
+from allauth.account.adapter import get_adapter
+from allauth.account.utils import complete_signup
+from allauth.account.views import ConfirmEmailView
+from allauth.socialaccount import signals
+from allauth.socialaccount.adapter import get_adapter as get_social_adapter
+from allauth.socialaccount.models import SocialAccount
+from dj_rest_auth.app_settings import (JWTSerializer, TokenSerializer,
+                                       create_token)
+from dj_rest_auth.models import TokenModel
+from dj_rest_auth.registration.serializers import (SocialAccountSerializer,
+                                                   SocialConnectSerializer,
+                                                   SocialLoginSerializer,
+                                                   VerifyEmailSerializer)
+from dj_rest_auth.utils import jwt_encode
+from dj_rest_auth.views import LoginView
 from django.conf import settings
 from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext_lazy as _
 from django.views.decorators.debug import sensitive_post_parameters
-
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework.permissions import (AllowAny,
-                                        IsAuthenticated)
-from rest_framework.generics import CreateAPIView, ListAPIView, GenericAPIView
-from rest_framework.exceptions import NotFound
 from rest_framework import status
+from rest_framework.exceptions import NotFound
+from rest_framework.generics import CreateAPIView, GenericAPIView, ListAPIView
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
-from allauth.account.adapter import get_adapter
-from allauth.account.views import ConfirmEmailView
-from allauth.account.utils import complete_signup
-from allauth.account import app_settings as allauth_settings
-from allauth.socialaccount import signals
-from allauth.socialaccount.adapter import get_adapter as get_social_adapter
-from allauth.socialaccount.models import SocialAccount
-
-from dj_rest_auth.app_settings import (TokenSerializer,
-                                    JWTSerializer,
-                                    create_token)
-from dj_rest_auth.models import TokenModel
-from dj_rest_auth.registration.serializers import (VerifyEmailSerializer,
-                                                SocialLoginSerializer,
-                                                SocialAccountSerializer,
-                                                SocialConnectSerializer)
-from dj_rest_auth.utils import jwt_encode
-from dj_rest_auth.views import LoginView
 from .app_settings import RegisterSerializer, register_permission_classes
 
 sensitive_post_parameters_m = method_decorator(

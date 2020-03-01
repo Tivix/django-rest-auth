@@ -1,22 +1,23 @@
 import json
 
-from django.test import TestCase
+import responses
+from allauth.socialaccount.models import SocialApp
+from allauth.socialaccount.providers.facebook.provider import GRAPH_API_URL
 from django.contrib.auth import get_user_model
-from django.test.utils import override_settings
 from django.contrib.sites.models import Site
+from django.test import TestCase
+from django.test.utils import override_settings
+from rest_framework import status
+
+from .mixins import TestsMixin
 
 try:
     from django.urls import reverse
 except ImportError:
     from django.core.urlresolvers import reverse
 
-from allauth.socialaccount.models import SocialApp
-from allauth.socialaccount.providers.facebook.provider import GRAPH_API_URL
-import responses
 
-from rest_framework import status
 
-from .mixins import TestsMixin
 
 
 @override_settings(ROOT_URLCONF="tests.urls")

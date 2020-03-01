@@ -1,11 +1,9 @@
 import json
 
 from django.conf import settings
-from django.test.client import Client, MULTIPART_CONTENT
+from django.test.client import MULTIPART_CONTENT, Client
 from django.utils.encoding import force_text
-
-from rest_framework import status
-from rest_framework import permissions
+from rest_framework import permissions, status
 
 try:
     from django.urls import reverse

@@ -1,17 +1,15 @@
-from django.test import TestCase, override_settings
+from allauth.account import app_settings as account_app_settings
+from dj_rest_auth.registration.app_settings import register_permission_classes
+from dj_rest_auth.registration.views import RegisterView
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core import mail
-from django.conf import settings
+from django.test import TestCase, override_settings
 from django.utils.encoding import force_text
-
-from allauth.account import app_settings as account_app_settings
 from rest_framework import status
 from rest_framework.test import APIRequestFactory
 
-from dj_rest_auth.registration.views import RegisterView
-from dj_rest_auth.registration.app_settings import register_permission_classes
-
-from .mixins import TestsMixin, CustomPermissionClass
+from .mixins import CustomPermissionClass, TestsMixin
 
 try:
     from django.urls import reverse

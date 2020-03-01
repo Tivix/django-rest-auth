@@ -1,6 +1,8 @@
+from django.contrib.auth import get_user_model
 from django.http import HttpRequest
 from django.utils.translation import ugettext_lazy as _
-from django.contrib.auth import get_user_model
+from requests.exceptions import HTTPError
+from rest_framework import serializers
 
 try:
     from allauth.account import app_settings as allauth_settings
@@ -14,8 +16,6 @@ try:
 except ImportError:
     raise ImportError("allauth needs to be added to INSTALLED_APPS.")
 
-from rest_framework import serializers
-from requests.exceptions import HTTPError
 
 
 class SocialAccountSerializer(serializers.ModelSerializer):

@@ -1,20 +1,18 @@
-from django.conf.urls import url, include
-from django.views.generic import TemplateView
-from . import django_urls
-
-from allauth.socialaccount.providers.facebook.views import FacebookOAuth2Adapter
+from allauth.socialaccount.providers.facebook.views import \
+    FacebookOAuth2Adapter
 from allauth.socialaccount.providers.twitter.views import TwitterOAuthAdapter
-
+from dj_rest_auth.registration.views import (SocialAccountDisconnectView,
+                                             SocialAccountListView,
+                                             SocialConnectView,
+                                             SocialLoginView)
+from dj_rest_auth.social_serializers import (TwitterConnectSerializer,
+                                             TwitterLoginSerializer)
+from dj_rest_auth.urls import urlpatterns
+from django.conf.urls import include, url
+from django.views.generic import TemplateView
 from rest_framework.decorators import api_view
 
-from dj_rest_auth.urls import urlpatterns
-from dj_rest_auth.registration.views import (
-    SocialLoginView, SocialConnectView, SocialAccountListView,
-    SocialAccountDisconnectView
-)
-from dj_rest_auth.social_serializers import (
-    TwitterLoginSerializer, TwitterConnectSerializer
-)
+from . import django_urls
 
 
 class FacebookLogin(SocialLoginView):
