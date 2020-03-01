@@ -7,7 +7,7 @@ jobs:
     docker:
       - image: circleci/python:3.8.0
     environment:
-      DJANGO_VERSION: 3.0
+      DJANGO_VERSION: 3.0.3
       DRF: 3.11
     executor: docker/docker
     steps:
@@ -24,7 +24,7 @@ jobs:
   test-django-2:
     <<: *template
     environment:
-      DJANGO_VERSION: 2.0
+      DJANGO_VERSION: 2.2.10
       DRF: 3.9
   test-django-11:
     <<: *template
