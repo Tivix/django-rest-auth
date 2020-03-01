@@ -25,6 +25,11 @@ jobs:
     environment:
       DJANGO_VERSION: 2.0
       DRF: 3.9
+  build-django-11:
+    <<: *template
+    environment:
+      DJANGO_VERSION: 1.11
+      DRF: 3.9
 
 workflows:
   main:

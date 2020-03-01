@@ -16,7 +16,7 @@ setup(
     author='iMerica',
     author_email='imichael@pm.me',
     url='http://github.com/iMerica/dj-rest-auth',
-    description='Create a set of REST API endpoints for Authentication and Registration',
+    description='Authentication and Registration in Django Rest Framework',
     packages=find_packages(),
     long_description=long_description,
     long_description_content_type='text/markdown',
