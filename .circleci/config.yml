@@ -5,13 +5,13 @@ orbs:
 jobs:
   build-latest: &template
     environment:
-      DJANGO_VERSION: 3.0.*
-      DRF: 3.9.*
+      DJANGO_VERSION: 3.0
+      DRF: 3.9
     executor: python/default
     steps:
       - checkout
-      - run: echo $DJANGO_VERSION > requirements.txt
-      - run: echo $DRF >> requirements.txt
+      - run: echo "Django==$DJANGO_VERSION" > requirements.txt
+      - run: echo "djangorestframework==$DRF" >> requirements.txt
       - run: pip install -r requirements.txt
       - run:
           command: ./manage.py test
@@ -19,8 +19,8 @@ jobs:
   build-django-2:
     <<: *template
     environment:
-      DJANGO_VERSION: 2.0.*
-      DRF: 3.9.*
+      DJANGO_VERSION: 2.0
+      DRF: 3.9
 
 workflows:
   main:
