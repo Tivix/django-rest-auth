@@ -31,3 +31,7 @@ Add URL patterns
         url(r'^dj-rest-auth/', include('dj_rest_auth.urls'))
     ]
 
+
+### Acknowledgements
+
+This project began as a fork of `django-rest-auth`. Big thanks to everyone who contributed to that repo!
