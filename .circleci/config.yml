@@ -10,8 +10,8 @@ jobs:
     executor: python/default
     steps:
       - checkout
-      - run: echo -n $DJANGO_VERSION > requirements.txt
-      - run: echo -n $DRF >> requirements.txt
+      - run: echo $DJANGO_VERSION > requirements.txt
+      - run: echo $DRF >> requirements.txt
       - run: pip install -r requirements.txt
       - run:
           command: ./manage.py test
