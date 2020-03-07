@@ -18,6 +18,9 @@ jobs:
       - run:
           command: coverage run --source=dj_rest_auth setup.py test
           name: Test
+      - run:
+          command: coveralls
+          name: Coverage
   test-django-2:
     <<: *template
     environment:
