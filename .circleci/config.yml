@@ -19,7 +19,7 @@ jobs:
           command: coverage run --source=dj_rest_auth setup.py test
           name: Test
       - run:
-          command: coveralls
+          command: COVERALLS_REPO_TOKEN=Q58WdUuZOi89XHyDeDsGE2lxUGQ2IfqP3 coveralls
           name: Coverage
   test-django-2:
     <<: *template
