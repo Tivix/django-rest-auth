@@ -248,12 +248,23 @@ JSON Web Token (JWT) Support (optional)
 
 By default ``dj-rest-auth`` uses Django's Token-based authentication. If you want to use JWT authentication, follow these steps:
 
-1. Install `djangorestframework-jwt <http://getblimp.github.io/django-rest-framework-jwt/>`_
-    - ``djangorestframework-jwt`` is currently the only supported JWT library.
-2. The ``JWT_PAYLOAD_HANDLER`` and ``JWT_ENCODE_HANDLER`` settings are imported from the ``django-rest-framework-jwt`` settings object.
-    - Refer to `the library's documentation <http://getblimp.github.io/django-rest-framework-jwt/#additional-settings>`_ for information on using different encoders.
+1. Install `djangorestframework-simplejwt <https://github.com/SimpleJWT/django-rest-framework-simplejwt/>`_
+    - ``djangorestframework-simplejwt`` is currently the only supported JWT library.
 
-3. Add the following configuration value to your settings file to enable JWT authentication.
+2. Add a simple_jwt auth configuration to the list of authentication classes.
+
+.. code-block:: python
+
+    REST_FRAMEWORK = {
+        ...
+        'DEFAULT_AUTHENTICATION_CLASSES': (
+            ...
+            'rest_framework_simplejwt.authentication.JWTAuthentication',
+        )
+        ...
+    }
+
+3. Add the following configuration value to your settings file to enable JWT authentication in dj-rest-auth.
 
 .. code-block:: python
 
