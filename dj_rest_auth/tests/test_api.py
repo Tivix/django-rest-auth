@@ -152,8 +152,8 @@ class APIBasicTests(TestsMixin, TestCase):
         get_user_model().objects.create_user(self.USERNAME, '', self.PASS)
 
         self.post(self.login_url, data=payload, status_code=200)
-        self.assertEqual('token' in self.response.json.keys(), True)
-        self.token = self.response.json['token']
+        self.assertEqual('access_token' in self.response.json.keys(), True)
+        self.token = self.response.json['access_token']
 
     def test_login_by_email(self):
         # starting test without allauth app
@@ -382,7 +382,7 @@ class APIBasicTests(TestsMixin, TestCase):
             "password": self.PASS
         }
         self.post(self.login_url, data=payload, status_code=200)
-        self.token = self.response.json['token']
+        self.token = self.response.json['access_token']
         self.get(self.user_url, status_code=200)
 
         self.patch(self.user_url, data=self.BASIC_USER_DATA, status_code=200)
@@ -426,7 +426,7 @@ class APIBasicTests(TestsMixin, TestCase):
         self.post(self.register_url, data={}, status_code=400)
 
         result = self.post(self.register_url, data=self.REGISTRATION_DATA, status_code=201)
-        self.assertIn('token', result.data)
+        self.assertIn('access_token', result.data)
         self.assertEqual(get_user_model().objects.all().count(), user_count + 1)
 
         self._login()

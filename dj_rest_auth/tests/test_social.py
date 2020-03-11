@@ -305,7 +305,7 @@ class TestSocialAuth(TestsMixin, TestCase):
         }
 
         self.post(self.fb_login_url, data=payload, status_code=200)
-        self.assertIn('token', self.response.json.keys())
+        self.assertIn('access_token', self.response.json.keys())
         self.assertIn('user', self.response.json.keys())
 
         self.assertEqual(get_user_model().objects.all().count(), users_count + 1)
