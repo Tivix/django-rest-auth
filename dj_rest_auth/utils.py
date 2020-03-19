@@ -18,7 +18,6 @@ def default_create_token(token_model, user, serializer):
 def jwt_encode(user):
     try:
         from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-        from rest_framework_simplejwt.views import TokenObtainPairView
     except ImportError:
         raise ImportError("rest-framework-simplejwt needs to be installed")
 

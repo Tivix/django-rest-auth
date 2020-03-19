@@ -83,6 +83,15 @@ class LoginView(GenericAPIView):
                                           context={'request': self.request})
 
         response = Response(serializer.data, status=status.HTTP_200_OK)
+        if getattr(settings, 'REST_USE_JWT', False):
+            from rest_framework_simplejwt.settings import api_settings as jwt_settings
+            #if jwt_settings.JWT_AUTH_COOKIE        #this needs to be added to simplejwt
+            from datetime import datetime
+            expiration = (datetime.utcnow() + jwt_settings.ACCESS_TOKEN_LIFETIME)
+            response.set_cookie('somestring',     #replace with jwt_settings.JWT_AUTH_COOKIE
+                                self.access_token,
+                                expires=expiration,
+                                httponly=True)
         return response
 
     def post(self, request, *args, **kwargs):
@@ -125,6 +134,10 @@ class LogoutView(APIView):
 
         response = Response({"detail": _("Successfully logged out.")},
                             status=status.HTTP_200_OK)
+        if getattr(settings, 'REST_USE_JWT', False):
+            from rest_framework_simplejwt.settings import api_settings as jwt_settings
+            #if jwt_settings.JWT_AUTH_COOKIE        #this needs to be added to simplejwt
+            response.delete_cookie('somestring') #replace with jwt_settings.JWT_AUTH_COOKIE
         return response
 
 
