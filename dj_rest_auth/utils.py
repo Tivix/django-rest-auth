@@ -1,5 +1,5 @@
 from importlib import import_module
-
+from .app_settings import JWT_AUTH_COOKIE
 
 def import_callable(path_or_callable):
     if hasattr(path_or_callable, '__call__'):
@@ -23,3 +23,31 @@ def jwt_encode(user):
 
     refresh = TokenObtainPairSerializer.get_token(user)
     return refresh.access_token, refresh
+
+
+try:
+    from rest_framework_simplejwt.authentication import JWTAuthentication
+
+    class JWTCookieAuthentication(JWTAuthentication):
+        """
+        An authentication plugin that hopefully authenticates requests through a JSON web
+        token provided in a request cookie (and through the header as normal, with a preference to the header).
+        """
+        def authenticate(self, request):
+            header = self.get_header(request)
+            if header is None:
+                if JWT_AUTH_COOKIE: # or settings.JWT_AUTH_COOKIE
+                    raw_token = request.COOKIES.get(JWT_AUTH_COOKIE)  # or settings.jwt_auth_cookie
+                else:
+                    return None
+            else:
+                raw_token = self.get_raw_token(header)
+                
+            if raw_token is None:
+                return None
+
+            validated_token = self.get_validated_token(raw_token)
+
+            return self.get_user(validated_token), validated_token
+except ImportError as I:
+    pass
