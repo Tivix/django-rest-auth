@@ -1,3 +1,10 @@
+Use dj-rest-auth instead.
+===========================
+
+This repo is not maintained and should be treated as Read-Only.
+
+Use the dj-rest-auth fork this package instead: https://github.com/jazzband/dj-rest-auth. 
+
 Welcome to django-rest-auth
 ===========================
 
