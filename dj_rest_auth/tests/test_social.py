@@ -17,9 +17,6 @@ except ImportError:
     from django.core.urlresolvers import reverse
 
 
-
-
-
 @override_settings(ROOT_URLCONF="tests.urls")
 class TestSocialAuth(TestsMixin, TestCase):
 

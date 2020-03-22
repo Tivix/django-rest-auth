@@ -16,7 +16,7 @@ from .app_settings import (JWTSerializer, LoginSerializer,
                            PasswordChangeSerializer,
                            PasswordResetConfirmSerializer,
                            PasswordResetSerializer, TokenSerializer,
-                           UserDetailsSerializer, create_token, JWT_AUTH_COOKIE)
+                           UserDetailsSerializer, create_token)
 from .models import TokenModel
 from .utils import jwt_encode
 
@@ -84,14 +84,17 @@ class LoginView(GenericAPIView):
 
         response = Response(serializer.data, status=status.HTTP_200_OK)
         if getattr(settings, 'REST_USE_JWT', False):
+            cookie_name = getattr(settings, 'JWT_AUTH_COOKIE', None)
             from rest_framework_simplejwt.settings import api_settings as jwt_settings
-            if JWT_AUTH_COOKIE:        #this needs to be added to simplejwt
+            if cookie_name:
                 from datetime import datetime
                 expiration = (datetime.utcnow() + jwt_settings.ACCESS_TOKEN_LIFETIME)
-                response.set_cookie(JWT_AUTH_COOKIE,     #this needs to be added to simplejwt
-                                    self.access_token,
-                                    expires=expiration,
-                                    httponly=True)
+                response.set_cookie(
+                    cookie_name,
+                    self.access_token,
+                    expires=expiration,
+                    httponly=True
+                )
         return response
 
     def post(self, request, *args, **kwargs):
@@ -135,9 +138,9 @@ class LogoutView(APIView):
         response = Response({"detail": _("Successfully logged out.")},
                             status=status.HTTP_200_OK)
         if getattr(settings, 'REST_USE_JWT', False):
-            # from rest_framework_simplejwt.settings import api_settings as jwt_settings
-            if JWT_AUTH_COOKIE:        #this needs to be added to simplejwt
-                response.delete_cookie(JWT_AUTH_COOKIE)    #this needs to be added to simplejwt
+            cookie_name = getattr(settings, 'JWT_AUTH_COOKIE')
+            if cookie_name:
+                response.delete_cookie(cookie_name)
         return response
 
 

@@ -11,8 +11,19 @@ from dj_rest_auth.urls import urlpatterns
 from django.conf.urls import include, url
 from django.views.generic import TemplateView
 from rest_framework.decorators import api_view
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import permissions
 
 from . import django_urls
+
+
+class ExampleProtectedView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+
+    def get(self, *args, **kwargs):
+        return Response(dict(success=True))
 
 
 class FacebookLogin(SocialLoginView):
@@ -64,6 +75,7 @@ urlpatterns += [
     url(r'^social-login/facebook/connect/$', FacebookConnect.as_view(), name='fb_connect'),
     url(r'^social-login/twitter/connect/$', TwitterConnect.as_view(), name='tw_connect'),
     url(r'^socialaccounts/$', SocialAccountListView.as_view(), name='social_account_list'),
+    url(r'^protected-view/$', ExampleProtectedView.as_view()),
     url(r'^socialaccounts/(?P<pk>\d+)/disconnect/$', SocialAccountDisconnectView.as_view(),
         name='social_account_disconnect'),
     url(r'^accounts/', include('allauth.socialaccount.urls'))

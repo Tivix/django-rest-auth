@@ -1,5 +1,5 @@
 from importlib import import_module
-from .app_settings import JWT_AUTH_COOKIE
+
 
 def import_callable(path_or_callable):
     if hasattr(path_or_callable, '__call__'):
@@ -31,13 +31,16 @@ try:
     class JWTCookieAuthentication(JWTAuthentication):
         """
         An authentication plugin that hopefully authenticates requests through a JSON web
-        token provided in a request cookie (and through the header as normal, with a preference to the header).
+        token provided in a request cookie (and through the header as normal, with a
+        preference to the header).
         """
         def authenticate(self, request):
+            from django.conf import settings
+            cookie_name = getattr(settings, 'JWT_AUTH_COOKIE', None)
             header = self.get_header(request)
             if header is None:
-                if JWT_AUTH_COOKIE: # or settings.JWT_AUTH_COOKIE
-                    raw_token = request.COOKIES.get(JWT_AUTH_COOKIE)  # or settings.jwt_auth_cookie
+                if cookie_name:
+                    raw_token = request.COOKIES.get(cookie_name)
                 else:
                     return None
             else:
@@ -47,7 +50,7 @@ try:
                 return None
 
             validated_token = self.get_validated_token(raw_token)
-
             return self.get_user(validated_token), validated_token
-except ImportError as I:
+
+except ImportError:
     pass
