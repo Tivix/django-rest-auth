@@ -1,6 +1,4 @@
 django-allauth>=0.25.0
 responses>=0.3.0
 flake8==2.4.0
-Django==3.0.4
 djangorestframework-simplejwt==4.4.0
-djangorestframework>=3.6.4
