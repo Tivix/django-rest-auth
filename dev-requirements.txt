@@ -2,4 +2,4 @@
 responses>=0.5.0
 djangorestframework-simplejwt==4.4.0
 django-allauth
-coveralls>=1.11.
+coveralls>=1.11.1
