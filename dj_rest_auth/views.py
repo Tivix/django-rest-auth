@@ -59,7 +59,7 @@ class LoginView(GenericAPIView):
         self.user = self.serializer.validated_data['user']
 
         if getattr(settings, 'REST_USE_JWT', False):
-            self.token = jwt_encode(self.user)
+            self.access_token, self.refresh_token = jwt_encode(self.user)
         else:
             self.token = create_token(self.token_model, self.user,
                                       self.serializer)
@@ -73,7 +73,8 @@ class LoginView(GenericAPIView):
         if getattr(settings, 'REST_USE_JWT', False):
             data = {
                 'user': self.user,
-                'token': self.token
+                'access_token': self.access_token,
+                'refresh_token': self.refresh_token
             }
             serializer = serializer_class(instance=data,
                                           context={'request': self.request})
@@ -83,14 +84,17 @@ class LoginView(GenericAPIView):
 
         response = Response(serializer.data, status=status.HTTP_200_OK)
         if getattr(settings, 'REST_USE_JWT', False):
-            from rest_framework_jwt.settings import api_settings as jwt_settings
-            if jwt_settings.JWT_AUTH_COOKIE:
+            cookie_name = getattr(settings, 'JWT_AUTH_COOKIE', None)
+            from rest_framework_simplejwt.settings import api_settings as jwt_settings
+            if cookie_name:
                 from datetime import datetime
-                expiration = (datetime.utcnow() + jwt_settings.JWT_EXPIRATION_DELTA)
-                response.set_cookie(jwt_settings.JWT_AUTH_COOKIE,
-                                    self.token,
-                                    expires=expiration,
-                                    httponly=True)
+                expiration = (datetime.utcnow() + jwt_settings.ACCESS_TOKEN_LIFETIME)
+                response.set_cookie(
+                    cookie_name,
+                    self.access_token,
+                    expires=expiration,
+                    httponly=True
+                )
         return response
 
     def post(self, request, *args, **kwargs):
@@ -134,9 +138,9 @@ class LogoutView(APIView):
         response = Response({"detail": _("Successfully logged out.")},
                             status=status.HTTP_200_OK)
         if getattr(settings, 'REST_USE_JWT', False):
-            from rest_framework_jwt.settings import api_settings as jwt_settings
-            if jwt_settings.JWT_AUTH_COOKIE:
-                response.delete_cookie(jwt_settings.JWT_AUTH_COOKIE)
+            cookie_name = getattr(settings, 'JWT_AUTH_COOKIE', None)
+            if cookie_name:
+                response.delete_cookie(cookie_name)
         return response
 
 

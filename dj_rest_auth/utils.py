@@ -17,12 +17,40 @@ def default_create_token(token_model, user, serializer):
 
 def jwt_encode(user):
     try:
-        from rest_framework_jwt.settings import api_settings
+        from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
     except ImportError:
-        raise ImportError("djangorestframework_jwt needs to be installed")
+        raise ImportError("rest-framework-simplejwt needs to be installed")
 
-    jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
-    jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
+    refresh = TokenObtainPairSerializer.get_token(user)
+    return refresh.access_token, refresh
 
-    payload = jwt_payload_handler(user)
-    return jwt_encode_handler(payload)
+
+try:
+    from rest_framework_simplejwt.authentication import JWTAuthentication
+
+    class JWTCookieAuthentication(JWTAuthentication):
+        """
+        An authentication plugin that hopefully authenticates requests through a JSON web
+        token provided in a request cookie (and through the header as normal, with a
+        preference to the header).
+        """
+        def authenticate(self, request):
+            from django.conf import settings
+            cookie_name = getattr(settings, 'JWT_AUTH_COOKIE', None)
+            header = self.get_header(request)
+            if header is None:
+                if cookie_name:
+                    raw_token = request.COOKIES.get(cookie_name)
+                else:
+                    return None
+            else:
+                raw_token = self.get_raw_token(header)
+                
+            if raw_token is None:
+                return None
+
+            validated_token = self.get_validated_token(raw_token)
+            return self.get_user(validated_token), validated_token
+
+except ImportError:
+    pass

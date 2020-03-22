@@ -12,9 +12,9 @@ jobs:
     executor: docker/docker
     steps:
       - checkout
-      - run: pip install -q --user coveralls djangorestframework==$DRF Django==$DJANGO_VERSION
       - run: pip install --user -r dev-requirements.txt
       - run: pip install --user -r dj_rest_auth/tests/requirements.pip
+      - run: pip install -q --user coveralls djangorestframework==$DRF Django==$DJANGO_VERSION
       - run:
           command: coverage run --source=dj_rest_auth setup.py test
           name: Test

@@ -152,8 +152,8 @@ class APIBasicTests(TestsMixin, TestCase):
         get_user_model().objects.create_user(self.USERNAME, '', self.PASS)
 
         self.post(self.login_url, data=payload, status_code=200)
-        self.assertEqual('token' in self.response.json.keys(), True)
-        self.token = self.response.json['token']
+        self.assertEqual('access_token' in self.response.json.keys(), True)
+        self.token = self.response.json['access_token']
 
     def test_login_by_email(self):
         # starting test without allauth app
@@ -382,7 +382,7 @@ class APIBasicTests(TestsMixin, TestCase):
             "password": self.PASS
         }
         self.post(self.login_url, data=payload, status_code=200)
-        self.token = self.response.json['token']
+        self.token = self.response.json['access_token']
         self.get(self.user_url, status_code=200)
 
         self.patch(self.user_url, data=self.BASIC_USER_DATA, status_code=200)
@@ -426,7 +426,7 @@ class APIBasicTests(TestsMixin, TestCase):
         self.post(self.register_url, data={}, status_code=400)
 
         result = self.post(self.register_url, data=self.REGISTRATION_DATA, status_code=201)
-        self.assertIn('token', result.data)
+        self.assertIn('access_token', result.data)
         self.assertEqual(get_user_model().objects.all().count(), user_count + 1)
 
         self._login()
@@ -514,3 +514,47 @@ class APIBasicTests(TestsMixin, TestCase):
 
         self.post(self.login_url, data=payload, status_code=status.HTTP_200_OK)
         self.get(self.logout_url, status_code=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    @override_settings(REST_USE_JWT=True)
+    @override_settings(JWT_AUTH_COOKIE='jwt-auth')
+    def test_login_jwt_sets_cookie(self):
+        payload = {
+            "username": self.USERNAME,
+            "password": self.PASS
+        }
+        get_user_model().objects.create_user(self.USERNAME, '', self.PASS)
+        resp = self.post(self.login_url, data=payload, status_code=200)
+        self.assertTrue('jwt-auth' in resp.cookies.keys())
+
+
+    @override_settings(REST_USE_JWT=True)
+    @override_settings(JWT_AUTH_COOKIE='jwt-auth')
+    def test_logout_jwt_deletes_cookie(self):
+        payload = {
+            "username": self.USERNAME,
+            "password": self.PASS
+        }
+        get_user_model().objects.create_user(self.USERNAME, '', self.PASS)
+        self.post(self.login_url, data=payload, status_code=200)
+        resp = self.post(self.logout_url, status=200)
+        self.assertEqual('', resp.cookies.get('jwt-auth').value)
+
+
+    @override_settings(REST_USE_JWT=True)
+    @override_settings(JWT_AUTH_COOKIE='jwt-auth')
+    @override_settings(REST_FRAMEWORK=dict(
+        DEFAULT_AUTHENTICATION_CLASSES=[
+            'dj_rest_auth.utils.JWTCookieAuthentication'
+        ]
+    ))
+    @override_settings(REST_SESSION_LOGIN=False)
+    def test_cookie_authentication(self):
+        payload = {
+            "username": self.USERNAME,
+            "password": self.PASS
+        }
+        get_user_model().objects.create_user(self.USERNAME, '', self.PASS)
+        resp = self.post(self.login_url, data=payload, status_code=200)
+        self.assertEqual(['jwt-auth'], list(resp.cookies.keys()))
+        resp = self.get('/protected-view/')
+        self.assertEquals(resp.status_code, 200)

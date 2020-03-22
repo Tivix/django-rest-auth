@@ -34,3 +34,6 @@ PasswordResetConfirmSerializer = serializers.get(
 )
 
 PasswordChangeSerializer = import_callable(serializers.get('PASSWORD_CHANGE_SERIALIZER', DefaultPasswordChangeSerializer))
+
+JWT_AUTH_COOKIE = getattr(settings, 'JWT_AUTH_COOKIE', None)
+

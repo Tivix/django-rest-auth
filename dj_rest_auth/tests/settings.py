@@ -68,7 +68,7 @@ TEMPLATES = [
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.SessionAuthentication',
-        'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
+        'dj_rest_auth.utils.JWTCookieAuthentication',
     )
 }
 
@@ -94,8 +94,6 @@ INSTALLED_APPS = [
 
     'dj_rest_auth',
     'dj_rest_auth.registration',
-
-    'rest_framework_jwt'
 ]
 
 SECRET_KEY = "38dh*skf8sjfhs287dh&^hd8&3hdg*j2&sd"

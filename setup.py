@@ -12,7 +12,7 @@ f.close()
 
 setup(
     name='dj-rest-auth',
-    version='0.1.4',
+    version='0.2.0',
     author='iMerica',
     author_email='imichael@pm.me',
     url='http://github.com/jazzband/dj-rest-auth',
@@ -32,7 +32,7 @@ setup(
     tests_require=[
         'responses>=0.5.0',
         'django-allauth>=0.25.0',
-        'djangorestframework-jwt>=1.9.0',
+        'djangorestframework-simplejwt>=4.4.0 ',
         'coveralls>=1.11.1'
     ],
     test_suite='runtests.runtests',
