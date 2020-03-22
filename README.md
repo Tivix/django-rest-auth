@@ -18,20 +18,35 @@ Install package
     
 Add `dj_rest_auth` app to INSTALLED_APPS in your django settings.py:
 
-    INSTALLED_APPS = (
-        ...,
-        'rest_framework',
-        'rest_framework.authtoken',
-        ...,
-        'dj_rest_auth'
-    )
+```python
+INSTALLED_APPS = (
+    ...,
+    'rest_framework',
+    'rest_framework.authtoken',
+    ...,
+    'dj_rest_auth'
+)
+```
     
 Add URL patterns
 
+```python
+urlpatterns = [
+    url(r'^dj-rest-auth/', include('dj_rest_auth.urls'))
+]
+```
+    
+(Optional)
 
-    urlpatterns = [
-        url(r'^dj-rest-auth/', include('dj_rest_auth.urls'))
-    ]
+Use Http-Only cookies
+
+```python
+REST_USE_JWT = True
+JWT_AUTH_COOKIE = 'jwt-auth'
+```
+
+
+
 
 ### Documentation
 
