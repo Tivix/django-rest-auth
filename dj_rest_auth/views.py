@@ -138,7 +138,7 @@ class LogoutView(APIView):
         response = Response({"detail": _("Successfully logged out.")},
                             status=status.HTTP_200_OK)
         if getattr(settings, 'REST_USE_JWT', False):
-            cookie_name = getattr(settings, 'JWT_AUTH_COOKIE')
+            cookie_name = getattr(settings, 'JWT_AUTH_COOKIE', None)
             if cookie_name:
                 response.delete_cookie(cookie_name)
         return response
