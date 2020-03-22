@@ -36,9 +36,8 @@ urlpatterns = [
 ]
 ```
     
-(Optional)
 
-Use Http-Only cookies
+(Optional) Use Http-Only cookies
 
 ```python
 REST_USE_JWT = True
