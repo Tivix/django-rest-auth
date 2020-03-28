@@ -18,21 +18,28 @@ function App() {
       body:  JSON.stringify({username, password})
     }).then(resp => resp.json()).then(data => {
       changeResponse(data)
-    })
+    }).catch(error => console.log('error ->', error))
   }
 
   return (
     <div className="App">
       <header className="App-header">
-        <p>
+        <h1>
           Login
-        </p>
-        <p>
-
+        </h1>
+        <div className={'help-text'}>
+          Inspect the network requests in your browser to view headers returned by dj-rest-auth.
+        </div>
+        <div>
           {resp &&
-            <span>Response: {JSON.stringify(resp)}</span>
+            <div className={'response'}>
+              <code>
+                {JSON.stringify(resp)}
+              </code>
+            </div>
           }
-        </p>
+        </div>
+        <div>
         <form onSubmit={onSubmit}>
           <div>
             <input
@@ -50,6 +57,7 @@ function App() {
           </div>
           <button type={'submit'}>Submit</button>
         </form>
+        </div>
       </header>
     </div>
   );

@@ -116,10 +116,14 @@ ACCOUNT_EMAIL_REQUIRED = False
 ACCOUNT_AUTHENTICATION_METHOD = 'username'
 ACCOUNT_EMAIL_VERIFICATION = 'optional'
 
+REST_USE_JWT = True
+JWT_AUTH_COOKIE = 'auth'
+
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.TokenAuthentication',
+        'dj_rest_auth.utils.JWTCookieAuthentication'
     ),
     'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema'
 }
@@ -130,4 +134,5 @@ SWAGGER_SETTINGS = {
 }
 
 
-CORS_ORIGIN_ALLOW_ALL = True # For demo purposes only. Use a white list in the real world.
+# For demo purposes only. Use a white list in the real world.
+CORS_ORIGIN_ALLOW_ALL = True
