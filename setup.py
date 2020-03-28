@@ -12,7 +12,7 @@ f.close()
 
 setup(
     name='dj-rest-auth',
-    version='0.2.0',
+    version='1.0.0',
     author='iMerica',
     author_email='imichael@pm.me',
     url='http://github.com/jazzband/dj-rest-auth',

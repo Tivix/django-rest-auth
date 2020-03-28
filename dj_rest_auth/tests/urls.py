@@ -10,10 +10,10 @@ from dj_rest_auth.social_serializers import (TwitterConnectSerializer,
 from dj_rest_auth.urls import urlpatterns
 from django.conf.urls import include, url
 from django.views.generic import TemplateView
-from rest_framework.decorators import api_view
-from rest_framework.views import APIView
-from rest_framework.response import Response
 from rest_framework import permissions
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from . import django_urls
 

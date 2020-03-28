@@ -407,7 +407,6 @@ class APIBasicTests(TestsMixin, TestCase):
 
     @override_settings(REST_AUTH_REGISTER_PERMISSION_CLASSES=(CustomPermissionClass,))
     def test_registration_with_custom_permission_class(self):
-
         class CustomRegisterView(RegisterView):
             permission_classes = register_permission_classes()
             authentication_classes = ()
@@ -477,7 +476,7 @@ class APIBasicTests(TestsMixin, TestCase):
         )
 
         # verify email
-        email_confirmation = new_user.emailaddress_set.get(email=self.EMAIL)\
+        email_confirmation = new_user.emailaddress_set.get(email=self.EMAIL) \
             .emailconfirmation_set.order_by('-created')[0]
         self.post(
             self.verify_email_url,
@@ -526,7 +525,6 @@ class APIBasicTests(TestsMixin, TestCase):
         resp = self.post(self.login_url, data=payload, status_code=200)
         self.assertTrue('jwt-auth' in resp.cookies.keys())
 
-
     @override_settings(REST_USE_JWT=True)
     @override_settings(JWT_AUTH_COOKIE='jwt-auth')
     def test_logout_jwt_deletes_cookie(self):
@@ -538,7 +536,6 @@ class APIBasicTests(TestsMixin, TestCase):
         self.post(self.login_url, data=payload, status_code=200)
         resp = self.post(self.logout_url, status=200)
         self.assertEqual('', resp.cookies.get('jwt-auth').value)
-
 
     @override_settings(REST_USE_JWT=True)
     @override_settings(JWT_AUTH_COOKIE='jwt-auth')
