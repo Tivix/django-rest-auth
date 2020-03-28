@@ -269,3 +269,18 @@ By default ``dj-rest-auth`` uses Django's Token-based authentication. If you wan
 .. code-block:: python
 
     REST_USE_JWT = True
+
+4. Declare what you want the cookie key to be called.
+
+.. code-block:: python
+
+    JWT_AUTH_COOKIE = 'my-app-auth'
+
+
+This example value above will cause dj-rest-auth to return a `Set-Cookie` header that looks like this:
+
+.. code-block:: bash
+
+    Set-Cookie: my-app-auth=xxxxxxxxxxxxx; expires=Sat, 28 Mar 2020 18:59:00 GMT; HttpOnly; Max-Age=300; Path=/
+
+``JWT_AUTH_COOKIE`` is also used while authenticating each request against protected views.
