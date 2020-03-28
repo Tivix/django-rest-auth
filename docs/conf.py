@@ -44,7 +44,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'dj-rest-auth'
-copyright = u'2018, iMerica Inc.'
+copyright = u'2020, @iMerica'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -227,7 +227,7 @@ latex_documents = [
 # (source start file, name, description, authors, manual section).
 man_pages = [
     ('index', 'dj-rest-auth', u'dj-rest-auth Documentation',
-     [u'iMerica Inc.'], 1)
+     [u'@iMerica'], 1)
 ]
 
 # If true, show URL addresses after external links.
@@ -241,7 +241,7 @@ man_pages = [
 #  dir menu entry, description, category)
 texinfo_documents = [
   ('index', 'dj-rest-auth', u'dj-rest-auth Documentation',
-   u'iMerica Inc.', 'dj-rest-auth', 'One line description of project.',
+   u'@iMerica', 'dj-rest-auth', 'One line description of project.',
    'Miscellaneous'),
 ]
 
