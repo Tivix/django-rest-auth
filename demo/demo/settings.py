@@ -43,9 +43,11 @@ INSTALLED_APPS = (
     'allauth.socialaccount',
     'allauth.socialaccount.providers.facebook',
     'rest_framework_swagger',
+    'corsheaders'
 )
 
 MIDDLEWARE = (
+    'corsheaders.middleware.CorsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -126,3 +128,6 @@ SWAGGER_SETTINGS = {
     'LOGIN_URL': 'login',
     'LOGOUT_URL': 'logout',
 }
+
+
+CORS_ORIGIN_ALLOW_ALL = True # For demo purposes only. Use a white list in the real world.
