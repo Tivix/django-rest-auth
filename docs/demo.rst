@@ -19,6 +19,7 @@ Now, go to ``http://127.0.0.1:8000/`` in your browser. There is also a
 Single Page Application (SPA) in React within the ``demo/`` directory. To run this do:
 
 .. code-block:: python
+
     cd react-spa/
     yarn # or npm install
     yarn run start
