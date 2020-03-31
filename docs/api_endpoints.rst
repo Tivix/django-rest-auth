@@ -35,7 +35,7 @@ Basic
     - new_password2
     - old_password
 
-    .. note:: ``OLD_PASSWORD_FIELD_ENABLED = True`` to use old_password.
+    .. note:: ``OLD_PASSWORD_FIELD_ENABLED = True`` to use old_password. If user has no usable password set (registration using social account), validation will be skipped for `old_password` to allow to set a new password.
     .. note:: ``LOGOUT_ON_PASSWORD_CHANGE = False`` to keep the user logged in after password change
 
 - /dj-rest-auth/user/ (GET, PUT, PATCH)
