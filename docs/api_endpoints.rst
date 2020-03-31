@@ -61,6 +61,11 @@ Registration
 
     - key
 
+    .. note:: If you set account email verification as mandatory, you have to add the VerifyEmailView with the used `name`.
+        You need to import the view: ``from dj_rest_auth.registration.views import VerifyEmailView``. Then add the url with the corresponding name:
+        ``url(r'^dj-rest-auth/account-confirm-email/', VerifyEmailView.as_view(), name='account_email_verification_sent')`` to the urlpatterns list.
+        
+
 
 Social Media Authentication
 ---------------------------
