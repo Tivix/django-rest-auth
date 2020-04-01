@@ -142,20 +142,20 @@ class LogoutView(APIView):
             cookie_name = getattr(settings, 'JWT_AUTH_COOKIE', None)
             if cookie_name:
                 response.delete_cookie(cookie_name)
-            # add refresh token to blacklist
-            try:
-                token = RefreshToken(request.data['refresh'])
-                token.blacklist()
-            except KeyError:
-                response = Response({"detail": _("Refresh token was not included.")},
-                                    status=status.HTTP_401_UNAUTHORIZED)
-            except TokenError as e:
-                if e.args[0] == 'Token is blacklisted':
-                    response = Response({"detail": _("Token is already blacklisted.")},
-                                        status=status.HTTP_404_NOT_FOUND)
-            except AttributeError as e:
-                # warn user blacklist is not enabled if not using JWT_AUTH_COOKIE
-                if not cookie_name:
+            else:
+                # add refresh token to blacklist
+                try:
+                    token = RefreshToken(request.data['refresh'])
+                    token.blacklist()
+                except KeyError:
+                    response = Response({"detail": _("Refresh token was not included.")},
+                                        status=status.HTTP_401_UNAUTHORIZED)
+                except TokenError as e:
+                    if e.args[0] == 'Token is blacklisted':
+                        response = Response({"detail": _("Token is already blacklisted.")},
+                                            status=status.HTTP_404_NOT_FOUND)
+                except AttributeError as e:
+                    # warn user blacklist is not enabled
                     if e.args[0] == "'RefreshToken' object has no attribute 'blacklist'":
                         response = Response({"detail": _("Blacklist is not enabled in INSTALLED_APPS.")},
                                             status=status.HTTP_501_NOT_IMPLEMENTED)
