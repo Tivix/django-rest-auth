@@ -11,6 +11,8 @@ from rest_framework.generics import GenericAPIView, RetrieveUpdateAPIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework_simplejwt.exceptions import TokenError
+from rest_framework_simplejwt.tokens import RefreshToken
 
 from .app_settings import (JWTSerializer, LoginSerializer,
                            PasswordChangeSerializer,
@@ -134,13 +136,29 @@ class LogoutView(APIView):
             pass
         if getattr(settings, 'REST_SESSION_LOGIN', True):
             django_logout(request)
-
         response = Response({"detail": _("Successfully logged out.")},
                             status=status.HTTP_200_OK)
         if getattr(settings, 'REST_USE_JWT', False):
             cookie_name = getattr(settings, 'JWT_AUTH_COOKIE', None)
             if cookie_name:
                 response.delete_cookie(cookie_name)
+            # add refresh token to blacklist
+            try:
+                token = RefreshToken(request.data['refresh'])
+                token.blacklist()
+            except KeyError:
+                response = Response({"detail": _("Refresh token was not included.")},
+                                    status=status.HTTP_401_UNAUTHORIZED)
+            except TokenError as e:
+                if e.args[0] == 'Token is blacklisted':
+                    response = Response({"detail": _("Token is already blacklisted.")},
+                                        status=status.HTTP_404_NOT_FOUND)
+            except AttributeError as e:
+                # warn user blacklist is not enabled if not using JWT_AUTH_COOKIE
+                if not cookie_name:
+                    if e.args[0] == "'RefreshToken' object has no attribute 'blacklist'":
+                        response = Response({"detail": _("Blacklist is not enabled in INSTALLED_APPS.")},
+                                            status=status.HTTP_501_NOT_IMPLEMENTED)
         return response
 
 
