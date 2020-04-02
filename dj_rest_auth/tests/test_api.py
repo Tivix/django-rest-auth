@@ -555,3 +555,14 @@ class APIBasicTests(TestsMixin, TestCase):
         self.assertEqual(['jwt-auth'], list(resp.cookies.keys()))
         resp = self.get('/protected-view/')
         self.assertEquals(resp.status_code, 200)
+
+    @override_settings(REST_USE_JWT=True)
+    def test_blacklisting(self):
+        payload = {
+            "username": self.USERNAME,
+            "password": self.PASS
+        }
+        get_user_model().objects.create_user(self.USERNAME, '', self.PASS)
+        self.post(self.login_url, data=payload, status_code=200)
+        resp = self.post(self.logout_url, status=200)
+        pass

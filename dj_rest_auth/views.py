@@ -147,18 +147,26 @@ class LogoutView(APIView):
                 try:
                     token = RefreshToken(request.data['refresh'])
                     token.blacklist()
+
                 except KeyError:
-                    response = Response({"detail": _("Refresh token was not included.")},
+                    response = Response({"detail": _("Refresh token was not included in request data.")},
                                         status=status.HTTP_401_UNAUTHORIZED)
+
                 except TokenError as e:
-                    if e.args[0] == 'Token is blacklisted':
+                    if hasattr(e, 'args') and 'Token is blacklisted' in e.args:
                         response = Response({"detail": _("Token is already blacklisted.")},
                                             status=status.HTTP_404_NOT_FOUND)
+                    else:
+                        raise
+
                 except AttributeError as e:
                     # warn user blacklist is not enabled
-                    if e.args[0] == "'RefreshToken' object has no attribute 'blacklist'":
+                    if hasattr(e, 'args') and "'RefreshToken' object has no attribute 'blacklist'" in e.args:
                         response = Response({"detail": _("Blacklist is not enabled in INSTALLED_APPS.")},
                                             status=status.HTTP_501_NOT_IMPLEMENTED)
+                    else:
+                        raise
+
         return response
 
 
