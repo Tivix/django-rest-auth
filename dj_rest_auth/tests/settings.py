@@ -94,6 +94,8 @@ INSTALLED_APPS = [
 
     'dj_rest_auth',
     'dj_rest_auth.registration',
+
+    'rest_framework_simplejwt.token_blacklist'
 ]
 
 SECRET_KEY = "38dh*skf8sjfhs287dh&^hd8&3hdg*j2&sd"

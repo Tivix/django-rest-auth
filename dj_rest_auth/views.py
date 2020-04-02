@@ -147,25 +147,27 @@ class LogoutView(APIView):
                 try:
                     token = RefreshToken(request.data['refresh'])
                     token.blacklist()
-
                 except KeyError:
                     response = Response({"detail": _("Refresh token was not included in request data.")},
                                         status=status.HTTP_401_UNAUTHORIZED)
 
-                except TokenError as e:
-                    if hasattr(e, 'args') and 'Token is blacklisted' in e.args:
-                        response = Response({"detail": _("Token is already blacklisted.")},
-                                            status=status.HTTP_404_NOT_FOUND)
-                    else:
-                        raise
+                except (TokenError, AttributeError, TypeError) as error:
+                    if hasattr(error, 'args'):
+                        if 'Token is blacklisted' in error.args or 'Token is invalid or expired' in error.args:
+                            response = Response({"detail": _(error.args[0])},
+                                                status=status.HTTP_404_NOT_FOUND)
 
-                except AttributeError as e:
-                    # warn user blacklist is not enabled
-                    if hasattr(e, 'args') and "'RefreshToken' object has no attribute 'blacklist'" in e.args:
-                        response = Response({"detail": _("Blacklist is not enabled in INSTALLED_APPS.")},
-                                            status=status.HTTP_501_NOT_IMPLEMENTED)
+                        # warn user blacklist is not enabled
+                        elif "'RefreshToken' object has no attribute 'blacklist'" in error.args:
+                            response = Response({"detail": _("Blacklist is not enabled in INSTALLED_APPS.")},
+                                                status=status.HTTP_501_NOT_IMPLEMENTED)
+                        else:
+                            response = Response({"detail": _("An error has occurred.")},
+                                                status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
                     else:
-                        raise
+                        response = Response({"detail": _("No attr error has occurred.")},
+                                            status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         return response
 

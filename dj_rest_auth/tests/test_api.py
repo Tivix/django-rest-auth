@@ -1,6 +1,7 @@
+import json
+from unittest.mock import patch
+
 from allauth.account import app_settings as account_app_settings
-from dj_rest_auth.registration.app_settings import register_permission_classes
-from dj_rest_auth.registration.views import RegisterView
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core import mail
@@ -9,6 +10,8 @@ from django.utils.encoding import force_text
 from rest_framework import status
 from rest_framework.test import APIRequestFactory
 
+from dj_rest_auth.registration.app_settings import register_permission_classes
+from dj_rest_auth.registration.views import RegisterView
 from .mixins import CustomPermissionClass, TestsMixin
 
 try:
@@ -557,12 +560,35 @@ class APIBasicTests(TestsMixin, TestCase):
         self.assertEquals(resp.status_code, 200)
 
     @override_settings(REST_USE_JWT=True)
+    @patch('rest_framework_simplejwt.tokens.BlacklistMixin.blacklist')
+    def test_blacklisting_not_installed(self, mocked_blacklist):
+        mocked_blacklist.side_effect = AttributeError(f"'RefreshToken' object has no attribute 'blacklist'")
+        payload = {
+            "username": self.USERNAME,
+            "password": self.PASS
+        }
+        get_user_model().objects.create_user(self.USERNAME, '', self.PASS)
+        resp = self.post(self.login_url, data=payload, status_code=200)
+        token = resp.data['refresh_token']
+        resp = self.post(self.logout_url, status=200, data={'refresh': token})
+        self.assertEqual(resp.status_code, 501)
+
+    @override_settings(REST_USE_JWT=True)
     def test_blacklisting(self):
         payload = {
             "username": self.USERNAME,
             "password": self.PASS
         }
         get_user_model().objects.create_user(self.USERNAME, '', self.PASS)
-        self.post(self.login_url, data=payload, status_code=200)
+        resp = self.post(self.login_url, data=payload, status_code=200)
+        token = resp.data['refresh_token']
         resp = self.post(self.logout_url, status=200)
-        pass
+        self.assertEqual(resp.status_code, 401)
+        resp = self.post(self.logout_url, status=200, data={'refresh': '1'})
+        self.assertEqual(resp.status_code, 404)
+        resp = self.post(self.logout_url, status=200, data={'refresh': token})
+        self.assertEqual(resp.status_code, 200)
+        resp = self.post(self.logout_url, status=200, data={'refresh': token})
+        self.assertEqual(resp.status_code, 404)
+        resp = self.post(self.logout_url, status=200, data=json.dumps({'refresh': token}))
+        self.assertEqual(resp.status_code, 500)
