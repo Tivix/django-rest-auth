@@ -166,7 +166,7 @@ class LogoutView(APIView):
                                                 status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
                     else:
-                        response = Response({"detail": _("No attr error has occurred.")},
+                        response = Response({"detail": _("An error has occurred.")},
                                             status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         return response
