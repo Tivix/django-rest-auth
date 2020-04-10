@@ -159,7 +159,7 @@ class LogoutView(APIView):
                     if hasattr(error, 'args'):
                         if 'Token is blacklisted' in error.args or 'Token is invalid or expired' in error.args:
                             response = Response({"detail": _(error.args[0])},
-                                                status=status.HTTP_404_NOT_FOUND)
+                                                status=status.HTTP_401_UNAUTHORIZED)
 
                         else:
                             response = Response({"detail": _("An error has occurred.")},

@@ -583,13 +583,18 @@ class APIBasicTests(TestsMixin, TestCase):
         get_user_model().objects.create_user(self.USERNAME, '', self.PASS)
         resp = self.post(self.login_url, data=payload, status_code=200)
         token = resp.data['refresh_token']
+        # test refresh token not included in request data
         resp = self.post(self.logout_url, status=200)
         self.assertEqual(resp.status_code, 401)
+        # test token is invalid or expired
         resp = self.post(self.logout_url, status=200, data={'refresh': '1'})
-        self.assertEqual(resp.status_code, 404)
+        self.assertEqual(resp.status_code, 401)
+        # test successful logout
         resp = self.post(self.logout_url, status=200, data={'refresh': token})
         self.assertEqual(resp.status_code, 200)
+        # test token is blacklisted
         resp = self.post(self.logout_url, status=200, data={'refresh': token})
-        self.assertEqual(resp.status_code, 404)
+        self.assertEqual(resp.status_code, 401)
+        # test other TokenError, AttributeError, TypeError (invalid format)
         resp = self.post(self.logout_url, status=200, data=json.dumps({'refresh': token}))
         self.assertEqual(resp.status_code, 500)
