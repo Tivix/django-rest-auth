@@ -11,6 +11,8 @@ from rest_framework.generics import GenericAPIView, RetrieveUpdateAPIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework_simplejwt.exceptions import TokenError
+from rest_framework_simplejwt.tokens import RefreshToken
 
 from .app_settings import (JWTSerializer, LoginSerializer,
                            PasswordChangeSerializer,
@@ -132,15 +134,48 @@ class LogoutView(APIView):
             request.user.auth_token.delete()
         except (AttributeError, ObjectDoesNotExist):
             pass
+
         if getattr(settings, 'REST_SESSION_LOGIN', True):
             django_logout(request)
 
         response = Response({"detail": _("Successfully logged out.")},
                             status=status.HTTP_200_OK)
+
         if getattr(settings, 'REST_USE_JWT', False):
             cookie_name = getattr(settings, 'JWT_AUTH_COOKIE', None)
             if cookie_name:
                 response.delete_cookie(cookie_name)
+
+            elif 'rest_framework_simplejwt.token_blacklist' in settings.INSTALLED_APPS:
+                # add refresh token to blacklist
+                try:
+                    token = RefreshToken(request.data['refresh'])
+                    token.blacklist()
+
+                except KeyError:
+                    response = Response({"detail": _("Refresh token was not included in request data.")},
+                                        status=status.HTTP_401_UNAUTHORIZED)
+
+                except (TokenError, AttributeError, TypeError) as error:
+                    if hasattr(error, 'args'):
+                        if 'Token is blacklisted' in error.args or 'Token is invalid or expired' in error.args:
+                            response = Response({"detail": _(error.args[0])},
+                                                status=status.HTTP_401_UNAUTHORIZED)
+
+                        else:
+                            response = Response({"detail": _("An error has occurred.")},
+                                                status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+                    else:
+                        response = Response({"detail": _("An error has occurred.")},
+                                            status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+            else:
+                response = Response({
+                    "detail": _("Neither cookies or blacklist are enabled, so the token has not been deleted server "
+                                "side. Please make sure the token is deleted client side."
+                                )}, status=status.HTTP_200_OK)
+
         return response
 
 

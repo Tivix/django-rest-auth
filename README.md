@@ -44,7 +44,12 @@ REST_USE_JWT = True
 JWT_AUTH_COOKIE = 'jwt-auth'
 ```
 
+### Testing
 
+To run the tests within a virtualenv, run `python runtests.py` from the repository directory.
+The easiest way to run test coverage is with [`coverage`](https://pypi.org/project/coverage/),
+which runs the tests against all supported Django installs. To run the test coverage 
+within a virtualenv, run `coverage run ./runtests.py` from the repository directory then run `coverage report`.
 
 
 ### Documentation

@@ -1,6 +1,6 @@
+import json
+
 from allauth.account import app_settings as account_app_settings
-from dj_rest_auth.registration.app_settings import register_permission_classes
-from dj_rest_auth.registration.views import RegisterView
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core import mail
@@ -9,6 +9,8 @@ from django.utils.encoding import force_text
 from rest_framework import status
 from rest_framework.test import APIRequestFactory
 
+from dj_rest_auth.registration.app_settings import register_permission_classes
+from dj_rest_auth.registration.views import RegisterView
 from .mixins import CustomPermissionClass, TestsMixin
 
 try:
@@ -555,3 +557,44 @@ class APIBasicTests(TestsMixin, TestCase):
         self.assertEqual(['jwt-auth'], list(resp.cookies.keys()))
         resp = self.get('/protected-view/')
         self.assertEquals(resp.status_code, 200)
+
+    @override_settings(REST_USE_JWT=True)
+    def test_blacklisting_not_installed(self):
+        settings.INSTALLED_APPS.remove('rest_framework_simplejwt.token_blacklist')
+        payload = {
+            "username": self.USERNAME,
+            "password": self.PASS
+        }
+        get_user_model().objects.create_user(self.USERNAME, '', self.PASS)
+        resp = self.post(self.login_url, data=payload, status_code=200)
+        token = resp.data['refresh_token']
+        resp = self.post(self.logout_url, status=200, data={'refresh': token})
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.data["detail"],
+                         "Neither cookies or blacklist are enabled, so the token has not been deleted server side. "
+                         "Please make sure the token is deleted client side.")
+
+    @override_settings(REST_USE_JWT=True)
+    def test_blacklisting(self):
+        payload = {
+            "username": self.USERNAME,
+            "password": self.PASS
+        }
+        get_user_model().objects.create_user(self.USERNAME, '', self.PASS)
+        resp = self.post(self.login_url, data=payload, status_code=200)
+        token = resp.data['refresh_token']
+        # test refresh token not included in request data
+        resp = self.post(self.logout_url, status=200)
+        self.assertEqual(resp.status_code, 401)
+        # test token is invalid or expired
+        resp = self.post(self.logout_url, status=200, data={'refresh': '1'})
+        self.assertEqual(resp.status_code, 401)
+        # test successful logout
+        resp = self.post(self.logout_url, status=200, data={'refresh': token})
+        self.assertEqual(resp.status_code, 200)
+        # test token is blacklisted
+        resp = self.post(self.logout_url, status=200, data={'refresh': token})
+        self.assertEqual(resp.status_code, 401)
+        # test other TokenError, AttributeError, TypeError (invalid format)
+        resp = self.post(self.logout_url, status=200, data=json.dumps({'refresh': token}))
+        self.assertEqual(resp.status_code, 500)
