@@ -1,5 +1,4 @@
 import json
-from unittest.mock import patch
 
 from allauth.account import app_settings as account_app_settings
 from django.conf import settings
@@ -560,9 +559,8 @@ class APIBasicTests(TestsMixin, TestCase):
         self.assertEquals(resp.status_code, 200)
 
     @override_settings(REST_USE_JWT=True)
-    @patch('rest_framework_simplejwt.tokens.BlacklistMixin.blacklist')
-    def test_blacklisting_not_installed(self, mocked_blacklist):
-        mocked_blacklist.side_effect = AttributeError(f"'RefreshToken' object has no attribute 'blacklist'")
+    def test_blacklisting_not_installed(self):
+        settings.INSTALLED_APPS.remove('rest_framework_simplejwt.token_blacklist')
         payload = {
             "username": self.USERNAME,
             "password": self.PASS
@@ -571,7 +569,10 @@ class APIBasicTests(TestsMixin, TestCase):
         resp = self.post(self.login_url, data=payload, status_code=200)
         token = resp.data['refresh_token']
         resp = self.post(self.logout_url, status=200, data={'refresh': token})
-        self.assertEqual(resp.status_code, 501)
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.data["detail"],
+                         "Neither cookies or blacklist are enabled, so the token has not been deleted server side. "
+                         "Please make sure the token is deleted client side.")
 
     @override_settings(REST_USE_JWT=True)
     def test_blacklisting(self):
