@@ -11,8 +11,20 @@ from rest_framework.generics import GenericAPIView, RetrieveUpdateAPIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework_simplejwt.exceptions import TokenError
-from rest_framework_simplejwt.tokens import RefreshToken
+
+if getattr(settings, 'REST_USE_JWT'):
+    from rest_framework_simplejwt.exceptions import TokenError
+    from rest_framework_simplejwt.tokens import RefreshToken
+else:
+    # NOTE: these are not actually used except if `REST_USE_JWT` is True, but
+    # ensuring they're defined anyway in case
+
+    class TokenError(Exception):
+        pass
+
+    class RefreshToken:
+        pass
+
 
 from .app_settings import (JWTSerializer, LoginSerializer,
                            PasswordChangeSerializer,
