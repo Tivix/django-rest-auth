@@ -40,9 +40,9 @@ Configuration
     
         .. note:: The custom REGISTER_SERIALIZER must define a ``def save(self, request)`` method that returns a user model instance
 
-- **REST_AUTH_TOKEN_MODEL** - model class for tokens, default value ``rest_framework.authtoken.models``
+- **REST_AUTH_TOKEN_MODEL** - path to model class for tokens, default value ``'rest_framework.authtoken.models.Token'``
 
-- **REST_AUTH_TOKEN_CREATOR** - callable to create tokens, default value ``dj_rest_auth.utils.default_create_token``.
+- **REST_AUTH_TOKEN_CREATOR** - path to callable or callable for creating tokens, default value ``dj_rest_auth.utils.default_create_token``.
 
 - **REST_SESSION_LOGIN** - Enable session login in Login API view (default: True)
 
