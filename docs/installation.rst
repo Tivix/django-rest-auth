@@ -28,7 +28,7 @@ Installation
 
     urlpatterns = [
         ...,
-        url(r'^dj-rest-auth/', include('dj_rest_auth.urls'))
+        path('dj-rest-auth/', include('dj_rest_auth.urls'))
     ]
 
 4. Migrate your database
@@ -68,8 +68,8 @@ Registration (optional)
 
     urlpatterns = [
         ...,
-        url(r'^dj-rest-auth/', include('dj_rest_auth.urls')),
-        url(r'^dj-rest-auth/registration/', include('dj_rest_auth.registration.urls'))
+        path('dj-rest-auth/', include('dj_rest_auth.urls')),
+        path('dj-rest-auth/registration/', include('dj_rest_auth.registration.urls'))
     ]
 
 
@@ -122,7 +122,7 @@ Facebook
 
     urlpatterns += [
         ...,
-        url(r'^dj-rest-auth/facebook/$', FacebookLogin.as_view(), name='fb_login')
+        path('dj-rest-auth/facebook/', FacebookLogin.as_view(), name='fb_login')
     ]
 
 
@@ -149,7 +149,7 @@ If you are using Twitter for your social authentication, it is a bit different s
 
     urlpatterns += [
         ...,
-        url(r'^dj-rest-auth/twitter/$', TwitterLogin.as_view(), name='twitter_login')
+        path('dj-rest-auth/twitter/', TwitterLogin.as_view(), name='twitter_login')
     ]
 
 .. note:: Starting from v0.21.0, django-allauth has dropped support for context processors. Check out http://django-allauth.readthedocs.org/en/latest/changelog.html#from-0-21-0 for more details.
@@ -179,7 +179,7 @@ If you are using GitHub for your social authentication, it uses code and not Acc
 
     urlpatterns += [
         ...,
-        url(r'^dj-rest-auth/github/$', GitHubLogin.as_view(), name='github_login')
+        path('dj-rest-auth/github/', GitHubLogin.as_view(), name='github_login')
     ]
 
 Additional Social Connect Views
@@ -215,9 +215,9 @@ In urls.py:
 
     urlpatterns += [
         ...,
-        url(r'^dj-rest-auth/facebook/connect/$', FacebookConnect.as_view(), name='fb_connect')
-        url(r'^dj-rest-auth/twitter/connect/$', TwitterConnect.as_view(), name='twitter_connect')
-        url(r'^dj-rest-auth/github/connect/$', GithubConnect.as_view(), name='github_connect')
+        path('dj-rest-auth/facebook/connect/', FacebookConnect.as_view(), name='fb_connect')
+        path('dj-rest-auth/twitter/connect/', TwitterConnect.as_view(), name='twitter_connect')
+        path('dj-rest-auth/github/connect/', GithubConnect.as_view(), name='github_connect')
     ]
 
 You can also use the following views to check all social accounts attached to the current authenticated user and disconnect selected social accounts:
@@ -230,13 +230,13 @@ You can also use the following views to check all social accounts attached to th
 
     urlpatterns += [
         ...,
-        url(
-            r'^socialaccounts/$',
+        path(
+            'socialaccounts/',
             SocialAccountListView.as_view(),
             name='social_account_list'
         ),
-        url(
-            r'^socialaccounts/(?P<pk>\d+)/disconnect/$',
+        path(
+            'socialaccounts/<int:pk>/disconnect/',
             SocialAccountDisconnectView.as_view(),
             name='social_account_disconnect'
         )
