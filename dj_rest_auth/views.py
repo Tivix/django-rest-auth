@@ -11,8 +11,6 @@ from rest_framework.generics import GenericAPIView, RetrieveUpdateAPIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework_simplejwt.exceptions import TokenError
-from rest_framework_simplejwt.tokens import RefreshToken
 
 from .app_settings import (JWTSerializer, LoginSerializer,
                            PasswordChangeSerializer,
@@ -142,6 +140,13 @@ class LogoutView(APIView):
                             status=status.HTTP_200_OK)
 
         if getattr(settings, 'REST_USE_JWT', False):
+            # NOTE: this import occurs here rather than at the top level
+            # because JWT support is optional, and if `REST_USE_JWT` isn't
+            # True we shouldn't need the dependency
+            from rest_framework_simplejwt.exceptions import TokenError
+            from rest_framework_simplejwt.tokens import RefreshToken
+
+
             cookie_name = getattr(settings, 'JWT_AUTH_COOKIE', None)
             if cookie_name:
                 response.delete_cookie(cookie_name)
