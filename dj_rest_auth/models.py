@@ -1,6 +1,4 @@
 from django.conf import settings
-from rest_framework.authtoken.models import Token as DefaultTokenModel
+from django.utils.module_loading import import_string
 
-# Register your models here.
-
-TokenModel = getattr(settings, 'REST_AUTH_TOKEN_MODEL', DefaultTokenModel)
+TokenModel = import_string(getattr(settings, 'REST_AUTH_TOKEN_MODEL', 'rest_framework.authtoken.models.Token'))
