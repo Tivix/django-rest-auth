@@ -18,7 +18,7 @@ urlpatterns = [
         name='rest_password_change'),
 ]
 
-if getattr(settings, 'REST_USE_JWT', True):
+if getattr(settings, 'REST_USE_JWT', False):
     from rest_framework_simplejwt.views import (
         TokenRefreshView, TokenVerifyView,
     )
