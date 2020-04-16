@@ -24,6 +24,6 @@ if getattr(settings, 'REST_USE_JWT', True):
     )
 
     urlpatterns += [
-        url(r'token/verify/$', TokenVerifyView.as_view(), name='token_verify'),
+        url(r'^token/verify/$', TokenVerifyView.as_view(), name='token_verify'),
         url(r'^token/refresh/$', TokenRefreshView.as_view(), name='token_refresh'),
     ]
