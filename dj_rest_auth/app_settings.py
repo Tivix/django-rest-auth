@@ -29,9 +29,9 @@ PasswordResetSerializer = import_callable(serializers.get(
     'PASSWORD_RESET_SERIALIZER', DefaultPasswordResetSerializer
 ))
 
-PasswordResetConfirmSerializer = serializers.get(
+PasswordResetConfirmSerializer = import_callable(serializers.get(
     'PASSWORD_RESET_CONFIRM_SERIALIZER', DefaultPasswordResetConfirmSerializer
-)
+))
 
 PasswordChangeSerializer = import_callable(serializers.get('PASSWORD_CHANGE_SERIALIZER', DefaultPasswordChangeSerializer))
 
