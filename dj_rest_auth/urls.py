@@ -2,6 +2,7 @@ from dj_rest_auth.views import (LoginView, LogoutView, PasswordChangeView,
                                 PasswordResetConfirmView, PasswordResetView,
                                 UserDetailsView)
 from django.conf.urls import url
+from django.conf import settings
 
 urlpatterns = [
     # URLs that do not require a session or valid token
@@ -16,3 +17,13 @@ urlpatterns = [
     url(r'^password/change/$', PasswordChangeView.as_view(),
         name='rest_password_change'),
 ]
+
+if getattr(settings, 'REST_USE_JWT', False):
+    from rest_framework_simplejwt.views import (
+        TokenRefreshView, TokenVerifyView,
+    )
+
+    urlpatterns += [
+        url(r'^token/verify/$', TokenVerifyView.as_view(), name='token_verify'),
+        url(r'^token/refresh/$', TokenRefreshView.as_view(), name='token_refresh'),
+    ]
