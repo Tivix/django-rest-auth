@@ -10,9 +10,13 @@ long_description = f.read().strip()
 f.close()
 
 
+about = {}
+with open('dj_rest_auth/__version__.py', 'r', encoding="utf8") as f:
+    exec(f.read(), about)
+
 setup(
     name='dj-rest-auth',
-    version='1.0.4',
+    version=about['__version__'],
     author='iMerica',
     author_email='imichael@pm.me',
     url='http://github.com/jazzband/dj-rest-auth',
