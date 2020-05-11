@@ -208,6 +208,9 @@ class PasswordResetConfirmSerializer(serializers.Serializer):
     def validate(self, attrs):
         self._errors = {}
 
+        if not default_token_generator.check_token(self.user, attrs['token']):
+            raise ValidationError({'token': ['Invalid value']})
+
         # Decode the uidb64 to uid to get User object
         try:
             uid = force_text(uid_decoder(attrs['uid']))
@@ -222,8 +225,6 @@ class PasswordResetConfirmSerializer(serializers.Serializer):
         )
         if not self.set_password_form.is_valid():
             raise serializers.ValidationError(self.set_password_form.errors)
-        if not default_token_generator.check_token(self.user, attrs['token']):
-            raise ValidationError({'token': ['Invalid value']})
 
         return attrs
 
