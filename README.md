@@ -51,6 +51,21 @@ The easiest way to run test coverage is with [`coverage`](https://pypi.org/proje
 which runs the tests against all supported Django installs. To run the test coverage 
 within a virtualenv, run `coverage run ./runtests.py` from the repository directory then run `coverage report`.
 
+#### Tox
+
+Testing may also be done using [`tox`](https://pypi.org/project/tox/), which
+will run the tests against all supported combinations of python and django.
+
+Install tox, either globally or within a virtualenv, and then simply run `tox`
+from the repository directory. As there are many combinations, you may run them
+in [`parallel`](https://tox.readthedocs.io/en/latest/config.html#cmdoption-tox-p)
+using `tox --parallel`.
+
+The `tox.ini` includes an environment for testing code [`coverage`](https://pypi.org/project/coverage/)
+and you can run it and view this report with `tox -e coverage`.
+
+Linting may also be performed via [`flake8`](https://pypi.org/project/flake8/)
+by running `tox -e flake8`.
 
 ### Documentation
 
