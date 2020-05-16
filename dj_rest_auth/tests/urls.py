@@ -21,7 +21,6 @@ from . import django_urls
 class ExampleProtectedView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
-
     def get(self, *args, **kwargs):
         return Response(dict(success=True))
 
