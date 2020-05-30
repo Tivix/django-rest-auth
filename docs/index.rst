@@ -26,4 +26,4 @@ Contents
    Demo project <demo>
    FAQ <faq>
    Changelog <changelog>
-   Vulnerability Disclosure <disclosure>
+   Disclosure Policy <disclosure>

@@ -1,5 +1,5 @@
-Vulnerability Disclosure
-========================
+Vulnerability Disclosure Policy
+===============================
 
 Please observe the standard best practices of responsible disclosure, especially considering that this is OSS.
 See OWASP's disclosure `cheat sheet <https://cheatsheetseries.owasp.org/cheatsheets/Vulnerability_Disclosure_Cheat_Sheet.html>`_.
