@@ -25,5 +25,4 @@ Contents
    Configuration <configuration>
    Demo project <demo>
    FAQ <faq>
-   Changelog <changelog>
    Disclosure Policy <disclosure>
