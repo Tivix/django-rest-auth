@@ -26,3 +26,4 @@ Contents
    Demo project <demo>
    FAQ <faq>
    Changelog <changelog>
+   Security Disclosure <disclosure>

@@ -1,0 +1,17 @@
+Vulnerability Disclosure
+========================
+
+Attn: Developers and Security Researchers.
+
+Please observe the standard best practices of responsible disclosure, especially considering that this is OSS.
+See OWASP's disclosure `cheat sheet <https://cheatsheetseries.owasp.org/cheatsheets/Vulnerability_Disclosure_Cheat_Sheet.html#methods-of-disclosure>`_.
+
+Some basic rules:
+
+- Keep it legal.
+- Respect everyone's privacy.
+- Contact the core maintainer(s) immediately if you discover a security vulnerability (imichael@pm.me for now).
+
+
+
+
