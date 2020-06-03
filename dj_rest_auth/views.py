@@ -40,7 +40,7 @@ class LoginView(GenericAPIView):
     permission_classes = (AllowAny,)
     serializer_class = LoginSerializer
     token_model = TokenModel
-    throttle_scope = 'rest_auth'
+    throttle_scope = 'dj_rest_auth'
 
     @sensitive_post_parameters_m
     def dispatch(self, *args, **kwargs):
@@ -116,7 +116,7 @@ class LogoutView(APIView):
     Accepts/Returns nothing.
     """
     permission_classes = (AllowAny,)
-    throttle_scope = 'rest_auth'
+    throttle_scope = 'dj_rest_auth'
 
     def get(self, request, *args, **kwargs):
         if getattr(settings, 'ACCOUNT_LOGOUT_ON_GET', False):
@@ -219,7 +219,7 @@ class PasswordResetView(GenericAPIView):
     """
     serializer_class = PasswordResetSerializer
     permission_classes = (AllowAny,)
-    throttle_scope = 'rest_auth'
+    throttle_scope = 'dj_rest_auth'
 
     def post(self, request, *args, **kwargs):
         # Create a serializer with request.data
@@ -245,7 +245,7 @@ class PasswordResetConfirmView(GenericAPIView):
     """
     serializer_class = PasswordResetConfirmSerializer
     permission_classes = (AllowAny,)
-    throttle_scope = 'rest_auth'
+    throttle_scope = 'dj_rest_auth'
 
     @sensitive_post_parameters_m
     def dispatch(self, *args, **kwargs):
@@ -269,7 +269,7 @@ class PasswordChangeView(GenericAPIView):
     """
     serializer_class = PasswordChangeSerializer
     permission_classes = (IsAuthenticated,)
-    throttle_scope = 'rest_auth'
+    throttle_scope = 'dj_rest_auth'
 
     @sensitive_post_parameters_m
     def dispatch(self, *args, **kwargs):
