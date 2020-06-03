@@ -79,6 +79,7 @@ class SocialLoginSerializer(serializers.Serializer):
         # Case 1: We received the access_token
         if attrs.get('access_token'):
             access_token = attrs.get('access_token')
+            tokens_to_parse = {'access_token': access_token}
 
         # Case 2: We received the authorization code
         elif attrs.get('code'):
@@ -109,12 +110,17 @@ class SocialLoginSerializer(serializers.Serializer):
             )
             token = client.get_access_token(code)
             access_token = token['access_token']
+            tokens_to_parse = {'access_token': access_token}
 
+            # If available we add additional data to the dictionary
+            for key in ["refresh_token", adapter.expires_in_key]:
+                if key in token:
+                    tokens_to_parse[key] = token[key]
         else:
             raise serializers.ValidationError(
                 _("Incorrect input. access_token or code is required."))
 
-        social_token = adapter.parse_token({'access_token': access_token})
+        social_token = adapter.parse_token(tokens_to_parse)
         social_token.app = app
 
         try:
