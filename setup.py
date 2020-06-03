@@ -1,30 +1,34 @@
 #!/usr/bin/env python
 
 import os
-from setuptools import setup, find_packages
 
+from setuptools import find_packages, setup
 
 here = os.path.dirname(os.path.abspath(__file__))
-f = open(os.path.join(here, 'README.rst'))
+f = open(os.path.join(here, 'README.md'))
 long_description = f.read().strip()
 f.close()
 
 
+about = {}
+with open('dj_rest_auth/__version__.py', 'r', encoding="utf8") as f:
+    exec(f.read(), about)
+
 setup(
-    name='django-rest-auth',
-    version='0.9.5',
-    author='Sumit Chachra',
-    author_email='chachra@tivix.com',
-    url='http://github.com/Tivix/django-rest-auth',
-    description='Create a set of REST API endpoints for Authentication and Registration',
+    name='dj-rest-auth',
+    version=about['__version__'],
+    author='iMerica',
+    author_email='imichael@pm.me',
+    url='http://github.com/jazzband/dj-rest-auth',
+    description='Authentication and Registration in Django Rest Framework',
     packages=find_packages(),
     long_description=long_description,
+    long_description_content_type='text/markdown',
     keywords='django rest auth registration rest-framework django-registration api',
     zip_safe=False,
     install_requires=[
-        'Django>=1.8.0',
+        'Django>=1.11',
         'djangorestframework>=3.1.3',
-        'six>=1.9.0',
     ],
     extras_require={
         'with_social': ['django-allauth>=0.25.0'],
@@ -32,10 +36,12 @@ setup(
     tests_require=[
         'responses>=0.5.0',
         'django-allauth>=0.25.0',
-        'djangorestframework-jwt>=1.9.0',
+        'djangorestframework-simplejwt>=4.4.0 ',
+        'coveralls>=1.11.1'
     ],
     test_suite='runtests.runtests',
     include_package_data=True,
+    python_requires='>=3.5',
     classifiers=[
         'Framework :: Django',
         'Intended Audience :: Developers',

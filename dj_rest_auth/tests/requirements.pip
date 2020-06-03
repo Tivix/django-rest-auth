@@ -1,0 +1,4 @@
+django-allauth>=0.25.0
+responses>=0.3.0
+flake8==2.4.0
+djangorestframework-simplejwt==4.4.0
