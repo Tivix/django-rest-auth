@@ -1,0 +1,34 @@
+version: 2.1
+orbs:
+  docker: circleci/docker@0.6.0
+
+jobs:
+  test-django-3: &template
+    docker:
+      - image: circleci/python:3.8.0
+    environment:
+      DJANGO_VERSION: 3.0.3
+      DRF: 3.11
+    executor: docker/docker
+    steps:
+      - checkout
+      - run: pip install --user -r dev-requirements.txt
+      - run: pip install --user -r dj_rest_auth/tests/requirements.pip
+      - run: pip install -q --user coveralls djangorestframework==$DRF Django==$DJANGO_VERSION
+      - run:
+          command: coverage run --source=dj_rest_auth setup.py test
+          name: Test
+      - run:
+          command: COVERALLS_REPO_TOKEN=Q58WdUuZOi89XHyDeDsGE2lxUGQ2IfqP3 coveralls
+          name: Coverage
+  test-django-2:
+    <<: *template
+    environment:
+      DJANGO_VERSION: 2.2.10
+      DRF: 3.9
+
+workflows:
+  main:
+    jobs:
+      - test-django-3
+      - test-django-2

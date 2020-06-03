@@ -3,7 +3,7 @@ FAQ
 
 1. Why account_confirm_email url is defined but it is not usable?
 
-    In /rest_auth/registration/urls.py we can find something like this:
+    In /dj_rest_auth/registration/urls.py we can find something like this:
 
     .. code-block:: python
 
@@ -36,12 +36,12 @@ FAQ
             # custom fields for user
             company_name = models.CharField(max_length=100)
 
-    To allow update user details within one request send to rest_auth.views.UserDetailsView view, create serializer like this:
+    To allow update user details within one request send to dj_rest_auth.views.UserDetailsView view, create serializer like this:
 
     .. code-block:: python
 
         from rest_framework import serializers
-        from rest_auth.serializers import UserDetailsSerializer
+        from dj_rest_auth.serializers import UserDetailsSerializer
 
         class UserSerializer(UserDetailsSerializer):
 
