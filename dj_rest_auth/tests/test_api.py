@@ -466,6 +466,13 @@ class APIBasicTests(TestsMixin, TestCase):
         new_user = get_user_model().objects.latest('id')
         self.assertEqual(new_user.username, self.REGISTRATION_DATA['username'])
 
+        # test browsable endpoint
+        result = self.get(
+            self.verify_email_url
+        )
+        self.assertEqual(result.status_code, 405)
+        self.assertEqual(result.json['detail'], 'Method "GET" not allowed.')
+
         # email is not verified yet
         payload = {
             "username": self.USERNAME,
