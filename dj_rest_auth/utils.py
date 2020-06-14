@@ -21,7 +21,7 @@ try:
     from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
     def jwt_encode(user):
-        TOPS = getattr(settings, 'JWT_TOKEN_CLAIMS_SERIALIZER', TokenObtainPairSerializer)
+        TOPS = import_callable(getattr(settings, 'JWT_TOKEN_CLAIMS_SERIALIZER', TokenObtainPairSerializer))
         refresh = TOPS.get_token(user)
         return refresh.access_token, refresh
 
