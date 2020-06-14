@@ -21,6 +21,16 @@ except ImportError:
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from jwt import decode as decode_jwt
 
+class TESTTokenObtainPairSerializer(TokenObtainPairSerializer):
+    @classmethod
+    def get_token(cls, user):
+        token = super().get_token(user)
+        # Add custom claims
+        token['name'] = user.username
+        token['email'] = user.email
+
+        return token
+
 
 @override_settings(ROOT_URLCONF="tests.urls")
 class APIBasicTests(TestsMixin, TestCase):
@@ -610,18 +620,6 @@ class APIBasicTests(TestsMixin, TestCase):
         self.assertEqual(resp.status_code, 500)
 
 
-
-    class TESTTokenObtainPairSerializer(TokenObtainPairSerializer):
-        @classmethod
-        def get_token(cls, user):
-            token = super().get_token(user)
-            # Add custom claims
-            token['name'] = user.username
-            token['email'] = user.email
-
-            return token
-
-
     @override_settings(REST_USE_JWT=True)
     @override_settings(JWT_AUTH_COOKIE=None)
     @override_settings(REST_FRAMEWORK=dict(
@@ -630,7 +628,7 @@ class APIBasicTests(TestsMixin, TestCase):
         ]
     ))
     @override_settings(REST_SESSION_LOGIN=False)
-    @override_settings(JWT_TOKEN_CLAIMS_SERIALIZER = TESTTokenObtainPairSerializer)
+    @override_settings(JWT_TOKEN_CLAIMS_SERIALIZER = 'tests.test_api.TESTTokenObtainPairSerializer')
     def test_custom_jwt_claims(self):
         payload = {
             "username": self.USERNAME,
@@ -655,7 +653,7 @@ class APIBasicTests(TestsMixin, TestCase):
         ]
     ))
     @override_settings(REST_SESSION_LOGIN=False)
-    @override_settings(JWT_TOKEN_CLAIMS_SERIALIZER = TESTTokenObtainPairSerializer)
+    @override_settings(JWT_TOKEN_CLAIMS_SERIALIZER = 'tests.test_api.TESTTokenObtainPairSerializer')
     def test_custom_jwt_claims_cookie_w_authentication(self):
         payload = {
             "username": self.USERNAME,
