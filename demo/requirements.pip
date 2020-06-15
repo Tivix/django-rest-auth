@@ -1,5 +1,5 @@
-django>=1.9.0
-git+https://github.com/jazzband/dj-rest-auth.git@master
+django>=2.2
+dj-rest-auth @ git+https://github.com/jazzband/dj-rest-auth.git@master
 djangorestframework>=3.11.0
 djangorestframework-simplejwt==4.4.0
 django-allauth>=0.24.1
