@@ -87,7 +87,7 @@ class LoginView(GenericAPIView):
         if getattr(settings, 'REST_USE_JWT', False):
             cookie_name = getattr(settings, 'JWT_AUTH_COOKIE', None)
             cookie_secure = getattr(settings, 'JWT_AUTH_SECURE', False)
-            cookie_samesite = getattr(settings, 'JWT_AUTH_HTTPONLY', True)
+            cookie_httponly = getattr(settings, 'JWT_AUTH_HTTPONLY', True)
             cookie_samesite = getattr(settings, 'JWT_AUTH_SAMESITE', 'Lax')
             from rest_framework_simplejwt.settings import api_settings as jwt_settings
             if cookie_name:
@@ -98,7 +98,7 @@ class LoginView(GenericAPIView):
                     self.access_token,
                     expires=expiration,
                     secure=cookie_secure,
-                    httponly=True,
+                    httponly=cookie_httponly,
                     samesite=cookie_samesite
                 )
         return response
