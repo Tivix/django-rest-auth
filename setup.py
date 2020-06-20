@@ -34,6 +34,7 @@ setup(
         'with_social': ['django-allauth>=0.25.0'],
     },
     tests_require=[
+        'unittest-xml-reporting>=3.0.2',
         'responses>=0.5.0',
         'django-allauth>=0.25.0',
         'djangorestframework-simplejwt>=4.4.0 ',
