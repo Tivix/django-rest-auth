@@ -108,3 +108,6 @@ venv.bak/
 .mypy_cache/
 demo/react-spa/node_modules/
 demo/react-spa/yarn.lock
+
+# Visual Studio Code
+.vscode/
