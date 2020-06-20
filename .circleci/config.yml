@@ -19,12 +19,16 @@ jobs:
           command: |
             mkdir -p test-results/
             coverage run --source=dj_rest_auth setup.py test
+            coverage report
+            coverage html
           name: Test
       - run:
           command: COVERALLS_REPO_TOKEN=Q58WdUuZOi89XHyDeDsGE2lxUGQ2IfqP3 coveralls
           name: Coverage
       - store_test_results:
           path: test-results/
+      - store_artifacts:
+          path: htmlcov/
   test-django-2:
     <<: *template
     environment:
