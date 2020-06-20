@@ -13,8 +13,9 @@ jobs:
     steps:
       - checkout
       - run:
-        command: cat dj_rest_auth/tests/requirements.pip dev-requirements.txt | pip install --user -r /dev/stdin
-        name: "Install Static Test Dependencies"
+        command: |
+          cat dj_rest_auth/tests/requirements.pip dev-requirements.txt | pip install --user -r /dev/stdin
+        name: Install
       - run:
         command: pip install -q --user coveralls djangorestframework==$DRF Django==$DJANGO_VERSION
         name: "Install Django + DRF Deps"
