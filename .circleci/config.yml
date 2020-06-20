@@ -14,10 +14,10 @@ jobs:
       - checkout
       - run:
         command: cat dj_rest_auth/tests/requirements.pip dev-requirements.txt | pip install --user -r /dev/stdin
-        name: Install Static Test Dependencies
+        name: "Install Static Test Dependencies"
       - run:
         command: pip install -q --user coveralls djangorestframework==$DRF Django==$DJANGO_VERSION
-        name: Install Specific Django + DRF Deps.
+        name: "Install Django + DRF Deps"
       - run:
           command: |
             mkdir -p test-results/
