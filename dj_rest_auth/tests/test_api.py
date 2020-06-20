@@ -18,6 +18,19 @@ try:
 except ImportError:
     from django.core.urlresolvers import reverse
 
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from jwt import decode as decode_jwt
+
+class TESTTokenObtainPairSerializer(TokenObtainPairSerializer):
+    @classmethod
+    def get_token(cls, user):
+        token = super().get_token(user)
+        # Add custom claims
+        token['name'] = user.username
+        token['email'] = user.email
+
+        return token
+
 
 @override_settings(ROOT_URLCONF="tests.urls")
 class APIBasicTests(TestsMixin, TestCase):
@@ -605,3 +618,54 @@ class APIBasicTests(TestsMixin, TestCase):
         # test other TokenError, AttributeError, TypeError (invalid format)
         resp = self.post(self.logout_url, status=200, data=json.dumps({'refresh': token}))
         self.assertEqual(resp.status_code, 500)
+
+
+    @override_settings(REST_USE_JWT=True)
+    @override_settings(JWT_AUTH_COOKIE=None)
+    @override_settings(REST_FRAMEWORK=dict(
+        DEFAULT_AUTHENTICATION_CLASSES=[
+            'dj_rest_auth.utils.JWTCookieAuthentication'
+        ]
+    ))
+    @override_settings(REST_SESSION_LOGIN=False)
+    @override_settings(JWT_TOKEN_CLAIMS_SERIALIZER = 'tests.test_api.TESTTokenObtainPairSerializer')
+    def test_custom_jwt_claims(self):
+        payload = {
+            "username": self.USERNAME,
+            "password": self.PASS
+        }
+        get_user_model().objects.create_user(self.USERNAME, self.EMAIL, self.PASS)
+
+        self.post(self.login_url, data=payload, status_code=200)
+        self.assertEqual('access_token' in self.response.json.keys(), True)
+        self.token = self.response.json['access_token']
+        claims = decode_jwt(self.token, settings.SECRET_KEY, algorithms='HS256')
+        self.assertEquals(claims['user_id'], 1)
+        self.assertEquals(claims['name'], 'person')
+        self.assertEquals(claims['email'], 'person1@world.com')
+
+
+    @override_settings(REST_USE_JWT=True)
+    @override_settings(JWT_AUTH_COOKIE='jwt-auth')
+    @override_settings(REST_FRAMEWORK=dict(
+        DEFAULT_AUTHENTICATION_CLASSES=[
+            'dj_rest_auth.utils.JWTCookieAuthentication'
+        ]
+    ))
+    @override_settings(REST_SESSION_LOGIN=False)
+    @override_settings(JWT_TOKEN_CLAIMS_SERIALIZER = 'tests.test_api.TESTTokenObtainPairSerializer')
+    def test_custom_jwt_claims_cookie_w_authentication(self):
+        payload = {
+            "username": self.USERNAME,
+            "password": self.PASS
+        }
+        get_user_model().objects.create_user(self.USERNAME, self.EMAIL, self.PASS)
+        resp = self.post(self.login_url, data=payload, status_code=200)
+        self.assertEqual(['jwt-auth'], list(resp.cookies.keys()))
+        token = resp.cookies.get('jwt-auth').value
+        claims = decode_jwt(token, settings.SECRET_KEY, algorithms='HS256')
+        self.assertEquals(claims['user_id'], 1)
+        self.assertEquals(claims['name'], 'person')
+        self.assertEquals(claims['email'], 'person1@world.com')
+        resp = self.get('/protected-view/')
+        self.assertEquals(resp.status_code, 200)

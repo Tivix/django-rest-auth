@@ -15,18 +15,15 @@ def default_create_token(token_model, user, serializer):
     return token
 
 
-def jwt_encode(user):
-    try:
-        from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-    except ImportError:
-        raise ImportError("rest-framework-simplejwt needs to be installed")
-
-    refresh = TokenObtainPairSerializer.get_token(user)
-    return refresh.access_token, refresh
-
-
 try:
+    from django.conf import settings
     from rest_framework_simplejwt.authentication import JWTAuthentication
+    from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+
+    def jwt_encode(user):
+        TOPS = import_callable(getattr(settings, 'JWT_TOKEN_CLAIMS_SERIALIZER', TokenObtainPairSerializer))
+        refresh = TOPS.get_token(user)
+        return refresh.access_token, refresh
 
     class JWTCookieAuthentication(JWTAuthentication):
         """
@@ -35,7 +32,6 @@ try:
         preference to the header).
         """
         def authenticate(self, request):
-            from django.conf import settings
             cookie_name = getattr(settings, 'JWT_AUTH_COOKIE', None)
             header = self.get_header(request)
             if header is None:
@@ -53,4 +49,4 @@ try:
             return self.get_user(validated_token), validated_token
 
 except ImportError:
-    pass
+    raise ImportError("rest-framework-simplejwt needs to be installed")

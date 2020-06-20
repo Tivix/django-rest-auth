@@ -12,6 +12,8 @@ Configuration
 
         - JWT_SERIALIZER - (Using REST_USE_JWT=True) response for successful authentication in ``dj_rest_auth.views.LoginView``, default value ``dj_rest_auth.serializers.JWTSerializer``
 
+        - JWT_TOKEN_CLAIMS_SERIALIZER - A custom JWT Claim serializer. Default is `rest_framework_simplejwt.serializers.TokenObtainPairSerializer`
+
         - USER_DETAILS_SERIALIZER - serializer class in ``dj_rest_auth.views.UserDetailsView``, default value ``dj_rest_auth.serializers.UserDetailsSerializer``
 
         - PASSWORD_RESET_SERIALIZER - serializer class in ``dj_rest_auth.views.PasswordResetView``, default value ``dj_rest_auth.serializers.PasswordResetSerializer``
