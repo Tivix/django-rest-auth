@@ -21,6 +21,7 @@ jobs:
       - run:
           command: COVERALLS_REPO_TOKEN=Q58WdUuZOi89XHyDeDsGE2lxUGQ2IfqP3 coveralls
           name: Coverage
+      - store_test_results
   test-django-2:
     <<: *template
     environment:
