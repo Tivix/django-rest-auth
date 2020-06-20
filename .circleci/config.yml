@@ -25,7 +25,8 @@ jobs:
           command: COVERALLS_REPO_TOKEN=Q58WdUuZOi89XHyDeDsGE2lxUGQ2IfqP3 coveralls
           name: Coverage
       - run:
-          - command: python3 setup.py sdist
+          command: python3 setup.py sdist
+          name: Build
       - store_test_results:
           path: test-results/
       - store_artifacts:
