@@ -16,13 +16,15 @@ jobs:
       - run: pip install --user -r dj_rest_auth/tests/requirements.pip
       - run: pip install -q --user coveralls djangorestframework==$DRF Django==$DJANGO_VERSION
       - run:
-          command: coverage run --source=dj_rest_auth setup.py test
+          command: |
+            mkdir -p test-results/
+            coverage run --source=dj_rest_auth setup.py test
           name: Test
       - run:
           command: COVERALLS_REPO_TOKEN=Q58WdUuZOi89XHyDeDsGE2lxUGQ2IfqP3 coveralls
           name: Coverage
       - store_test_results:
-          path: ~/test-results/
+          path: test-results/
   test-django-2:
     <<: *template
     environment:
