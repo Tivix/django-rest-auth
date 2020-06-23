@@ -563,7 +563,7 @@ class APIBasicTests(TestsMixin, TestCase):
     @override_settings(JWT_AUTH_COOKIE='jwt-auth')
     @override_settings(REST_FRAMEWORK=dict(
         DEFAULT_AUTHENTICATION_CLASSES=[
-            'dj_rest_auth.utils.JWTCookieAuthentication'
+            'dj_rest_auth.jwt_auth.JWTCookieAuthentication'
         ]
     ))
     @override_settings(REST_SESSION_LOGIN=False)
@@ -624,7 +624,7 @@ class APIBasicTests(TestsMixin, TestCase):
     @override_settings(JWT_AUTH_COOKIE=None)
     @override_settings(REST_FRAMEWORK=dict(
         DEFAULT_AUTHENTICATION_CLASSES=[
-            'dj_rest_auth.utils.JWTCookieAuthentication'
+            'dj_rest_auth.jwt_auth.JWTCookieAuthentication'
         ]
     ))
     @override_settings(REST_SESSION_LOGIN=False)
@@ -649,7 +649,7 @@ class APIBasicTests(TestsMixin, TestCase):
     @override_settings(JWT_AUTH_COOKIE='jwt-auth')
     @override_settings(REST_FRAMEWORK=dict(
         DEFAULT_AUTHENTICATION_CLASSES=[
-            'dj_rest_auth.utils.JWTCookieAuthentication'
+            'dj_rest_auth.jwt_auth.JWTCookieAuthentication'
         ]
     ))
     @override_settings(REST_SESSION_LOGIN=False)

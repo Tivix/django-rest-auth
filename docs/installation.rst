@@ -35,9 +35,9 @@ Installation
 
 .. code-block:: python
 
-    python manage.py migrate 
-    
-    
+    python manage.py migrate
+
+
 You're good to go now!
 
 
@@ -59,7 +59,7 @@ Registration (optional)
         'allauth.account',
         'dj_rest_auth.registration',
     )
-    
+
     SITE_ID = 1
 
 3. Add dj_rest_auth.registration urls:
@@ -76,7 +76,7 @@ Registration (optional)
 Social Authentication (optional)
 --------------------------------
 
-Using ``django-allauth``, ``dj-rest-auth`` provides helpful class for creating social media authentication view. 
+Using ``django-allauth``, ``dj-rest-auth`` provides helpful class for creating social media authentication view.
 
 .. note:: Points 1 and 2 are related to ``django-allauth`` configuration, so if you have already configured social authentication, then please go to step 3. See ``django-allauth`` documentation for more details.
 
@@ -223,7 +223,7 @@ In urls.py:
 You can also use the following views to check all social accounts attached to the current authenticated user and disconnect selected social accounts:
 
 .. code-block:: python
-    
+
     from dj_rest_auth.registration.views import (
         SocialAccountListView, SocialAccountDisconnectView
     )
@@ -259,7 +259,7 @@ By default ``dj-rest-auth`` uses Django's Token-based authentication. If you wan
         ...
         'DEFAULT_AUTHENTICATION_CLASSES': (
             ...
-            'dj_rest_auth.utils.JWTCookieAuthentication',
+            'dj_rest_auth.jwt_auth.JWTCookieAuthentication',
         )
         ...
     }
