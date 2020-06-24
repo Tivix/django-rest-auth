@@ -78,10 +78,10 @@ class LoginView(GenericAPIView):
                 'refresh_token': self.refresh_token
             }
             serializer = serializer_class(instance=data,
-                                          context={'request': self.request})
+                                          context=self.get_serializer_context())
         else:
             serializer = serializer_class(instance=self.token,
-                                          context={'request': self.request})
+                                          context=self.get_serializer_context())
 
         response = Response(serializer.data, status=status.HTTP_200_OK)
         if getattr(settings, 'REST_USE_JWT', False):
@@ -105,8 +105,7 @@ class LoginView(GenericAPIView):
 
     def post(self, request, *args, **kwargs):
         self.request = request
-        self.serializer = self.get_serializer(data=self.request.data,
-                                              context={'request': request})
+        self.serializer = self.get_serializer(data=self.request.data)
         self.serializer.is_valid(raise_exception=True)
 
         self.login()
