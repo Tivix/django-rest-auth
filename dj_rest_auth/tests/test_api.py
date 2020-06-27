@@ -669,3 +669,101 @@ class APIBasicTests(TestsMixin, TestCase):
         self.assertEquals(claims['email'], 'person1@world.com')
         resp = self.get('/protected-view/')
         self.assertEquals(resp.status_code, 200)
+
+
+    @override_settings(REST_USE_JWT=True)
+    @override_settings(JWT_AUTH_COOKIE='jwt-auth')
+    @override_settings(JWT_AUTH_COOKIE_USE_CSRF=True)
+    @override_settings(JWT_AUTH_COOKIE_ENFORCE_CSRF_ON_UNAUTHENTICATED=False)
+    @override_settings(REST_FRAMEWORK=dict(
+        DEFAULT_AUTHENTICATION_CLASSES=[
+            'dj_rest_auth.jwt_auth.JWTCookieAuthentication'
+        ]
+    ))
+    @override_settings(REST_SESSION_LOGIN=False)
+    @override_settings(CSRF_COOKIE_SECURE =True)
+    @override_settings(CSRF_COOKIE_HTTPONLY =True)
+    def test_csrf_wo_login_csrf_enforcement(self): 
+        from .mixins import APIClient
+        payload = {
+            "username": self.USERNAME,
+            "password": self.PASS
+        }
+        client = APIClient(enforce_csrf_checks=True)
+        get_user_model().objects.create_user(self.USERNAME, '', self.PASS)
+        
+        response = client.get(reverse("getcsrf"))
+        csrftoken = client.cookies['csrftoken'].value
+        
+        resp = client.post(self.login_url, payload)
+        self.assertTrue('jwt-auth' in list(client.cookies.keys()))
+        self.assertTrue('csrftoken' in list(client.cookies.keys()))
+        self.assertEquals(resp.status_code, 200)
+
+        ## TEST WITH JWT AUTH HEADER
+        jwtclient = APIClient(enforce_csrf_checks=True)
+        token = resp.data['access_token']
+        resp = jwtclient.get('/protected-view/')
+        self.assertEquals(resp.status_code, 403)
+        resp = jwtclient.get('/protected-view/', HTTP_AUTHORIZATION='Bearer '+token)
+        self.assertEquals(resp.status_code, 200)
+        resp = jwtclient.post('/protected-view/', {})
+        self.assertEquals(resp.status_code, 403)
+        resp = jwtclient.post('/protected-view/', {}, HTTP_AUTHORIZATION='Bearer '+token)
+        self.assertEquals(resp.status_code, 200)
+
+        ## TEST WITH COOKIES
+        #fail w/o csrftoken in payload
+        resp = client.post('/protected-view/', {})
+        self.assertEquals(resp.status_code, 403)
+
+        csrfparam = {"csrfmiddlewaretoken": csrftoken}
+        resp = client.post('/protected-view/', csrfparam)
+        self.assertEquals(resp.status_code, 200)
+
+
+    @override_settings(REST_USE_JWT=True)
+    @override_settings(JWT_AUTH_COOKIE='jwt-auth')
+    @override_settings(JWT_AUTH_COOKIE_USE_CSRF=True)
+    @override_settings(JWT_AUTH_COOKIE_ENFORCE_CSRF_ON_UNAUTHENTICATED=True) #True at your own risk
+    @override_settings(REST_FRAMEWORK=dict(
+        DEFAULT_AUTHENTICATION_CLASSES=[
+            'dj_rest_auth.jwt_auth.JWTCookieAuthentication'
+        ]
+    ))
+    @override_settings(REST_SESSION_LOGIN=False)
+    @override_settings(CSRF_COOKIE_SECURE =True)
+    @override_settings(CSRF_COOKIE_HTTPONLY =True)
+    def test_csrf_w_login_csrf_enforcement(self): 
+        from .mixins import APIClient
+        payload = {
+            "username": self.USERNAME,
+            "password": self.PASS
+        }
+        client = APIClient(enforce_csrf_checks=True)
+        get_user_model().objects.create_user(self.USERNAME, '', self.PASS)
+        
+        response = client.get(reverse("getcsrf"))
+        csrftoken = client.cookies['csrftoken'].value
+        
+        #fail w/o csrftoken in payload
+        resp = client.post(self.login_url, payload)
+        self.assertEquals(resp.status_code, 403)
+
+        payload['csrfmiddlewaretoken'] = csrftoken
+        resp = client.post(self.login_url, payload)
+        self.assertTrue('jwt-auth' in list(client.cookies.keys()))
+        self.assertTrue('csrftoken' in list(client.cookies.keys()))
+        self.assertEquals(resp.status_code, 200)
+
+        ## TEST WITH JWT AUTH HEADER does not make sense 
+
+        ## TEST WITH COOKIES
+        #fail w/o csrftoken in payload
+        resp = client.post('/protected-view/', {})
+        self.assertEquals(resp.status_code, 403)
+
+        csrfparam = {"csrfmiddlewaretoken": csrftoken}
+        resp = client.post('/protected-view/', csrfparam)
+        self.assertEquals(resp.status_code, 200)
+
