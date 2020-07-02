@@ -10,6 +10,8 @@ from dj_rest_auth.social_serializers import (TwitterConnectSerializer,
 from dj_rest_auth.urls import urlpatterns
 from django.conf.urls import include, url
 from django.views.generic import TemplateView
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import ensure_csrf_cookie
 from rest_framework import permissions
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -22,6 +24,9 @@ class ExampleProtectedView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, *args, **kwargs):
+        return Response(dict(success=True))
+
+    def post(self, *args, **kwargs):
         return Response(dict(success=True))
 
 
@@ -59,6 +64,11 @@ def twitter_login_view(request):
 class TwitterLoginNoAdapter(SocialLoginView):
     serializer_class = TwitterLoginSerializer
 
+@ensure_csrf_cookie
+@api_view(['GET'])
+def get_csrf_cookie(request):
+    return Response()
+
 
 urlpatterns += [
     url(r'^rest-registration/', include('dj_rest_auth.registration.urls')),
@@ -77,5 +87,6 @@ urlpatterns += [
     url(r'^protected-view/$', ExampleProtectedView.as_view()),
     url(r'^socialaccounts/(?P<pk>\d+)/disconnect/$', SocialAccountDisconnectView.as_view(),
         name='social_account_disconnect'),
-    url(r'^accounts/', include('allauth.socialaccount.urls'))
+    url(r'^accounts/', include('allauth.socialaccount.urls')),
+    url(r'^getcsrf/', get_csrf_cookie, name='getcsrf'),
 ]
