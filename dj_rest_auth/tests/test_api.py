@@ -628,7 +628,11 @@ class APIBasicTests(TestsMixin, TestCase):
         ]
     ))
     @override_settings(REST_SESSION_LOGIN=False)
-    @override_settings(JWT_TOKEN_CLAIMS_SERIALIZER = 'tests.test_api.TESTTokenObtainPairSerializer')
+    @override_settings(
+        REST_AUTH_SERIALIZERS={
+            "JWT_TOKEN_CLAIMS_SERIALIZER": TESTTokenObtainPairSerializer
+        }
+    )
     def test_custom_jwt_claims(self):
         payload = {
             "username": self.USERNAME,
@@ -653,7 +657,11 @@ class APIBasicTests(TestsMixin, TestCase):
         ]
     ))
     @override_settings(REST_SESSION_LOGIN=False)
-    @override_settings(JWT_TOKEN_CLAIMS_SERIALIZER = 'tests.test_api.TESTTokenObtainPairSerializer')
+    @override_settings(
+        REST_AUTH_SERIALIZERS={
+            "JWT_TOKEN_CLAIMS_SERIALIZER": TESTTokenObtainPairSerializer
+        }
+    )
     def test_custom_jwt_claims_cookie_w_authentication(self):
         payload = {
             "username": self.USERNAME,
