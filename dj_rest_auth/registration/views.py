@@ -69,10 +69,12 @@ class RegisterView(CreateAPIView):
 
     def perform_create(self, serializer):
         user = serializer.save(self.request)
-        if getattr(settings, 'REST_USE_JWT', False):
-            self.access_token, self.refresh_token = jwt_encode(user)
-        else:
-            create_token(self.token_model, user, serializer)
+        if allauth_settings.EMAIL_VERIFICATION != \
+                allauth_settings.EmailVerificationMethod.MANDATORY:
+            if getattr(settings, 'REST_USE_JWT', False):
+                self.access_token, self.refresh_token = jwt_encode(user)
+            else:
+                create_token(self.token_model, user, serializer)
 
         complete_signup(self.request._request, user,
                         allauth_settings.EMAIL_VERIFICATION,
