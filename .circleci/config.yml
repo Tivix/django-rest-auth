@@ -7,14 +7,14 @@ jobs:
     docker:
       - image: circleci/python:3.8.0
     environment:
-      DJANGO_VERSION: 3.0.3
-      DRF: 3.11
+      DJANGO_VERSION: 3.1
+      DRF: 3.11.1
     executor: docker/docker
     steps:
       - checkout
       - run:
-          command: pip install --user -r dev-requirements.txt
-          name: "Pip Install dev requirements"
+          command: pip install --user Django==$DJANGO_VERSION djangorestframework==$DRF
+          name: "Pip install version-specific Django + DRF"
       - run:
           command: pip install --user -r dj_rest_auth/tests/requirements.pip
           name: "Pip Install test requirements"
