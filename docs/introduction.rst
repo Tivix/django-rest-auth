@@ -22,13 +22,9 @@ Apps structure
 * ``dj_rest_auth.registration`` has logic related with registration and social media authentication
 
 
-Angular app
------------
 
-- iMerica has also created angular module which uses API endpoints from this app - `angular-django-registration-auth <https://github.com/iMerica/angular-django-registration-auth>`_
-
-
-Demo project
+Demo projects
 ------------
 
 - You can also check our :doc:`Demo Project </demo>` which is using jQuery on frontend.
+- There is also a React demo project based on Create-React-App in demo/react-spa/
