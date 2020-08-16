@@ -1,4 +1,4 @@
-- name: Publish package to Pypi
+- name: Publish package
   if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
   uses: pypa/gh-action-pypi-publish@master
   with:
