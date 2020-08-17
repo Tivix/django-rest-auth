@@ -1,4 +1,4 @@
-name: Greet Everyone
+name: Release to PyPi
 on: [push]
 
 jobs:
