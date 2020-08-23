@@ -41,6 +41,17 @@ Configuration
         - REGISTER_SERIALIZER - serializer class in ``dj_rest_auth.registration.views.RegisterView``, default value ``dj_rest_auth.registration.serializers.RegisterSerializer``
     
         .. note:: The custom REGISTER_SERIALIZER must define a ``def save(self, request)`` method that returns a user model instance
+- **REST_AUTH_REGISTER_PERMISSION_CLASSES** - A tuple contains paths of another permission classes you wish to be used in ``RegisterView``, ``AllowAny`` is included by default.
+
+    Example :
+
+    .. code-block:: python
+
+        REST_AUTH_REGISTER_PERMISSION_CLASSES = (
+            'rest_framework.permissions.IsAuthenticated',
+            'path.to.another.permission.class',
+            ...
+        )
 - **REST_AUTH_TOKEN_MODEL** - path to model class for tokens, default value ``'rest_framework.authtoken.models.Token'``
 - **REST_AUTH_TOKEN_CREATOR** - path to callable or callable for creating tokens, default value ``dj_rest_auth.utils.default_create_token``.
 - **REST_SESSION_LOGIN** - Enable session login in Login API view (default: True)

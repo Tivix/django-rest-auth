@@ -13,5 +13,5 @@ RegisterSerializer = import_callable(serializers.get('REGISTER_SERIALIZER', Defa
 def register_permission_classes():
     permission_classes = [AllowAny, ]
     for klass in getattr(settings, 'REST_AUTH_REGISTER_PERMISSION_CLASSES', tuple()):
-        permission_classes.append(klass)
+        permission_classes.append(import_callable(klass))
     return tuple(permission_classes)
