@@ -47,6 +47,25 @@ Basic
     Returns pk, username, email, first_name, last_name
 
 
+- /dj-rest-auth/token/verify/ (POST)
+
+    - token
+
+    Returns an empty JSON object.
+
+    .. note:: ``REST_USE_JWT = True`` to use token/verify/ route.
+    .. note:: Takes a token and indicates if it is valid.  This view provides no information about a token's fitness for a particular use. Will return a ``HTTP 200 OK`` in case of a valid token and ``HTTP 401 Unauthorized`` with ``{"detail": "Token is invalid or expired", "code": "token_not_valid"}`` in case of a invalid or expired token.
+
+
+- /dj-rest-auth/token/refresh/ (POST) (`see also <https://django-rest-framework-simplejwt.readthedocs.io/en/latest/getting_started.html#usage>`_)
+
+    - refresh
+
+    Returns access
+
+    .. note:: ``REST_USE_JWT = True`` to use token/refresh/ route.
+    .. note:: Takes a refresh type JSON web token and returns an access type JSON web token if the refresh token is valid. ``HTTP 401 Unauthorized`` with ``{"detail": "Token is invalid or expired", "code": "token_not_valid"}`` in case of a invalid or expired token.
+
 Registration
 ------------
 
@@ -64,7 +83,7 @@ Registration
     .. note:: If you set account email verification as mandatory, you have to add the VerifyEmailView with the used `name`.
         You need to import the view: ``from dj_rest_auth.registration.views import VerifyEmailView``. Then add the url with the corresponding name:
         ``path('dj-rest-auth/account-confirm-email/', VerifyEmailView.as_view(), name='account_email_verification_sent')`` to the urlpatterns list.
-        
+
 
 
 Social Media Authentication
