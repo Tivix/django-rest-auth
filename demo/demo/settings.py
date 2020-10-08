@@ -31,23 +31,23 @@ INSTALLED_APPS = (
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
-    # 'django.contrib.messages',
+    'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sites',
-
     'rest_framework',
     'rest_framework.authtoken',
-    'rest_auth',
-
+    'dj_rest_auth',
     'allauth',
     'allauth.account',
-    'rest_auth.registration',
+    'dj_rest_auth.registration',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.facebook',
     'rest_framework_swagger',
+    'corsheaders'
 )
 
 MIDDLEWARE = (
+    'corsheaders.middleware.CorsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -116,14 +116,23 @@ ACCOUNT_EMAIL_REQUIRED = False
 ACCOUNT_AUTHENTICATION_METHOD = 'username'
 ACCOUNT_EMAIL_VERIFICATION = 'optional'
 
+REST_USE_JWT = True
+JWT_AUTH_COOKIE = 'auth'
+
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.TokenAuthentication',
-    )
+        'dj_rest_auth.jwt_auth.JWTCookieAuthentication'
+    ),
+    'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema'
 }
 
 SWAGGER_SETTINGS = {
     'LOGIN_URL': 'login',
     'LOGOUT_URL': 'logout',
 }
+
+
+# For demo purposes only. Use a white list in the real world.
+CORS_ORIGIN_ALLOW_ALL = True

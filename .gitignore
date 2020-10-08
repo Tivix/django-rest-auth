@@ -46,6 +46,7 @@ coverage.xml
 *.cover
 .hypothesis/
 .pytest_cache/
+test-results/
 
 # Translations
 *.mo
@@ -71,6 +72,9 @@ target/
 
 # Jupyter Notebook
 .ipynb_checkpoints
+
+# IDE
+.idea
 
 # pyenv
 .python-version
@@ -102,3 +106,8 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+demo/react-spa/node_modules/
+demo/react-spa/yarn.lock
+
+# Visual Studio Code
+.vscode/
