@@ -1,6 +1,8 @@
-django>=1.9.0
-django-rest-auth==0.9.3
-djangorestframework>=3.7.0
+django>=2.2
+dj-rest-auth @ git+https://github.com/jazzband/dj-rest-auth.git@master
+djangorestframework>=3.11.0
+djangorestframework-simplejwt==4.4.0
 django-allauth>=0.24.1
-six==1.9.0
 django-rest-swagger==2.0.7
+django-cors-headers==3.2.1
+coreapi==2.3.3
