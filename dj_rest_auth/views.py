@@ -72,11 +72,23 @@ class LoginView(GenericAPIView):
         serializer_class = self.get_response_serializer()
 
         if getattr(settings, 'REST_USE_JWT', False):
+            from rest_framework_simplejwt.settings import api_settings as jwt_settings
+            from datetime import datetime
+
+            access_token_expiration = (datetime.utcnow() + jwt_settings.ACCESS_TOKEN_LIFETIME)
+            refresh_token_expiration = (datetime.utcnow() + jwt_settings.REFRESH_TOKEN_LIFETIME)
+            return_expiration_times = getattr(settings, 'JWT_AUTH_RETURN_EXPIRATION', False)
+
             data = {
                 'user': self.user,
                 'access_token': self.access_token,
                 'refresh_token': self.refresh_token
             }
+
+            if return_expiration_times:
+                data['access_token_expiration'] = access_token_expiration
+                data['refresh_token_expiration'] = refresh_token_expiration
+
             serializer = serializer_class(instance=data,
                                           context=self.get_serializer_context())
         else:
@@ -90,24 +102,22 @@ class LoginView(GenericAPIView):
             cookie_secure = getattr(settings, 'JWT_AUTH_SECURE', False)
             cookie_httponly = getattr(settings, 'JWT_AUTH_HTTPONLY', True)
             cookie_samesite = getattr(settings, 'JWT_AUTH_SAMESITE', 'Lax')
-            from rest_framework_simplejwt.settings import api_settings as jwt_settings
-            from datetime import datetime
+
             if cookie_name:
-                expiration = (datetime.utcnow() + jwt_settings.ACCESS_TOKEN_LIFETIME)
                 response.set_cookie(
                     cookie_name,
                     self.access_token,
-                    expires=expiration,
+                    expires=access_token_expiration,
                     secure=cookie_secure,
                     httponly=cookie_httponly,
                     samesite=cookie_samesite
                 )
+
             if refresh_cookie_name:
-                expiration = (datetime.utcnow() + jwt_settings.REFRESH_TOKEN_LIFETIME)
                 response.set_cookie(
                     refresh_cookie_name,
                     self.refresh_token,
-                    expires=expiration,
+                    expires=refresh_token_expiration,
                     secure=cookie_secure,
                     httponly=cookie_httponly,
                     samesite=cookie_samesite
