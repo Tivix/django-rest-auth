@@ -104,6 +104,7 @@ class LoginView(GenericAPIView):
         if getattr(settings, 'REST_USE_JWT', False):
             cookie_name = getattr(settings, 'JWT_AUTH_COOKIE', None)
             refresh_cookie_name = getattr(settings, 'JWT_AUTH_REFRESH_COOKIE', None)
+            refresh_cookie_path = getattr(settings, 'JWT_AUTH_REFRESH_COOKIE_PATH', '/')
             cookie_secure = getattr(settings, 'JWT_AUTH_SECURE', False)
             cookie_httponly = getattr(settings, 'JWT_AUTH_HTTPONLY', True)
             cookie_samesite = getattr(settings, 'JWT_AUTH_SAMESITE', 'Lax')
@@ -125,7 +126,8 @@ class LoginView(GenericAPIView):
                     expires=refresh_token_expiration,
                     secure=cookie_secure,
                     httponly=cookie_httponly,
-                    samesite=cookie_samesite
+                    samesite=cookie_samesite,
+                    path=refresh_cookie_path
                 )
         return response
 
