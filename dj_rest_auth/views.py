@@ -12,6 +12,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from serializers import JWTSerializerWithExpiration
 from .app_settings import (JWTSerializer, LoginSerializer,
                            PasswordChangeSerializer,
                            PasswordResetConfirmSerializer,
@@ -51,7 +52,12 @@ class LoginView(GenericAPIView):
 
     def get_response_serializer(self):
         if getattr(settings, 'REST_USE_JWT', False):
-            response_serializer = JWTSerializer
+
+            if getattr(settings, 'JWT_AUTH_RETURN_EXPIRATION', False):
+                response_serializer = JWTSerializerWithExpiration
+            else:
+                response_serializer = JWTSerializer
+
         else:
             response_serializer = TokenSerializer
         return response_serializer

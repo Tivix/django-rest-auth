@@ -178,6 +178,11 @@ class JWTSerializer(serializers.Serializer):
         return user_data
 
 
+class JWTSerializerWithExpiration(JWTSerializer):
+    access_token_expiration = serializers.DateTimeField()
+    refresh_token_expiration = serializers.DateTimeField()
+
+
 class PasswordResetSerializer(serializers.Serializer):
     """
     Serializer for requesting a password reset e-mail.
