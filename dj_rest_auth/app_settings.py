@@ -22,7 +22,7 @@ TokenSerializer = import_callable(serializers.get('TOKEN_SERIALIZER', DefaultTok
 
 JWTSerializer = import_callable(serializers.get('JWT_SERIALIZER', DefaultJWTSerializer))
 
-DefaultJWTSerializerWithExpiration = import_callable(serializers.get('JWT_SERIALIZER_WITH_EXPIRATION', DefaultJWTSerializerWithExpiration))
+JWTSerializerWithExpiration = import_callable(serializers.get('JWT_SERIALIZER_WITH_EXPIRATION', DefaultJWTSerializerWithExpiration))
 
 UserDetailsSerializer = import_callable(serializers.get('USER_DETAILS_SERIALIZER', DefaultUserDetailsSerializer))
 
