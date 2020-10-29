@@ -1,4 +1,5 @@
 from dj_rest_auth.serializers import JWTSerializer as DefaultJWTSerializer
+from dj_rest_auth.serializers import JWTSerializerWithExpiration as DefaultJWTSerializerWithExpiration
 from dj_rest_auth.serializers import LoginSerializer as DefaultLoginSerializer
 from dj_rest_auth.serializers import \
     PasswordChangeSerializer as DefaultPasswordChangeSerializer
@@ -20,6 +21,8 @@ serializers = getattr(settings, 'REST_AUTH_SERIALIZERS', {})
 TokenSerializer = import_callable(serializers.get('TOKEN_SERIALIZER', DefaultTokenSerializer))
 
 JWTSerializer = import_callable(serializers.get('JWT_SERIALIZER', DefaultJWTSerializer))
+
+DefaultJWTSerializerWithExpiration = import_callable(serializers.get('JWT_SERIALIZER_WITH_EXPIRATION', DefaultJWTSerializerWithExpiration))
 
 UserDetailsSerializer = import_callable(serializers.get('USER_DETAILS_SERIALIZER', DefaultUserDetailsSerializer))
 

@@ -179,6 +179,9 @@ class JWTSerializer(serializers.Serializer):
 
 
 class JWTSerializerWithExpiration(JWTSerializer):
+    """
+    Serializer for JWT authentication with expiration times.
+    """
     access_token_expiration = serializers.DateTimeField()
     refresh_token_expiration = serializers.DateTimeField()
 
