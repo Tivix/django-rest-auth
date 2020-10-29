@@ -86,16 +86,27 @@ class LoginView(GenericAPIView):
         response = Response(serializer.data, status=status.HTTP_200_OK)
         if getattr(settings, 'REST_USE_JWT', False):
             cookie_name = getattr(settings, 'JWT_AUTH_COOKIE', None)
+            refresh_cookie_name = getattr(settings, 'JWT_AUTH_REFRESH_COOKIE', None)
             cookie_secure = getattr(settings, 'JWT_AUTH_SECURE', False)
             cookie_httponly = getattr(settings, 'JWT_AUTH_HTTPONLY', True)
             cookie_samesite = getattr(settings, 'JWT_AUTH_SAMESITE', 'Lax')
             from rest_framework_simplejwt.settings import api_settings as jwt_settings
+            from datetime import datetime
             if cookie_name:
-                from datetime import datetime
                 expiration = (datetime.utcnow() + jwt_settings.ACCESS_TOKEN_LIFETIME)
                 response.set_cookie(
                     cookie_name,
                     self.access_token,
+                    expires=expiration,
+                    secure=cookie_secure,
+                    httponly=cookie_httponly,
+                    samesite=cookie_samesite
+                )
+            if refresh_cookie_name:
+                expiration = (datetime.utcnow() + jwt_settings.REFRESH_TOKEN_LIFETIME)
+                response.set_cookie(
+                    refresh_cookie_name,
+                    self.refresh_token,
                     expires=expiration,
                     secure=cookie_secure,
                     httponly=cookie_httponly,
@@ -155,6 +166,10 @@ class LogoutView(APIView):
             cookie_name = getattr(settings, 'JWT_AUTH_COOKIE', None)
             if cookie_name:
                 response.delete_cookie(cookie_name)
+
+            refresh_cookie_name = getattr(settings, 'JWT_AUTH_REFRESH_COOKIE', None)
+            if refresh_cookie_name:
+                response.delete_cookie(refresh_cookie_name)
 
             elif 'rest_framework_simplejwt.token_blacklist' in settings.INSTALLED_APPS:
                 # add refresh token to blacklist
