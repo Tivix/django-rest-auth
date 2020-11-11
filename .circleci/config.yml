@@ -3,45 +3,44 @@ orbs:
   docker: circleci/docker@0.6.0
 
 jobs:
-  test-django-3: &template
+  test:
     docker:
       - image: circleci/python:3.8.0
-    environment:
-      DJANGO_VERSION: 3.1
-      DRF: 3.11.1
     executor: docker/docker
     steps:
       - checkout
       - run:
-          command: pip install --user Django==$DJANGO_VERSION djangorestframework==$DRF
-          name: "Pip install version-specific Django + DRF"
+          command: pip install --user tox coverage coveralls
+          name: "Install Tox & Coverage"
       - run:
-          command: pip install --user -r dj_rest_auth/tests/requirements.pip
-          name: "Pip Install test requirements"
+          command: tox
+          name: "Run Tox on All Supported Django and Python Versions"
       - run:
           command: |
             mkdir -p test-results/
-            coverage run --source=dj_rest_auth setup.py test
-            coverage report
-          name: Test
+            tox -e coverage
+          name: "Generate Coverage Report"
       - run:
           command: COVERALLS_REPO_TOKEN=Q58WdUuZOi89XHyDeDsGE2lxUGQ2IfqP3 coveralls
-          name: Coverage
+          name: "Send results to Coveralls"
+      - store_test_results:
+          path: test-results/
+  build:
+    docker:
+      - image: circleci/python:3.8.0
+    executor: docker/docker
+    steps:
+      - checkout
       - run:
           command: python3 setup.py sdist
           name: Build
-      - store_test_results:
-          path: test-results/
       - store_artifacts:
           path: dist/
-  test-django-2:
-    <<: *template
-    environment:
-      DJANGO_VERSION: 2.2.10
-      DRF: 3.9
 
 workflows:
   main:
     jobs:
-      - test-django-3
-      - test-django-2
+      - test
+      - build:
+          requires:
+            - test
