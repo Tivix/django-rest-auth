@@ -131,7 +131,7 @@ class UserDetailsSerializer(serializers.ModelSerializer):
     """
     class Meta:
         model = UserModel
-        fields = ('pk', 'username', 'email', 'first_name', 'last_name')
+        fields = ('pk', UserModel.USERNAME_FIELD, UserModel.EMAIL_FIELD, 'first_name', 'last_name')
         read_only_fields = ('email', )
 
 
