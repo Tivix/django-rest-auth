@@ -11,6 +11,7 @@ from rest_framework.test import APIRequestFactory
 
 from dj_rest_auth.registration.app_settings import register_permission_classes
 from dj_rest_auth.registration.views import RegisterView
+
 from .mixins import CustomPermissionClass, TestsMixin
 
 try:
@@ -18,8 +19,9 @@ try:
 except ImportError:
     from django.core.urlresolvers import reverse
 
-from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from jwt import decode as decode_jwt
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+
 
 class TESTTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
@@ -71,8 +73,8 @@ class APIBasicTests(TestsMixin, TestCase):
 
     def _generate_uid_and_token(self, user):
         result = {}
-        from django.utils.encoding import force_bytes
         from django.contrib.auth.tokens import default_token_generator
+        from django.utils.encoding import force_bytes
         from django.utils.http import urlsafe_base64_encode
 
         result['uid'] = urlsafe_base64_encode(force_bytes(user.pk))
@@ -559,6 +561,20 @@ class APIBasicTests(TestsMixin, TestCase):
         resp = self.post(self.logout_url, status=200)
         self.assertEqual('', resp.cookies.get('jwt-auth').value)
 
+    @override_settings(JWT_AUTH_REFRESH_COOKIE='jwt-auth-refresh')
+    @override_settings(REST_USE_JWT=True)
+    @override_settings(JWT_AUTH_COOKIE='jwt-auth')
+    def test_logout_jwt_deletes_cookie_refresh(self):
+        payload = {
+            "username": self.USERNAME,
+            "password": self.PASS
+        }
+        get_user_model().objects.create_user(self.USERNAME, '', self.PASS)
+        self.post(self.login_url, data=payload, status_code=200)
+        resp = self.post(self.logout_url, status=200)
+        self.assertEqual('', resp.cookies.get('jwt-auth').value)
+        self.assertEqual('', resp.cookies.get('jwt-auth-refresh').value)
+
     @override_settings(REST_USE_JWT=True)
     @override_settings(JWT_AUTH_COOKIE='jwt-auth')
     @override_settings(REST_FRAMEWORK=dict(
@@ -604,21 +620,15 @@ class APIBasicTests(TestsMixin, TestCase):
         resp = self.post(self.login_url, data=payload, status_code=200)
         token = resp.data['refresh_token']
         # test refresh token not included in request data
-        resp = self.post(self.logout_url, status=200)
-        self.assertEqual(resp.status_code, 401)
+        self.post(self.logout_url, status_code=401)
         # test token is invalid or expired
-        resp = self.post(self.logout_url, status=200, data={'refresh': '1'})
-        self.assertEqual(resp.status_code, 401)
+        self.post(self.logout_url, status_code=401, data={'refresh': '1'})
         # test successful logout
-        resp = self.post(self.logout_url, status=200, data={'refresh': token})
-        self.assertEqual(resp.status_code, 200)
+        self.post(self.logout_url, status_code=200, data={'refresh': token})
         # test token is blacklisted
-        resp = self.post(self.logout_url, status=200, data={'refresh': token})
-        self.assertEqual(resp.status_code, 401)
+        self.post(self.logout_url, status_code=401, data={'refresh': token})
         # test other TokenError, AttributeError, TypeError (invalid format)
-        resp = self.post(self.logout_url, status=200, data=json.dumps({'refresh': token}))
-        self.assertEqual(resp.status_code, 500)
-
+        self.post(self.logout_url, status_code=500, data=json.dumps({'refresh': token}))
 
     @override_settings(REST_USE_JWT=True)
     @override_settings(JWT_AUTH_COOKIE=None)
@@ -868,3 +878,38 @@ class APIBasicTests(TestsMixin, TestCase):
         resp = client.post('/protected-view/', csrfparam)
         self.assertEquals(resp.status_code, 200)
 
+    @override_settings(JWT_AUTH_RETURN_EXPIRATION=True)
+    @override_settings(REST_USE_JWT=True)
+    @override_settings(ACCOUNT_LOGOUT_ON_GET=True)
+    def test_return_expiration(self):
+        payload = {
+            "username": self.USERNAME,
+            "password": self.PASS
+        }
+
+        # create user
+        get_user_model().objects.create_user(self.USERNAME, '', self.PASS)
+
+        resp = self.post(self.login_url, data=payload, status_code=200)
+        self.assertIn('access_token_expiration', resp.data.keys())
+        self.assertIn('refresh_token_expiration', resp.data.keys())
+
+    @override_settings(JWT_AUTH_RETURN_EXPIRATION=True)
+    @override_settings(REST_USE_JWT=True)
+    @override_settings(JWT_AUTH_COOKIE='xxx')
+    @override_settings(ACCOUNT_LOGOUT_ON_GET=True)
+    @override_settings(JWT_AUTH_REFRESH_COOKIE='refresh-xxx')
+    @override_settings(JWT_AUTH_REFRESH_COOKIE_PATH='/foo/bar')
+    def test_refresh_cookie_name(self):
+        payload = {
+            "username": self.USERNAME,
+            "password": self.PASS
+        }
+
+        # create user
+        get_user_model().objects.create_user(self.USERNAME, '', self.PASS)
+
+        resp = self.post(self.login_url, data=payload, status_code=200)
+        self.assertIn('xxx', resp.cookies.keys())
+        self.assertIn('refresh-xxx', resp.cookies.keys())
+        self.assertEqual(resp.cookies.get('refresh-xxx').get('path'), '/foo/bar')

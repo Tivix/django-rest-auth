@@ -2,6 +2,7 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth import login as django_login
 from django.contrib.auth import logout as django_logout
+from django.utils import timezone
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext_lazy as _
@@ -76,12 +77,12 @@ class LoginView(GenericAPIView):
     def get_response(self):
         serializer_class = self.get_response_serializer()
 
+        access_token_expiration = None
+        refresh_token_expiration = None
         if getattr(settings, 'REST_USE_JWT', False):
             from rest_framework_simplejwt.settings import api_settings as jwt_settings
-            from datetime import datetime
-
-            access_token_expiration = (datetime.utcnow() + jwt_settings.ACCESS_TOKEN_LIFETIME)
-            refresh_token_expiration = (datetime.utcnow() + jwt_settings.REFRESH_TOKEN_LIFETIME)
+            access_token_expiration = (timezone.now() + jwt_settings.ACCESS_TOKEN_LIFETIME)
+            refresh_token_expiration = (timezone.now() + jwt_settings.REFRESH_TOKEN_LIFETIME)
             return_expiration_times = getattr(settings, 'JWT_AUTH_RETURN_EXPIRATION', False)
 
             data = {
@@ -170,8 +171,10 @@ class LogoutView(APIView):
         if getattr(settings, 'REST_SESSION_LOGIN', True):
             django_logout(request)
 
-        response = Response({"detail": _("Successfully logged out.")},
-                            status=status.HTTP_200_OK)
+        response = Response(
+            {"detail": _("Successfully logged out.")},
+            status=status.HTTP_200_OK
+        )
 
         if getattr(settings, 'REST_USE_JWT', False):
             # NOTE: this import occurs here rather than at the top level
@@ -183,41 +186,38 @@ class LogoutView(APIView):
             cookie_name = getattr(settings, 'JWT_AUTH_COOKIE', None)
             if cookie_name:
                 response.delete_cookie(cookie_name)
-
             refresh_cookie_name = getattr(settings, 'JWT_AUTH_REFRESH_COOKIE', None)
             if refresh_cookie_name:
                 response.delete_cookie(refresh_cookie_name)
 
-            elif 'rest_framework_simplejwt.token_blacklist' in settings.INSTALLED_APPS:
+            if 'rest_framework_simplejwt.token_blacklist' in settings.INSTALLED_APPS:
                 # add refresh token to blacklist
                 try:
                     token = RefreshToken(request.data['refresh'])
                     token.blacklist()
-
                 except KeyError:
-                    response = Response({"detail": _("Refresh token was not included in request data.")},
-                                        status=status.HTTP_401_UNAUTHORIZED)
-
+                    response.data = {"detail": _("Refresh token was not included in request data.")}
+                    response.status_code =status.HTTP_401_UNAUTHORIZED
                 except (TokenError, AttributeError, TypeError) as error:
                     if hasattr(error, 'args'):
                         if 'Token is blacklisted' in error.args or 'Token is invalid or expired' in error.args:
-                            response = Response({"detail": _(error.args[0])},
-                                                status=status.HTTP_401_UNAUTHORIZED)
-
+                            response.data = {"detail": _(error.args[0])}
+                            response.status_code = status.HTTP_401_UNAUTHORIZED
                         else:
-                            response = Response({"detail": _("An error has occurred.")},
-                                                status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                            response.data = {"detail": _("An error has occurred.")}
+                            response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
 
                     else:
-                        response = Response({"detail": _("An error has occurred.")},
-                                            status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                        response.data = {"detail": _("An error has occurred.")}
+                        response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
 
             else:
-                response = Response({
-                    "detail": _("Neither cookies or blacklist are enabled, so the token has not been deleted server "
-                                "side. Please make sure the token is deleted client side."
-                                )}, status=status.HTTP_200_OK)
-
+                message = _(
+                    "Neither cookies or blacklist are enabled, so the token "
+                    "has not been deleted server side. Please make sure the token is deleted client side."
+                )
+                response.data = {"detail": message}
+                response.status_code = status.HTTP_200_OK
         return response
 
 
