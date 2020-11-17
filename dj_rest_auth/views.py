@@ -2,6 +2,7 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth import login as django_login
 from django.contrib.auth import logout as django_logout
+from django.utils import timezone
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext_lazy as _
@@ -12,7 +13,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .app_settings import (JWTSerializer, LoginSerializer,
+from .app_settings import (JWTSerializer, JWTSerializerWithExpiration, LoginSerializer,
                            PasswordChangeSerializer,
                            PasswordResetConfirmSerializer,
                            PasswordResetSerializer, TokenSerializer,
@@ -51,7 +52,12 @@ class LoginView(GenericAPIView):
 
     def get_response_serializer(self):
         if getattr(settings, 'REST_USE_JWT', False):
-            response_serializer = JWTSerializer
+
+            if getattr(settings, 'JWT_AUTH_RETURN_EXPIRATION', False):
+                response_serializer = JWTSerializerWithExpiration
+            else:
+                response_serializer = JWTSerializer
+
         else:
             response_serializer = TokenSerializer
         return response_serializer
@@ -71,12 +77,24 @@ class LoginView(GenericAPIView):
     def get_response(self):
         serializer_class = self.get_response_serializer()
 
+        access_token_expiration = None
+        refresh_token_expiration = None
         if getattr(settings, 'REST_USE_JWT', False):
+            from rest_framework_simplejwt.settings import api_settings as jwt_settings
+            access_token_expiration = (timezone.now() + jwt_settings.ACCESS_TOKEN_LIFETIME)
+            refresh_token_expiration = (timezone.now() + jwt_settings.REFRESH_TOKEN_LIFETIME)
+            return_expiration_times = getattr(settings, 'JWT_AUTH_RETURN_EXPIRATION', False)
+
             data = {
                 'user': self.user,
                 'access_token': self.access_token,
                 'refresh_token': self.refresh_token
             }
+
+            if return_expiration_times:
+                data['access_token_expiration'] = access_token_expiration
+                data['refresh_token_expiration'] = refresh_token_expiration
+
             serializer = serializer_class(instance=data,
                                           context=self.get_serializer_context())
         else:
@@ -86,20 +104,31 @@ class LoginView(GenericAPIView):
         response = Response(serializer.data, status=status.HTTP_200_OK)
         if getattr(settings, 'REST_USE_JWT', False):
             cookie_name = getattr(settings, 'JWT_AUTH_COOKIE', None)
+            refresh_cookie_name = getattr(settings, 'JWT_AUTH_REFRESH_COOKIE', None)
+            refresh_cookie_path = getattr(settings, 'JWT_AUTH_REFRESH_COOKIE_PATH', '/')
             cookie_secure = getattr(settings, 'JWT_AUTH_SECURE', False)
             cookie_httponly = getattr(settings, 'JWT_AUTH_HTTPONLY', True)
             cookie_samesite = getattr(settings, 'JWT_AUTH_SAMESITE', 'Lax')
-            from rest_framework_simplejwt.settings import api_settings as jwt_settings
+
             if cookie_name:
-                from datetime import datetime
-                expiration = (datetime.utcnow() + jwt_settings.ACCESS_TOKEN_LIFETIME)
                 response.set_cookie(
                     cookie_name,
                     self.access_token,
-                    expires=expiration,
+                    expires=access_token_expiration,
                     secure=cookie_secure,
                     httponly=cookie_httponly,
                     samesite=cookie_samesite
+                )
+
+            if refresh_cookie_name:
+                response.set_cookie(
+                    refresh_cookie_name,
+                    self.refresh_token,
+                    expires=refresh_token_expiration,
+                    secure=cookie_secure,
+                    httponly=cookie_httponly,
+                    samesite=cookie_samesite,
+                    path=refresh_cookie_path
                 )
         return response
 
@@ -142,8 +171,10 @@ class LogoutView(APIView):
         if getattr(settings, 'REST_SESSION_LOGIN', True):
             django_logout(request)
 
-        response = Response({"detail": _("Successfully logged out.")},
-                            status=status.HTTP_200_OK)
+        response = Response(
+            {"detail": _("Successfully logged out.")},
+            status=status.HTTP_200_OK
+        )
 
         if getattr(settings, 'REST_USE_JWT', False):
             # NOTE: this import occurs here rather than at the top level
@@ -155,37 +186,38 @@ class LogoutView(APIView):
             cookie_name = getattr(settings, 'JWT_AUTH_COOKIE', None)
             if cookie_name:
                 response.delete_cookie(cookie_name)
+            refresh_cookie_name = getattr(settings, 'JWT_AUTH_REFRESH_COOKIE', None)
+            if refresh_cookie_name:
+                response.delete_cookie(refresh_cookie_name)
 
-            elif 'rest_framework_simplejwt.token_blacklist' in settings.INSTALLED_APPS:
+            if 'rest_framework_simplejwt.token_blacklist' in settings.INSTALLED_APPS:
                 # add refresh token to blacklist
                 try:
                     token = RefreshToken(request.data['refresh'])
                     token.blacklist()
-
                 except KeyError:
-                    response = Response({"detail": _("Refresh token was not included in request data.")},
-                                        status=status.HTTP_401_UNAUTHORIZED)
-
+                    response.data = {"detail": _("Refresh token was not included in request data.")}
+                    response.status_code =status.HTTP_401_UNAUTHORIZED
                 except (TokenError, AttributeError, TypeError) as error:
                     if hasattr(error, 'args'):
                         if 'Token is blacklisted' in error.args or 'Token is invalid or expired' in error.args:
-                            response = Response({"detail": _(error.args[0])},
-                                                status=status.HTTP_401_UNAUTHORIZED)
-
+                            response.data = {"detail": _(error.args[0])}
+                            response.status_code = status.HTTP_401_UNAUTHORIZED
                         else:
-                            response = Response({"detail": _("An error has occurred.")},
-                                                status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                            response.data = {"detail": _("An error has occurred.")}
+                            response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
 
                     else:
-                        response = Response({"detail": _("An error has occurred.")},
-                                            status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                        response.data = {"detail": _("An error has occurred.")}
+                        response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
 
             else:
-                response = Response({
-                    "detail": _("Neither cookies or blacklist are enabled, so the token has not been deleted server "
-                                "side. Please make sure the token is deleted client side."
-                                )}, status=status.HTTP_200_OK)
-
+                message = _(
+                    "Neither cookies or blacklist are enabled, so the token "
+                    "has not been deleted server side. Please make sure the token is deleted client side."
+                )
+                response.data = {"detail": message}
+                response.status_code = status.HTTP_200_OK
         return response
 
 
