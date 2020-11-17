@@ -61,55 +61,72 @@ class LoginSerializer(serializers.Serializer):
 
         return user
 
+    def get_auth_user_using_allauth(self, username, email, password):
+        from allauth.account import app_settings
+
+        # Authentication through email
+        if app_settings.AUTHENTICATION_METHOD == app_settings.AuthenticationMethod.EMAIL:
+            return self._validate_email(email, password)
+
+        # Authentication through username
+        if app_settings.AUTHENTICATION_METHOD == app_settings.AuthenticationMethod.USERNAME:
+            return self._validate_username(username, password)
+
+        # Authentication through either username or email
+        return self._validate_username_email(username, email, password)
+
+    def get_auth_user_using_orm(self, username, email, password):
+        if email:
+            try:
+                username = UserModel.objects.get(email__iexact=email).get_username()
+            except UserModel.DoesNotExist:
+                pass
+
+        if username:
+            return self._validate_username_email(username, '', password)
+
+        return None
+
+    def get_auth_user(self, username, email, password):
+        """
+        Retrieve the auth user from given POST payload by using
+        either `allauth` auth scheme or bare Django auth scheme.
+
+        Returns the authenticated user instance if credentials are correct,
+        else `None` will be returned
+        """
+        if 'allauth' in settings.INSTALLED_APPS:
+            return self.get_auth_user_using_allauth(username, email, password)
+        return self.get_auth_user_using_orm(username, email, password)
+
+    def validate_auth_user_status(self, user):
+        if not user.is_active:
+            msg = _('User account is disabled.')
+            raise exceptions.ValidationError(msg)
+
+    def validate_email_verification_status(self, user):
+        from allauth.account import app_settings
+        if app_settings.EMAIL_VERIFICATION == app_settings.EmailVerificationMethod.MANDATORY:
+            email_address = user.emailaddress_set.get(email=user.email)
+            if not email_address.verified:
+                raise serializers.ValidationError(_('E-mail is not verified.'))
+
     def validate(self, attrs):
         username = attrs.get('username')
         email = attrs.get('email')
         password = attrs.get('password')
+        user = self.get_auth_user(username, email, password)
 
-        user = None
-
-        if 'allauth' in settings.INSTALLED_APPS:
-            from allauth.account import app_settings
-
-            # Authentication through email
-            if app_settings.AUTHENTICATION_METHOD == app_settings.AuthenticationMethod.EMAIL:
-                user = self._validate_email(email, password)
-
-            # Authentication through username
-            elif app_settings.AUTHENTICATION_METHOD == app_settings.AuthenticationMethod.USERNAME:
-                user = self._validate_username(username, password)
-
-            # Authentication through either username or email
-            else:
-                user = self._validate_username_email(username, email, password)
-
-        else:
-            # Authentication without using allauth
-            if email:
-                try:
-                    username = UserModel.objects.get(email__iexact=email).get_username()
-                except UserModel.DoesNotExist:
-                    pass
-
-            if username:
-                user = self._validate_username_email(username, '', password)
-
-        # Did we get back an active user?
-        if user:
-            if not user.is_active:
-                msg = _('User account is disabled.')
-                raise exceptions.ValidationError(msg)
-        else:
+        if not user:
             msg = _('Unable to log in with provided credentials.')
             raise exceptions.ValidationError(msg)
 
+        # Did we get back an active user?
+        self.validate_auth_user_status(user)
+
         # If required, is the email verified?
         if 'dj_rest_auth.registration' in settings.INSTALLED_APPS:
-            from allauth.account import app_settings
-            if app_settings.EMAIL_VERIFICATION == app_settings.EmailVerificationMethod.MANDATORY:
-                email_address = user.emailaddress_set.get(email=user.email)
-                if not email_address.verified:
-                    raise serializers.ValidationError(_('E-mail is not verified.'))
+            self.validate_email_verification_status(user)
 
         attrs['user'] = user
         return attrs
