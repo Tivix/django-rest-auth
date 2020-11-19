@@ -1,7 +1,37 @@
 from django.conf import settings
-from rest_framework_simplejwt.authentication import JWTAuthentication
+from django.utils import timezone
 from rest_framework import exceptions
 from rest_framework.authentication import CSRFCheck
+from rest_framework_simplejwt.authentication import JWTAuthentication
+
+
+def get_refresh_view():
+    """ Returns a Token Refresh CBV without a circular import """
+    from rest_framework_simplejwt.settings import api_settings as jwt_settings
+    from rest_framework_simplejwt.views import TokenRefreshView
+    
+    class RefreshViewWithCookieSupport(TokenRefreshView):
+        def post(self, request, *args, **kwargs):
+            response = super().post(request, *args, **kwargs)
+            cookie_name = getattr(settings, 'JWT_AUTH_COOKIE', None)
+            if cookie_name and response.status_code == 200 and 'access' in response.data:
+                cookie_secure = getattr(settings, 'JWT_AUTH_SECURE', False)
+                cookie_httponly = getattr(settings, 'JWT_AUTH_HTTPONLY', True)
+                cookie_samesite = getattr(settings, 'JWT_AUTH_SAMESITE', 'Lax')
+                token_expiration = (timezone.now() + jwt_settings.ACCESS_TOKEN_LIFETIME)
+                response.set_cookie(
+                    cookie_name,
+                    response.data['access'],
+                    expires=token_expiration,
+                    secure=cookie_secure,
+                    httponly=cookie_httponly,
+                    samesite=cookie_samesite,
+                )
+
+                response.data['access_token_expiration'] = token_expiration
+            return response
+    return RefreshViewWithCookieSupport
+
 
 class JWTCookieAuthentication(JWTAuthentication):
     """

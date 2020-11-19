@@ -1,6 +1,16 @@
 from allauth.socialaccount.providers.facebook.views import \
     FacebookOAuth2Adapter
 from allauth.socialaccount.providers.twitter.views import TwitterOAuthAdapter
+from django.conf.urls import include, url
+from django.views.decorators.csrf import ensure_csrf_cookie
+from django.views.generic import TemplateView
+from rest_framework import permissions
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework_simplejwt.views import TokenVerifyView
+
+from dj_rest_auth.jwt_auth import get_refresh_view
 from dj_rest_auth.registration.views import (SocialAccountDisconnectView,
                                              SocialAccountListView,
                                              SocialConnectView,
@@ -8,14 +18,6 @@ from dj_rest_auth.registration.views import (SocialAccountDisconnectView,
 from dj_rest_auth.social_serializers import (TwitterConnectSerializer,
                                              TwitterLoginSerializer)
 from dj_rest_auth.urls import urlpatterns
-from django.conf.urls import include, url
-from django.views.generic import TemplateView
-from django.utils.decorators import method_decorator
-from django.views.decorators.csrf import ensure_csrf_cookie
-from rest_framework import permissions
-from rest_framework.decorators import api_view
-from rest_framework.response import Response
-from rest_framework.views import APIView
 
 from . import django_urls
 
@@ -64,6 +66,7 @@ def twitter_login_view(request):
 class TwitterLoginNoAdapter(SocialLoginView):
     serializer_class = TwitterLoginSerializer
 
+
 @ensure_csrf_cookie
 @api_view(['GET'])
 def get_csrf_cookie(request):
@@ -89,4 +92,6 @@ urlpatterns += [
         name='social_account_disconnect'),
     url(r'^accounts/', include('allauth.socialaccount.urls')),
     url(r'^getcsrf/', get_csrf_cookie, name='getcsrf'),
+    url('^token/verify/', TokenVerifyView.as_view(), name='token_verify'),
+    url('^token/refresh/', get_refresh_view().as_view(), name='token_refresh'),
 ]

@@ -913,3 +913,23 @@ class APIBasicTests(TestsMixin, TestCase):
         self.assertIn('xxx', resp.cookies.keys())
         self.assertIn('refresh-xxx', resp.cookies.keys())
         self.assertEqual(resp.cookies.get('refresh-xxx').get('path'), '/foo/bar')
+
+    @override_settings(JWT_AUTH_RETURN_EXPIRATION=True)
+    @override_settings(REST_USE_JWT=True)
+    @override_settings(JWT_AUTH_COOKIE='xxx')
+    @override_settings(JWT_AUTH_REFRESH_COOKIE='refresh-xxx')
+    def test_custom_token_refresh_view(self):
+        payload = {
+            "username": self.USERNAME,
+            "password": self.PASS
+        }
+
+        get_user_model().objects.create_user(self.USERNAME, '', self.PASS)
+        resp = self.post(self.login_url, data=payload, status_code=200)
+        refresh = resp.data.get('refresh_token')
+        refresh_resp = self.post(
+            reverse('token_refresh'),
+            data=dict(refresh=refresh),
+            status_code=200
+        )
+        self.assertIn('xxx', refresh_resp.cookies)
