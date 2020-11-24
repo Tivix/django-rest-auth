@@ -116,7 +116,7 @@ class SocialLoginSerializer(serializers.Serializer):
             tokens_to_parse = {'access_token': access_token}
 
             # If available we add additional data to the dictionary
-            for key in ["refresh_token", adapter.expires_in_key]:
+            for key in ["refresh_token", "id_token", adapter.expires_in_key]:
                 if key in token:
                     tokens_to_parse[key] = token[key]
         else:
