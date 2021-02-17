@@ -5,6 +5,7 @@ from django.conf import settings
 from django.utils.encoding import force_text
 
 from allauth.account import app_settings as account_app_settings
+from allauth.account.models import EmailAddress
 from rest_framework import status
 from rest_framework.test import APIRequestFactory
 
@@ -516,3 +517,66 @@ class APIBasicTests(TestsMixin, TestCase):
 
         self.post(self.login_url, data=payload, status_code=status.HTTP_200_OK)
         self.get(self.logout_url, status_code=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    @override_settings(ACCOUNT_EMAIL_VERIFICATION='mandatory')
+    def test_resend_account_verification_email(self):
+        self.post(
+            self.register_url,
+            data=self.REGISTRATION_DATA_WITH_EMAIL,
+            status_code=status.HTTP_201_CREATED
+        )
+
+        self.assertEqual(EmailAddress.objects.count(), 1)
+        self.assertEqual(EmailAddress.objects.first().email, self.EMAIL)
+        self.assertEqual(EmailAddress.objects.first().verified, False)
+
+        self.post(
+            reverse('rest_resend_confirmation_email'),
+            data={
+                'email': self.EMAIL,
+            },
+            status_code=status.HTTP_200_OK
+        )
+
+        self.assertEqual(len(mail.outbox), 2)
+
+    @override_settings(ACCOUNT_EMAIL_VERIFICATION='mandatory')
+    def test_resend_not_registered_account_verification_email(self):
+        self.assertEqual(EmailAddress.objects.count(), 0)
+
+        self.post(
+            reverse('rest_resend_confirmation_email'),
+            data={
+                'email': self.EMAIL,
+            },
+            status_code=status.HTTP_200_OK
+        )
+
+        self.assertEqual(len(mail.outbox), 0)
+
+    @override_settings(ACCOUNT_EMAIL_VERIFICATION='mandatory')
+    def test_resend_already_verified_account_verification_email(self):
+        self.post(
+            self.register_url,
+            data=self.REGISTRATION_DATA_WITH_EMAIL,
+            status_code=status.HTTP_201_CREATED
+        )
+
+        self.assertEqual(EmailAddress.objects.count(), 1)
+        self.assertEqual(EmailAddress.objects.first().email, self.EMAIL)
+        self.assertEqual(EmailAddress.objects.first().verified, False)
+        self.assertEqual(len(mail.outbox), 1)
+
+        email_address = EmailAddress.objects.first()
+        email_address.verified = True
+        email_address.save()
+
+        self.post(
+            reverse('rest_resend_confirmation_email'),
+            data={
+                'email': self.EMAIL
+            },
+            status_code=status.HTTP_200_OK
+        )
+
+        self.assertEqual(len(mail.outbox), 1)

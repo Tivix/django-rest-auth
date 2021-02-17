@@ -1,10 +1,18 @@
 from django.views.generic import TemplateView
 from django.conf.urls import url
 
-from .views import RegisterView, VerifyEmailView
+from .views import (
+    RegisterView,
+    VerifyEmailView,
+    ResendConfirmationEmailView,
+)
+
 
 urlpatterns = [
     url(r'^$', RegisterView.as_view(), name='rest_register'),
+    url(r'^resend-confirmation-email/$',
+        ResendConfirmationEmailView.as_view(),
+        name='rest_resend_confirmation_email'),
     url(r'^verify-email/$', VerifyEmailView.as_view(), name='rest_verify_email'),
 
     # This url is used by django-allauth and empty TemplateView is
