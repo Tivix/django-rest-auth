@@ -11,6 +11,7 @@ try:
     from allauth.socialaccount.helpers import complete_social_login
     from allauth.socialaccount.models import SocialAccount
     from allauth.socialaccount.providers.base import AuthProcess
+    from allauth.socialaccount.providers.oauth2.client import OAuth2Error
 except ImportError:
     raise ImportError("allauth needs to be added to INSTALLED_APPS.")
 
@@ -108,7 +109,10 @@ class SocialLoginSerializer(serializers.Serializer):
                 self.callback_url,
                 scope
             )
-            token = client.get_access_token(code)
+            try:
+                token = client.get_access_token(code)
+            except OAuth2Error as e:
+                raise serializers.ValidationError({'code': e})
             access_token = token['access_token']
 
         else:
