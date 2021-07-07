@@ -21,11 +21,14 @@ class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField(required=False, allow_blank=True)
     password = serializers.CharField(style={'input_type': 'password'})
 
+    def authenticate(self, **kwargs):
+        return authenticate(self.context['request'], **kwargs)
+
     def _validate_email(self, email, password):
         user = None
 
         if email and password:
-            user = authenticate(email=email, password=password)
+            user = self.authenticate(email=email, password=password)
         else:
             msg = _('Must include "email" and "password".')
             raise exceptions.ValidationError(msg)
@@ -36,7 +39,7 @@ class LoginSerializer(serializers.Serializer):
         user = None
 
         if username and password:
-            user = authenticate(username=username, password=password)
+            user = self.authenticate(username=username, password=password)
         else:
             msg = _('Must include "username" and "password".')
             raise exceptions.ValidationError(msg)
@@ -47,9 +50,9 @@ class LoginSerializer(serializers.Serializer):
         user = None
 
         if email and password:
-            user = authenticate(email=email, password=password)
+            user = self.authenticate(email=email, password=password)
         elif username and password:
-            user = authenticate(username=username, password=password)
+            user = self.authenticate(username=username, password=password)
         else:
             msg = _('Must include either "username" or "email" and "password".')
             raise exceptions.ValidationError(msg)
@@ -71,7 +74,7 @@ class LoginSerializer(serializers.Serializer):
                 user = self._validate_email(email, password)
 
             # Authentication through username
-            if app_settings.AUTHENTICATION_METHOD == app_settings.AuthenticationMethod.USERNAME:
+            elif app_settings.AUTHENTICATION_METHOD == app_settings.AuthenticationMethod.USERNAME:
                 user = self._validate_username(username, password)
 
             # Authentication through either username or email
@@ -146,7 +149,7 @@ class JWTSerializer(serializers.Serializer):
         JWTUserDetailsSerializer = import_callable(
             rest_auth_serializers.get('USER_DETAILS_SERIALIZER', UserDetailsSerializer)
         )
-        user_data = JWTUserDetailsSerializer(obj['user']).data
+        user_data = JWTUserDetailsSerializer(obj['user'], context=self.context).data
         return user_data
 
 
@@ -220,7 +223,7 @@ class PasswordResetConfirmSerializer(serializers.Serializer):
         return attrs
 
     def save(self):
-        self.set_password_form.save()
+        return self.set_password_form.save()
 
 
 class PasswordChangeSerializer(serializers.Serializer):
@@ -253,7 +256,8 @@ class PasswordChangeSerializer(serializers.Serializer):
         )
 
         if all(invalid_password_conditions):
-            raise serializers.ValidationError('Invalid password')
+            err_msg = _("Your old password was entered incorrectly. Please enter it again.")
+            raise serializers.ValidationError(err_msg)
         return value
 
     def validate(self, attrs):

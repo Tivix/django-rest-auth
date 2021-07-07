@@ -8,6 +8,8 @@ if 'allauth.socialaccount' in settings.INSTALLED_APPS:
     from allauth.socialaccount.models import SocialToken
     from allauth.socialaccount.providers.oauth.client import OAuthError
 
+    from rest_auth.registration.serializers import SocialConnectMixin
+
 
 class TwitterLoginSerializer(serializers.Serializer):
     access_token = serializers.CharField()
@@ -73,3 +75,7 @@ class TwitterLoginSerializer(serializers.Serializer):
         attrs['user'] = login.account.user
 
         return attrs
+
+
+class TwitterConnectSerializer(SocialConnectMixin, TwitterLoginSerializer):
+    pass

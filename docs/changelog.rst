@@ -1,6 +1,31 @@
 Changelog
 =========
 
+0.9.5
+-----
+- fixed package distribution issue
+
+0.9.4
+-----
+- Compatibility fixes (#437, #506)
+- JWT auth cookie fix (#345)
+- config & packaging fixes
+- updated docs
+- added new translations (Czech, Chinese, Turkish, Korean)
+
+0.9.3
+-----
+- added social connect views
+- added check for pre-existing accounts in social login
+- prevent double-validation in LoginSerializer
+- unit tests and demo project changes for Django 2.0
+
+0.9.2
+-----
+- added permission classes configuration for registration
+- added more info to JWT docs
+- added Polish translations
+
 0.9.1
 -----
 - fixed import error when extending rest_auth serializers

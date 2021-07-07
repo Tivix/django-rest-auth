@@ -1,11 +1,13 @@
 Welcome to django-rest-auth
 ===========================
 
-.. image:: https://travis-ci.org/Tivix/django-rest-auth.png
+Repository is unmaintained at the moment (on pause). More info can be found on this issue page: https://github.com/Tivix/django-rest-auth/issues/568
+
+.. image:: https://travis-ci.org/Tivix/django-rest-auth.svg
     :target: https://travis-ci.org/Tivix/django-rest-auth
 
 
-.. image:: https://coveralls.io/repos/Tivix/django-rest-auth/badge.png
+.. image:: https://coveralls.io/repos/Tivix/django-rest-auth/badge.svg
     :target: https://coveralls.io/r/Tivix/django-rest-auth?branch=master
 
 

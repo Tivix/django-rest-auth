@@ -1,14 +1,8 @@
 #!/usr/bin/env python
 
-try:
-    from setuptools import setup, find_packages
-except ImportError:
-    from ez_setup import use_setuptools
-    use_setuptools()
-    from setuptools import setup, find_packages
-
-
 import os
+from setuptools import setup, find_packages
+
 
 here = os.path.dirname(os.path.abspath(__file__))
 f = open(os.path.join(here, 'README.rst'))
@@ -18,7 +12,7 @@ f.close()
 
 setup(
     name='django-rest-auth',
-    version='0.9.1',
+    version='0.9.5',
     author='Sumit Chachra',
     author_email='chachra@tivix.com',
     url='http://github.com/Tivix/django-rest-auth',
@@ -29,7 +23,7 @@ setup(
     zip_safe=False,
     install_requires=[
         'Django>=1.8.0',
-        'djangorestframework>=3.1.0',
+        'djangorestframework>=3.1.3',
         'six>=1.9.0',
     ],
     extras_require={
