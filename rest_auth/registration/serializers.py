@@ -1,5 +1,5 @@
 from django.http import HttpRequest
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.contrib.auth import get_user_model
 
 try:
@@ -54,7 +54,8 @@ class SocialLoginSerializer(serializers.Serializer):
             `allauth.socialaccount.SocialLoginView` instance
         """
         request = self._get_request()
-        social_login = adapter.complete_login(request, app, token, response=response)
+        social_login = adapter.complete_login(
+            request, app, token, response=response)
         social_login.token = token
         return social_login
 
@@ -69,7 +70,8 @@ class SocialLoginSerializer(serializers.Serializer):
 
         adapter_class = getattr(view, 'adapter_class', None)
         if not adapter_class:
-            raise serializers.ValidationError(_("Define adapter_class in view"))
+            raise serializers.ValidationError(
+                _("Define adapter_class in view"))
 
         adapter = adapter_class(request)
         app = adapter.get_provider().get_app(request)
@@ -119,7 +121,8 @@ class SocialLoginSerializer(serializers.Serializer):
         social_token.app = app
 
         try:
-            login = self.get_social_login(adapter, app, social_token, access_token)
+            login = self.get_social_login(
+                adapter, app, social_token, access_token)
             complete_social_login(request, login)
         except HTTPError:
             raise serializers.ValidationError(_("Incorrect value"))
@@ -154,7 +157,8 @@ class SocialConnectMixin(object):
         Refer to the implementation of get_social_login in base class and to the
         allauth.socialaccount.helpers module complete_social_login function.
         """
-        social_login = super(SocialConnectMixin, self).get_social_login(*args, **kwargs)
+        social_login = super(SocialConnectMixin,
+                             self).get_social_login(*args, **kwargs)
         social_login.state['process'] = AuthProcess.CONNECT
         return social_login
 
@@ -190,7 +194,8 @@ class RegisterSerializer(serializers.Serializer):
 
     def validate(self, data):
         if data['password1'] != data['password2']:
-            raise serializers.ValidationError(_("The two password fields didn't match."))
+            raise serializers.ValidationError(
+                _("The two password fields didn't match."))
         return data
 
     def custom_signup(self, request, user):

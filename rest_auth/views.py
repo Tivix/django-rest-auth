@@ -6,7 +6,7 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.decorators import method_decorator
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.views.decorators.debug import sensitive_post_parameters
 
 from rest_framework import status
@@ -89,7 +89,8 @@ class LoginView(GenericAPIView):
             from rest_framework_jwt.settings import api_settings as jwt_settings
             if jwt_settings.JWT_AUTH_COOKIE:
                 from datetime import datetime
-                expiration = (datetime.utcnow() + jwt_settings.JWT_EXPIRATION_DELTA)
+                expiration = (datetime.utcnow() +
+                              jwt_settings.JWT_EXPIRATION_DELTA)
                 response.set_cookie(jwt_settings.JWT_AUTH_COOKIE,
                                     self.token,
                                     expires=expiration,
