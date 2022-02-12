@@ -2,7 +2,7 @@ from django.test import TestCase, override_settings
 from django.contrib.auth import get_user_model
 from django.core import mail
 from django.conf import settings
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 
 from allauth.account import app_settings as account_app_settings
 from rest_framework import status
@@ -300,7 +300,7 @@ class APIBasicTests(TestsMixin, TestCase):
         data = {
             'new_password1': self.NEW_PASS,
             'new_password2': self.NEW_PASS,
-            'uid': force_text(url_kwargs['uid']),
+            'uid': force_str(url_kwargs['uid']),
             'token': '-wrong-token-'
         }
         self.post(url, data=data, status_code=400)
@@ -327,7 +327,7 @@ class APIBasicTests(TestsMixin, TestCase):
         data = {
             'new_password1': self.NEW_PASS,
             'new_password2': self.NEW_PASS,
-            'uid': force_text(url_kwargs['uid']),
+            'uid': force_str(url_kwargs['uid']),
             'token': url_kwargs['token']
         }
         url = reverse('rest_password_reset_confirm')

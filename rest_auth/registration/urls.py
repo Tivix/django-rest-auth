@@ -1,11 +1,11 @@
 from django.views.generic import TemplateView
-from django.conf.urls import url
+from django.urls import re_path
 
 from .views import RegisterView, VerifyEmailView
 
 urlpatterns = [
-    url(r'^$', RegisterView.as_view(), name='rest_register'),
-    url(r'^verify-email/$', VerifyEmailView.as_view(), name='rest_verify_email'),
+    re_path(r'^$', RegisterView.as_view(), name='rest_register'),
+    re_path(r'^verify-email/$', VerifyEmailView.as_view(), name='rest_verify_email'),
 
     # This url is used by django-allauth and empty TemplateView is
     # defined just to allow reverse() call inside app, for example when email
@@ -18,6 +18,6 @@ urlpatterns = [
     # If you don't want to use API on that step, then just use ConfirmEmailView
     # view from:
     # django-allauth https://github.com/pennersr/django-allauth/blob/master/allauth/account/views.py
-    url(r'^account-confirm-email/(?P<key>[-:\w]+)/$', TemplateView.as_view(),
+    re_path(r'^account-confirm-email/(?P<key>[-:\w]+)/$', TemplateView.as_view(),
         name='account_confirm_email'),
 ]
