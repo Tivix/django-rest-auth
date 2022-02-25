@@ -1,7 +1,11 @@
+===========
+Deprecated
+===========
+Please use https://github.com/iMerica/dj-rest-auth as this project is no longer maintained. Thanks!
+
+
 Welcome to django-rest-auth
 ===========================
-
-Repository is unmaintained at the moment (on pause). More info can be found on this issue page: https://github.com/Tivix/django-rest-auth/issues/568
 
 .. image:: https://travis-ci.org/Tivix/django-rest-auth.svg
     :target: https://travis-ci.org/Tivix/django-rest-auth
