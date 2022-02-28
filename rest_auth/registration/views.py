@@ -46,6 +46,10 @@ class RegisterView(CreateAPIView):
         return super(RegisterView, self).dispatch(*args, **kwargs)
 
     def get_response_data(self, user):
+        """
+            Here I added context to the return of each serializer so
+            HyperlinkedIdentityFields would work for the user return
+        """
         if allauth_settings.EMAIL_VERIFICATION == \
                 allauth_settings.EmailVerificationMethod.MANDATORY:
             return {"detail": _("Verification e-mail sent.")}
@@ -55,9 +59,13 @@ class RegisterView(CreateAPIView):
                 'user': user,
                 'token': self.token
             }
-            return JWTSerializer(data).data
+            return JWTSerializer(data,
+                                 context={'request': self.request}
+                                 ).data
         else:
-            return TokenSerializer(user.auth_token).data
+            return TokenSerializer(user.auth_token,
+                                   context={'request': self.request}
+                                   ).data
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
