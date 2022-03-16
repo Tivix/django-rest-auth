@@ -1,3 +1,4 @@
+from django.core.exceptions import ValidationError as DjangoValidationError
 from django.http import HttpRequest
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth import get_user_model
@@ -207,7 +208,14 @@ class RegisterSerializer(serializers.Serializer):
         adapter = get_adapter()
         user = adapter.new_user(request)
         self.cleaned_data = self.get_cleaned_data()
-        adapter.save_user(request, user, self)
+        user = adapter.save_user(request, user, self, commit=False)
+        try:
+            adapter.clean_password(self.cleaned_data['password1'], user=user)
+        except DjangoValidationError as exc:
+            raise serializers.ValidationError(
+                detail=serializers.as_serializer_error(exc)
+            )
+        user.save()
         self.custom_signup(request, user)
         setup_user_email(request, user, [])
         return user
