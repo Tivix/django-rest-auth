@@ -123,6 +123,12 @@ class SocialLoginView(LoginView):
     """
     serializer_class = SocialLoginSerializer
 
+    def get_callback_url(self):
+        return getattr(self, 'callback_url', None)
+
+    def get_client_class(self):
+        return getattr(self, 'client_class', None)
+
     def process_login(self):
         get_adapter(self.request).login(self.request, self.user)
 
