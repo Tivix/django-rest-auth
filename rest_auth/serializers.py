@@ -104,8 +104,15 @@ class LoginSerializer(serializers.Serializer):
         # If required, is the email verified?
         if 'rest_auth.registration' in settings.INSTALLED_APPS:
             from allauth.account import app_settings
+            from allauth.account.models import EmailAddress
             if app_settings.EMAIL_VERIFICATION == app_settings.EmailVerificationMethod.MANDATORY:
-                email_address = user.emailaddress_set.get(email=user.email)
+                try:
+                    email_address = user.emailaddress_set.get(email=user.email)
+                # There is no corresponding email address object for the EmailAddress model, this could happen
+                # if the rest_auth app has bee installed after some users had already been created.
+                except EmailAddress.DoesNotExist:
+                    email_address = EmailAddress(user=user, email=user.email, verified=True, primary=True)
+                    email_address.save()
                 if not email_address.verified:
                     raise serializers.ValidationError(_('E-mail is not verified.'))
 
