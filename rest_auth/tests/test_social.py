@@ -10,7 +10,7 @@ try:
 except ImportError:
     from django.core.urlresolvers import reverse
 
-from allauth.socialaccount.models import SocialApp
+from allauth.socialaccount.models import SocialAccount, SocialApp
 from allauth.socialaccount.providers.facebook.provider import GRAPH_API_URL
 import responses
 
@@ -53,6 +53,7 @@ class TestSocialAuth(TestsMixin, TestCase):
         social_app.sites.add(site)
         twitter_social_app.sites.add(site)
         self.graph_api_url = GRAPH_API_URL + '/me'
+        self.graph_api_access_token_url = GRAPH_API_URL + '/oauth/access_token'
         self.twitter_url = 'http://twitter.com/foobarme'
 
     @responses.activate
@@ -109,6 +110,63 @@ class TestSocialAuth(TestsMixin, TestCase):
         self.post(self.fb_login_url, data=payload, status_code=200)
         self.assertIn('key', self.response.json.keys())
         self.assertEqual(get_user_model().objects.all().count(), users_count + 1)
+
+    @responses.activate
+    def test_social_auth_with_authorization_code(self):
+        # Test Facebook
+        resp_body = {
+            "id": "123123123123123123",
+            "access_token": "gimme-access",
+            "refresh_token": "sofresh",  # Note: Facebook does not actually return this but other providers can
+            "token_refresh_interval_sec": 3600,
+        }
+        responses.add(
+            responses.POST,
+            self.graph_api_access_token_url,
+            body=json.dumps(resp_body),
+            status=200,
+            content_type='application/json'
+        )
+
+        resp_body = {
+            "id": "123123123123",
+            "first_name": "John",
+            "gender": "male",
+            "last_name": "Smith",
+            "link": "https://www.facebook.com/john.smith",
+            "locale": "en_US",
+            "name": "John Smith",
+            "timezone": 2,
+            "updated_time": "2014-08-13T10:14:38+0000",
+            "username": "john.smith",
+            "verified": True
+        }
+        responses.add(
+            responses.GET,
+            self.graph_api_url,
+            body=json.dumps(resp_body),
+            status=200,
+            content_type='application/json'
+        )
+
+        users_count = get_user_model().objects.all().count()
+        payload = {
+            'code': 'abc123'
+        }
+
+        self.post(self.fb_login_url, data=payload, status_code=200)
+        self.assertIn('key', self.response.json.keys())
+        self.assertEqual(get_user_model().objects.all().count(), users_count + 1)
+
+        # make sure that second request will not create a new user
+        self.post(self.fb_login_url, data=payload, status_code=200)
+        self.assertIn('key', self.response.json.keys())
+        self.assertEqual(get_user_model().objects.all().count(), users_count + 1)
+
+        account = SocialAccount.objects.first()
+        social_token = account.socialtoken_set.first()
+        self.assertEqual(social_token.token, "gimme-access")
+        self.assertEqual(social_token.token_secret, "sofresh")
 
     def _twitter_social_auth(self):
         # fake response for twitter call
@@ -297,13 +355,12 @@ class TestSocialAuth(TestsMixin, TestCase):
             status=200,
             content_type='application/json'
         )
-
         users_count = get_user_model().objects.all().count()
         payload = {
             'access_token': 'abc123'
         }
 
-        self.post(self.fb_login_url, data=payload, status_code=200)
+        self.post(self.fb_login_url, data=payload)
         self.assertIn('token', self.response.json.keys())
         self.assertIn('user', self.response.json.keys())
 
@@ -344,6 +401,7 @@ class TestSocialConnectAuth(TestsMixin, TestCase):
         facebook_social_app.sites.add(site)
         twitter_social_app.sites.add(site)
         self.graph_api_url = GRAPH_API_URL + '/me'
+        self.graph_api_access_token_url = GRAPH_API_URL + '/oauth/access_token'
         self.twitter_url = 'https://api.twitter.com/1.1/account/verify_credentials.json'
 
     @responses.activate
@@ -445,3 +503,59 @@ class TestSocialConnectAuth(TestsMixin, TestCase):
         self.get(self.social_account_list_url)
         self.assertEqual(len(self.response.json), 1)
         self.assertEqual(self.response.json[0]['provider'], 'twitter')
+
+    @responses.activate
+    def test_social_connect_with_authorization_code(self):
+        # register user
+        self.post(
+            self.register_url,
+            data=self.REGISTRATION_DATA,
+            status_code=201
+        )
+
+        # Test Facebook
+        resp_body = {
+            "id": "123123123123123123",
+            "access_token": "gimme-access",
+            "refresh_token": "sofresh",  # Note: Facebook does not actually return this but other providers can
+            "token_refresh_interval_sec": 3600,
+        }
+        responses.add(
+            responses.POST,
+            self.graph_api_access_token_url,
+            body=json.dumps(resp_body),
+            status=200,
+            content_type='application/json'
+        )
+
+        resp_body = {
+            "id": "123123123123",
+            "first_name": "John",
+            "gender": "male",
+            "last_name": "Smith",
+            "link": "https://www.facebook.com/john.smith",
+            "locale": "en_US",
+            "name": "John Smith",
+            "timezone": 2,
+            "updated_time": "2014-08-13T10:14:38+0000",
+            "username": "john.smith",
+            "verified": True
+        }
+        responses.add(
+            responses.GET,
+            self.graph_api_url,
+            body=json.dumps(resp_body),
+            status=200,
+            content_type='application/json'
+        )
+
+        payload = {
+            'code': 'abc123'
+        }
+
+        self.post(self.fb_connect_url, data=payload, status_code=200)
+        self.assertIn('key', self.response.json.keys())
+        account = SocialAccount.objects.first()
+        social_token = account.socialtoken_set.first()
+        self.assertEqual(social_token.token, "gimme-access")
+        self.assertEqual(social_token.token_secret, "sofresh")

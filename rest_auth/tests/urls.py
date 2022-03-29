@@ -3,6 +3,7 @@ from django.views.generic import TemplateView
 from . import django_urls
 
 from allauth.socialaccount.providers.facebook.views import FacebookOAuth2Adapter
+from allauth.socialaccount.providers.oauth2.client import OAuth2Client
 from allauth.socialaccount.providers.twitter.views import TwitterOAuthAdapter
 
 from rest_framework.decorators import api_view
@@ -19,6 +20,8 @@ from rest_auth.social_serializers import (
 
 class FacebookLogin(SocialLoginView):
     adapter_class = FacebookOAuth2Adapter
+    callback_url = 'https://localhost:8000'
+    client_class = OAuth2Client
 
 
 class TwitterLogin(SocialLoginView):
@@ -28,6 +31,8 @@ class TwitterLogin(SocialLoginView):
 
 class FacebookConnect(SocialConnectView):
     adapter_class = FacebookOAuth2Adapter
+    callback_url = 'https://localhost:8000'
+    client_class = OAuth2Client
 
 
 class TwitterConnect(SocialConnectView):
