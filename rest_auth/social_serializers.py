@@ -1,9 +1,12 @@
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.http import HttpRequest
+from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 # Import is needed only if we are using social login, in which
 # case the allauth.socialaccount will be declared
 if 'allauth.socialaccount' in settings.INSTALLED_APPS:
+    from allauth.account import app_settings as allauth_settings
     from allauth.socialaccount.helpers import complete_social_login
     from allauth.socialaccount.models import SocialToken
     from allauth.socialaccount.providers.oauth.client import OAuthError
@@ -70,6 +73,20 @@ class TwitterLoginSerializer(serializers.Serializer):
             raise serializers.ValidationError(str(e))
 
         if not login.is_existing:
+            # We have an account already signed up in a different flow
+            # with the same email address: raise an exception.
+            # This needs to be handled in the frontend. We can not just
+            # link up the accounts due to security constraints
+            if allauth_settings.UNIQUE_EMAIL:
+                # Do we have an account already with this email address?
+                account_exists = get_user_model().objects.filter(
+                    email=login.user.email,
+                ).exists()
+                if account_exists:
+                    raise serializers.ValidationError(
+                        _("User is already registered with this e-mail address.")
+                    )
+
             login.lookup()
             login.save(request, connect=True)
         attrs['user'] = login.account.user
