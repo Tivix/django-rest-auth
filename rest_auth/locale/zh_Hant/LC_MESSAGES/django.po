@@ -42,10 +42,6 @@ msgstr ""
 msgid "Incorrect value"
 msgstr ""
 
-#: registration/serializers.py:139
-msgid "User is already registered with this e-mail address."
-msgstr ""
-
 #: registration/serializers.py:185
 msgid "A user is already registered with this e-mail address."
 msgstr ""
