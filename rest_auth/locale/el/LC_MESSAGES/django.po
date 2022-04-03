@@ -1,0 +1,95 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-03-05 21:56-0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: registration/serializers.py:53
+msgid "View is not defined, pass it as a context variable"
+msgstr "Η όψη (view) δεν είναι ορισμένη, να περαστεί ως μεταβλητή πλαισίου (context variable)"
+
+#: registration/serializers.py:58
+msgid "Define adapter_class in view"
+msgstr "Να οριστεί το adapter_class στην όψη (view)"
+
+#: registration/serializers.py:77
+msgid "Define callback_url in view"
+msgstr "Να οριστεί το callback_url στην όψη (view)"
+
+#: registration/serializers.py:81
+msgid "Define client_class in view"
+msgstr "Να οριστεί το client_class στην όψη (view)"
+
+#: registration/serializers.py:102
+msgid "Incorrect input. access_token or code is required."
+msgstr "Λανθασμένη καταχώρηση. Απαιτείται κουπόνι πρόσβασης (access_token) ή κωδικός (code)."
+
+#: registration/serializers.py:111
+msgid "Incorrect value"
+msgstr "Λανθασμένη τιμή"
+
+#: registration/serializers.py:140
+msgid "A user is already registered with this e-mail address."
+msgstr "Ένας χρήστης είναι ήδη εγγεγραμμένος με αυτήν την ηλεκτρονική διεύθυνση"
+
+#: registration/serializers.py:148
+msgid "The two password fields didn't match."
+msgstr "Τα δύο πεδία του κωδικού πρόσβασης δεν ταιριάζουν"
+
+#: registration/views.py:91
+msgid "ok"
+msgstr "οκ"
+
+#: serializers.py:30
+msgid "Must include \"email\" and \"password\"."
+msgstr "Πρέπει να περιλαμβάνει \"email\" και \"password\"."
+
+#: serializers.py:41
+msgid "Must include \"username\" and \"password\"."
+msgstr "Πρέπει να περιλαμβάνει \"username\" και \"password\"."
+
+#: serializers.py:54
+msgid "Must include either \"username\" or \"email\" and \"password\"."
+msgstr "Πρέπει να περιλαμβάνει είτε \"username\" ή \"email\" και \"password\"."
+
+#: serializers.py:95
+msgid "User account is disabled."
+msgstr "Ο λογαριασμός χρήστη είναι απενεργοποιημένος."
+
+#: serializers.py:98
+msgid "Unable to log in with provided credentials."
+msgstr "Αδυναμία σύνδεσης με τα παρεχώμενα στοιχεία."
+
+#: serializers.py:107
+msgid "E-mail is not verified."
+msgstr "Το e-mail δεν έχει επαληθευτεί."
+
+#: views.py:126
+msgid "Successfully logged out."
+msgstr "Επιτυχημένη αποσύνδεση."
+
+#: views.py:174
+msgid "Password reset e-mail has been sent."
+msgstr "Το e-mail για την ανάκτηση του συνθηματικού έχει σταλεί."
+
+#: views.py:200
+msgid "Password has been reset with the new password."
+msgstr "Το συνθηματικό έχει αντικατασταθεί με το καινούριο."
+
+#: views.py:222
+msgid "New password has been saved."
+msgstr "Το νέο συνθηματικό έχει αποθηκευτεί."
