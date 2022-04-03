@@ -51,3 +51,5 @@ Configuration
 - **OLD_PASSWORD_FIELD_ENABLED** - set it to True if you want to have old password verification on password change enpoint (default: False)
 
 - **LOGOUT_ON_PASSWORD_CHANGE** - set to False if you want to keep the current user logged in after a password change
+
+- **REST_AUTH_ROLL_BACK_REGISTER_ON_ERROR** - set to True to prevent a user being created if an error occurs after writing the user (such as during the sending of the verification email).
