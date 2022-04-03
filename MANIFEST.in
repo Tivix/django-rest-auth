@@ -2,4 +2,5 @@ include AUTHORS
 include LICENSE
 include MANIFEST.in
 include README.md
+include runtests.py
 graft rest_auth
