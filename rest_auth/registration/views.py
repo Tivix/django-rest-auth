@@ -13,7 +13,7 @@ from rest_framework import status
 
 from allauth.account.adapter import get_adapter
 from allauth.account.views import ConfirmEmailView
-from allauth.account.utils import complete_signup
+from allauth.account.utils import complete_signup, send_email_confirmation
 from allauth.account import app_settings as allauth_settings
 from allauth.socialaccount import signals
 from allauth.socialaccount.adapter import get_adapter as get_social_adapter
@@ -76,6 +76,17 @@ class RegisterView(CreateAPIView):
         else:
             create_token(self.token_model, user, serializer)
 
+        account_email_verification = getattr(
+            settings,
+            'ACCOUNT_EMAIL_VERIFICATION',
+            allauth_settings.EmailVerificationMethod.OPTIONAL
+        )
+        send_email_required = (
+            allauth_settings.EmailVerificationMethod.MANDATORY,
+            allauth_settings.EmailVerificationMethod.OPTIONAL
+        )
+        if account_email_verification in send_email_required:
+            send_email_confirmation(self.request._request, user, True)
         complete_signup(self.request._request, user,
                         allauth_settings.EMAIL_VERIFICATION,
                         None)
