@@ -1,5 +1,7 @@
 import json
 
+from allauth.socialaccount.providers.facebook.views import FacebookOAuth2Adapter
+
 from django.test import TestCase
 from django.contrib.auth import get_user_model
 from django.test.utils import override_settings
@@ -17,6 +19,21 @@ import responses
 from rest_framework import status
 
 from .mixins import TestsMixin
+
+
+facebook_resp_body = {
+    "id": "123123123123",
+    "first_name": "John",
+    "gender": "male",
+    "last_name": "Smith",
+    "link": "https://www.facebook.com/john.smith",
+    "locale": "en_US",
+    "name": "John Smith",
+    "timezone": 2,
+    "updated_time": "2014-08-13T10:14:38+0000",
+    "username": "john.smith",
+    "verified": True
+}
 
 
 @override_settings(ROOT_URLCONF="tests.urls")
@@ -73,25 +90,10 @@ class TestSocialAuth(TestsMixin, TestCase):
 
     @responses.activate
     def test_social_auth(self):
-        # fake response for facebook call
-        resp_body = {
-            "id": "123123123123",
-            "first_name": "John",
-            "gender": "male",
-            "last_name": "Smith",
-            "link": "https://www.facebook.com/john.smith",
-            "locale": "en_US",
-            "name": "John Smith",
-            "timezone": 2,
-            "updated_time": "2014-08-13T10:14:38+0000",
-            "username": "john.smith",
-            "verified": True
-        }
-
         responses.add(
             responses.GET,
             self.graph_api_url,
-            body=json.dumps(resp_body),
+            body=json.dumps(facebook_resp_body),
             status=200,
             content_type='application/json'
         )
@@ -109,6 +111,75 @@ class TestSocialAuth(TestsMixin, TestCase):
         self.post(self.fb_login_url, data=payload, status_code=200)
         self.assertIn('key', self.response.json.keys())
         self.assertEqual(get_user_model().objects.all().count(), users_count + 1)
+
+    @responses.activate
+    def test_social_auth_with_code(self):
+        # fake response exchanging the authorization code for an access token
+        responses.add(
+            responses.Response(
+                responses.POST,
+                FacebookOAuth2Adapter.access_token_url,
+                json={'access_token': 'donkeyface'},
+                status=200,
+            )
+        )
+        # fake response for facebook call
+        responses.add(
+            responses.GET,
+            self.graph_api_url,
+            body=json.dumps(facebook_resp_body),
+            status=200,
+            content_type='application/json'
+        )
+        users_count = get_user_model().objects.all().count()
+        payload = {
+            'code': 'abc123',
+        }
+
+        self.post(self.fb_login_auth_code_url, data=payload, status_code=200)
+        self.assertIn('key', self.response.json.keys())
+        self.assertEqual(get_user_model().objects.all().count(), users_count + 1)
+
+        # make sure that second request will not create a new user
+        self.post(self.fb_login_auth_code_url, data=payload, status_code=200)
+        self.assertIn('key', self.response.json.keys())
+        self.assertEqual(get_user_model().objects.all().count(), users_count + 1)
+
+    @responses.activate
+    def test_social_auth_with_code_and_invalid_callback(self):
+        payload = {
+            'code': 'abc123',
+            'callback_url': 'Iamnotaurl',
+        }
+        response = self.post(self.fb_login_auth_code_url, data=payload, status_code=400)
+        self.assertIn('callback_url', response.json)
+
+    @responses.activate
+    def test_social_auth_with_code_and_valid_callback(self):
+        # fake response exchanging the authorization code for an access token
+        responses.add(
+            responses.Response(
+                responses.POST,
+                FacebookOAuth2Adapter.access_token_url,
+                json={'access_token': 'donkeyface'},
+                status=200,
+            )
+        )
+        # fake response for facebook call
+        responses.add(
+            responses.GET,
+            self.graph_api_url,
+            body=json.dumps(facebook_resp_body),
+            status=200,
+            content_type='application/json'
+        )
+        payload = {
+            'code': 'abc123',
+            'callback_url': 'https://another.1231sda1D123.url.com/',
+        }
+        self.post(self.fb_login_auth_code_url, data=payload, status_code=200)
+        # test that the custom callback URL has been used in the code exchange
+        self.assertIn('1231sda1D123', responses.calls[0].request.body)
 
     def _twitter_social_auth(self):
         # fake response for twitter call
