@@ -170,8 +170,8 @@ class RegisterSerializer(serializers.Serializer):
         required=allauth_settings.USERNAME_REQUIRED
     )
     email = serializers.EmailField(required=allauth_settings.EMAIL_REQUIRED)
-    password1 = serializers.CharField(write_only=True)
-    password2 = serializers.CharField(write_only=True)
+    password1 = serializers.CharField(write_only=True, style={'input_type': 'password'}, trim_whitespace=False)
+    password2 = serializers.CharField(write_only=True, style={'input_type': 'password'}, trim_whitespace=False)
 
     def validate_username(self, username):
         username = get_adapter().clean_username(username)
