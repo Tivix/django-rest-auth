@@ -35,6 +35,7 @@ class SocialAccountSerializer(serializers.ModelSerializer):
 
 class SocialLoginSerializer(serializers.Serializer):
     access_token = serializers.CharField(required=False, allow_blank=True)
+    refresh_token = serializers.CharField(required=False, allow_blank=True)
     code = serializers.CharField(required=False, allow_blank=True)
 
     def _get_request(self):
@@ -80,6 +81,8 @@ class SocialLoginSerializer(serializers.Serializer):
         # Case 1: We received the access_token
         if attrs.get('access_token'):
             access_token = attrs.get('access_token')
+            # Also optional refresh token
+            refresh_token = attrs.get('refresh_token')
 
         # Case 2: We received the authorization code
         elif attrs.get('code'):
@@ -110,12 +113,17 @@ class SocialLoginSerializer(serializers.Serializer):
             )
             token = client.get_access_token(code)
             access_token = token['access_token']
+            refresh_token = token.get('refresh_token')
 
         else:
             raise serializers.ValidationError(
                 _("Incorrect input. access_token or code is required."))
 
-        social_token = adapter.parse_token({'access_token': access_token})
+        token_dict = {'access_token': access_token}
+        if refresh_token:
+            # Also pass the refresh_token if there is one
+            token_dict.update({'refresh_token': refresh_token})
+        social_token = adapter.parse_token(token_dict)
         social_token.app = app
 
         try:
