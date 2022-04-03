@@ -16,71 +16,37 @@ from .utils import import_callable
 UserModel = get_user_model()
 
 
-class LoginSerializer(serializers.Serializer):
-    username = serializers.CharField(required=False, allow_blank=True)
-    email = serializers.EmailField(required=False, allow_blank=True)
-    password = serializers.CharField(style={'input_type': 'password'})
+class LoginSerializer(Serializer):
+    username = CharField(required=False, allow_blank=True)
+    email = EmailField(required=False, allow_blank=True)
+    password = CharField(style={'input_type': 'password'})
 
     def authenticate(self, **kwargs):
         return authenticate(self.context['request'], **kwargs)
 
-    def _validate_email(self, email, password):
-        user = None
-
-        if email and password:
-            user = self.authenticate(email=email, password=password)
-        else:
-            msg = _('Must include "email" and "password".')
-            raise exceptions.ValidationError(msg)
-
-        return user
-
-    def _validate_username(self, username, password):
-        user = None
-
-        if username and password:
-            user = self.authenticate(username=username, password=password)
-        else:
-            msg = _('Must include "username" and "password".')
-            raise exceptions.ValidationError(msg)
-
-        return user
-
     def _validate_username_email(self, username, email, password):
         user = None
-
         if email and password:
-            user = self.authenticate(email=email, password=password)
+            # Get User object with email
+            user_obj=User.objects.get(email=email) 
+            #Get access to username via the User object
+            user = self.authenticate(username=user_obj.username, password=password)
         elif username and password:
             user = self.authenticate(username=username, password=password)
         else:
             msg = _('Must include either "username" or "email" and "password".')
             raise exceptions.ValidationError(msg)
-
         return user
 
     def validate(self, attrs):
         username = attrs.get('username')
         email = attrs.get('email')
         password = attrs.get('password')
-
         user = None
-
         if 'allauth' in settings.INSTALLED_APPS:
-            from allauth.account import app_settings
-
-            # Authentication through email
-            if app_settings.AUTHENTICATION_METHOD == app_settings.AuthenticationMethod.EMAIL:
-                user = self._validate_email(email, password)
-
-            # Authentication through username
-            elif app_settings.AUTHENTICATION_METHOD == app_settings.AuthenticationMethod.USERNAME:
-                user = self._validate_username(username, password)
-
-            # Authentication through either username or email
-            else:
-                user = self._validate_username_email(username, email, password)
-
+            # those if-elif loop doesn't work, it focuses only on (username and password) everytime
+            # authenticate if (email and password) or (username and password)
+            user = self._validate_username_email(username, email, password)
         else:
             # Authentication without using allauth
             if email:
@@ -88,10 +54,8 @@ class LoginSerializer(serializers.Serializer):
                     username = UserModel.objects.get(email__iexact=email).get_username()
                 except UserModel.DoesNotExist:
                     pass
-
             if username:
                 user = self._validate_username_email(username, '', password)
-
         # Did we get back an active user?
         if user:
             if not user.is_active:
@@ -100,7 +64,6 @@ class LoginSerializer(serializers.Serializer):
         else:
             msg = _('Unable to log in with provided credentials.')
             raise exceptions.ValidationError(msg)
-
         # If required, is the email verified?
         if 'rest_auth.registration' in settings.INSTALLED_APPS:
             from allauth.account import app_settings
@@ -108,7 +71,6 @@ class LoginSerializer(serializers.Serializer):
                 email_address = user.emailaddress_set.get(email=user.email)
                 if not email_address.verified:
                     raise serializers.ValidationError(_('E-mail is not verified.'))
-
         attrs['user'] = user
         return attrs
 
