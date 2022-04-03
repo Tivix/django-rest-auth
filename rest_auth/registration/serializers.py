@@ -58,7 +58,7 @@ class SocialLoginSerializer(serializers.Serializer):
         social_login.token = token
         return social_login
 
-    def validate(self, attrs):
+    def validate(self, attrs):  # noqa: C901
         view = self.context.get('view')
         request = self._get_request()
 

@@ -1,23 +1,3 @@
-import os
-import sys
-
-PROJECT_ROOT = os.path.abspath(os.path.split(os.path.split(__file__)[0])[0])
-
-ROOT_URLCONF = 'urls'
-STATIC_URL = '/static/'
-STATIC_ROOT = '%s/staticserve' % PROJECT_ROOT
-STATICFILES_DIRS = (
-    ('global', '%s/static' % PROJECT_ROOT),
-)
-UPLOADS_DIR_NAME = 'uploads'
-MEDIA_URL = '/%s/' % UPLOADS_DIR_NAME
-MEDIA_ROOT = os.path.join(PROJECT_ROOT, '%s' % UPLOADS_DIR_NAME)
-
-IS_DEV = False
-IS_STAGING = False
-IS_PROD = False
-IS_TEST = 'test' in sys.argv or 'test_coverage' in sys.argv
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -33,31 +13,22 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware'
 ]
 
-# Adding for backwards compatibility for Django 1.8 tests
-MIDDLEWARE_CLASSES = MIDDLEWARE
-
-TEMPLATE_CONTEXT_PROCESSORS = [
-    'django.contrib.auth.context_processors.auth',
-    'django.core.context_processors.debug',
-    'django.core.context_processors.media',
-    'django.core.context_processors.request',
-    'django.contrib.messages.context_processors.messages',
-    'django.core.context_processors.static',
-
-    "allauth.account.context_processors.account",
-    "allauth.socialaccount.context_processors.socialaccount",
-]
-
-# avoid deprecation warnings during tests
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [
-            # insert your TEMPLATE_DIRS here
-        ],
         'APP_DIRS': True,
         'OPTIONS': {
-            'context_processors': TEMPLATE_CONTEXT_PROCESSORS,
+            'context_processors': [
+                'django.contrib.auth.context_processors.auth',
+                'django.core.context_processors.debug',
+                'django.core.context_processors.media',
+                'django.core.context_processors.request',
+                'django.contrib.messages.context_processors.messages',
+                'django.core.context_processors.static',
+
+                "allauth.account.context_processors.account",
+                "allauth.socialaccount.context_processors.socialaccount",
+            ],
         },
     },
 ]
@@ -75,6 +46,7 @@ INSTALLED_APPS = [
     'django.contrib.humanize',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
+    'django.contrib.messages',
     'django.contrib.sites',
     'django.contrib.sitemaps',
     'django.contrib.staticfiles',

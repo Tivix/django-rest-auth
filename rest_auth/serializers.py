@@ -59,7 +59,7 @@ class LoginSerializer(serializers.Serializer):
 
         return user
 
-    def validate(self, attrs):
+    def validate(self, attrs):  # noqa: C901
         username = attrs.get('username')
         email = attrs.get('email')
         password = attrs.get('password')

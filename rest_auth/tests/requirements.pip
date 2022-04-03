@@ -1,5 +1,0 @@
-django-allauth>=0.25.0
-responses>=0.3.0
-flake8==2.4.0
-djangorestframework-jwt>=1.7.2
-djangorestframework>=3.6.4
