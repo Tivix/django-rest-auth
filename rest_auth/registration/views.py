@@ -8,7 +8,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import (AllowAny,
                                         IsAuthenticated)
 from rest_framework.generics import CreateAPIView, ListAPIView, GenericAPIView
-from rest_framework.exceptions import NotFound
+from rest_framework.exceptions import NotFound, MethodNotAllowed
 from rest_framework import status
 
 from allauth.account.adapter import get_adapter
@@ -85,6 +85,9 @@ class RegisterView(CreateAPIView):
 class VerifyEmailView(APIView, ConfirmEmailView):
     permission_classes = (AllowAny,)
     allowed_methods = ('POST', 'OPTIONS', 'HEAD')
+
+    def get(self, *args, **kwargs):
+        raise MethodNotAllowed('GET')
 
     def get_serializer(self, *args, **kwargs):
         return VerifyEmailSerializer(*args, **kwargs)
