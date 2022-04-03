@@ -35,3 +35,7 @@ https://github.com/Tivix/django-rest-auth
 Stack Overflow
 -----------
 http://stackoverflow.com/questions/tagged/django-rest-auth
+
+Custom translations
+
+This fork was made due to the demand of custom translations.
