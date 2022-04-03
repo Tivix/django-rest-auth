@@ -142,6 +142,9 @@ class SocialLoginSerializer(serializers.Serializer):
             login.lookup()
             login.save(request, connect=True)
 
+        if not login.user.is_active:
+            raise serializers.ValidationError(_('User account is disabled.'))
+
         attrs['user'] = login.account.user
 
         return attrs
