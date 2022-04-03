@@ -10,7 +10,7 @@ Do these steps to make it running (ideally in virtualenv).
     cd /tmp
     git clone https://github.com/Tivix/django-rest-auth.git
     cd django-rest-auth/demo/
-    pip install -r requirements.pip
+    pip install -r requirements.txt
     python manage.py migrate --settings=demo.settings --noinput
     python manage.py runserver --settings=demo.settings
 
