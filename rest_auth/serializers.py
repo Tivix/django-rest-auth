@@ -9,6 +9,8 @@ from django.utils.encoding import force_text
 from rest_framework import serializers, exceptions
 from rest_framework.exceptions import ValidationError
 
+from allauth.account.utils import send_email_confirmation
+
 from .models import TokenModel
 from .utils import import_callable
 
@@ -64,6 +66,7 @@ class LoginSerializer(serializers.Serializer):
         email = attrs.get('email')
         password = attrs.get('password')
 
+
         user = None
 
         if 'allauth' in settings.INSTALLED_APPS:
@@ -107,6 +110,12 @@ class LoginSerializer(serializers.Serializer):
             if app_settings.EMAIL_VERIFICATION == app_settings.EmailVerificationMethod.MANDATORY:
                 email_address = user.emailaddress_set.get(email=user.email)
                 if not email_address.verified:
+                    # send email confirmation mail for mandatory verification settings
+                    request = self.context.get("request")
+                    # above `request` is DRF's Request class wrapper on Django's HttpRequest
+                    django_http_request = getattr(request, "_request", None)
+                    if django_http_request:
+                        send_email_confirmation(django_http_request, user)
                     raise serializers.ValidationError(_('E-mail is not verified.'))
 
         attrs['user'] = user
