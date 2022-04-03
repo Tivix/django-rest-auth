@@ -205,6 +205,21 @@ class APIBasicTests(TestsMixin, TestCase):
         # bring back allauth
         settings.INSTALLED_APPS.append('allauth')
 
+    @override_settings(REST_USE_TOKEN=False)
+    def test_login_api_return_user_information(self):
+            get_user_model().objects.create_user(
+                username=self.USERNAME, password=self.PASS,
+            )
+
+            payload = {
+                'username': self.USERNAME,
+                'password': self.PASS
+            }
+            self.post(self.login_url, data=payload, status_code=200)
+
+            self.assertEqual(self.response.json['username'], self.USERNAME)
+            self.assertEqual(self.response.json['last_name'], "")
+
     def test_password_change(self):
         login_payload = {
             "username": self.USERNAME,
@@ -431,6 +446,18 @@ class APIBasicTests(TestsMixin, TestCase):
         self.assertIn('token', result.data)
         self.assertEqual(get_user_model().objects.all().count(), user_count + 1)
 
+        self._login()
+        self._logout()
+
+    @override_settings(REST_USE_TOKEN=False)
+    def test_registration_without_token(self):
+        user_count = get_user_model().objects.all().count()
+
+        self.post(self.register_url, data=self.REGISTRATION_DATA_WITH_EMAIL, status_code=201)
+        self.assertEqual(self.response.json['username'], self.USERNAME)
+        self.assertEqual(self.response.json['email'], self.EMAIL)
+
+        self.assertEqual(get_user_model().objects.all().count(), user_count + 1)
         self._login()
         self._logout()
 
