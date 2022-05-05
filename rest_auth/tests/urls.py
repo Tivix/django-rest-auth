@@ -1,4 +1,4 @@
-from django.conf.urls import url, include
+from django.urls import path, re_path, include
 from django.views.generic import TemplateView
 from . import django_urls
 
@@ -53,20 +53,20 @@ class TwitterLoginNoAdapter(SocialLoginView):
 
 
 urlpatterns += [
-    url(r'^rest-registration/', include('rest_auth.registration.urls')),
-    url(r'^test-admin/', include(django_urls)),
-    url(r'^account-email-verification-sent/$', TemplateView.as_view(),
+    path('rest-registration/', include('rest_auth.registration.urls')),
+    path('test-admin/', include(django_urls)),
+    re_path(r'^account-email-verification-sent/$', TemplateView.as_view(),
         name='account_email_verification_sent'),
-    url(r'^account-confirm-email/(?P<key>[-:\w]+)/$', TemplateView.as_view(),
+    re_path(r'^account-confirm-email/(?P<key>[-:\w]+)/$', TemplateView.as_view(),
         name='account_confirm_email'),
-    url(r'^social-login/facebook/$', FacebookLogin.as_view(), name='fb_login'),
-    url(r'^social-login/twitter/$', TwitterLogin.as_view(), name='tw_login'),
-    url(r'^social-login/twitter-no-view/$', twitter_login_view, name='tw_login_no_view'),
-    url(r'^social-login/twitter-no-adapter/$', TwitterLoginNoAdapter.as_view(), name='tw_login_no_adapter'),
-    url(r'^social-login/facebook/connect/$', FacebookConnect.as_view(), name='fb_connect'),
-    url(r'^social-login/twitter/connect/$', TwitterConnect.as_view(), name='tw_connect'),
-    url(r'^socialaccounts/$', SocialAccountListView.as_view(), name='social_account_list'),
-    url(r'^socialaccounts/(?P<pk>\d+)/disconnect/$', SocialAccountDisconnectView.as_view(),
+    re_path(r'^social-login/facebook/$', FacebookLogin.as_view(), name='fb_login'),
+    re_path(r'^social-login/twitter/$', TwitterLogin.as_view(), name='tw_login'),
+    re_path(r'^social-login/twitter-no-view/$', twitter_login_view, name='tw_login_no_view'),
+    re_path(r'^social-login/twitter-no-adapter/$', TwitterLoginNoAdapter.as_view(), name='tw_login_no_adapter'),
+    re_path(r'^social-login/facebook/connect/$', FacebookConnect.as_view(), name='fb_connect'),
+    re_path(r'^social-login/twitter/connect/$', TwitterConnect.as_view(), name='tw_connect'),
+    re_path(r'^socialaccounts/$', SocialAccountListView.as_view(), name='social_account_list'),
+    re_path(r'^socialaccounts/(?P<pk>\d+)/disconnect/$', SocialAccountDisconnectView.as_view(),
         name='social_account_disconnect'),
-    url(r'^accounts/', include('allauth.socialaccount.urls'))
+    path('accounts/', include('allauth.socialaccount.urls'))
 ]
