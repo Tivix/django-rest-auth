@@ -2,7 +2,7 @@ from django.test import TestCase, override_settings
 from django.contrib.auth import get_user_model
 from django.core import mail
 from django.conf import settings
-from django.utils.encoding import force_text
+from django.utils.encoding import  force_str 
 
 from allauth.account import app_settings as account_app_settings
 from rest_framework import status
