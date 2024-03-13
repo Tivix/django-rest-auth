@@ -2,7 +2,7 @@ import json
 
 from django.conf import settings
 from django.test.client import Client, MULTIPART_CONTENT
-from django.utils.encoding import force_text
+from django.utils.encoding import  force_str 
 
 from rest_framework import status
 from rest_framework import permissions
